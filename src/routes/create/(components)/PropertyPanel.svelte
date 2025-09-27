@@ -1,50 +1,25 @@
 <script lang="ts">
-	import type { ResumeElement } from '$lib/types/resume';
+	import { fontFamilies, fontSizes } from '$lib/const/font';
+	import { appStore } from '$lib/stores/appStore.svelte.ts';
 
-	interface PropertyPanelProps {
-		element: ResumeElement | null;
-		updateElementProperties: (params: {
-			elementId: string;
-			properties: Record<string, string | number | boolean | undefined>;
-			pageId: string;
-		}) => void;
-		deleteElement: (element: ResumeElement) => void;
-	}
-
-	let {
-		element = $bindable(),
-		updateElementProperties,
-		deleteElement
-	}: PropertyPanelProps = $props();
-
-	const fontFamilies = [
-		'Inter',
-		'Arial',
-		'Helvetica',
-		'Times New Roman',
-		'Georgia',
-		'Verdana',
-		'Courier New'
-	];
-
-	const fontSizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+	let selectedElement = $derived(appStore.getSelectedElement());
 
 	function handlePropertyChange(property: string, value: any) {
-		if (!element) return;
+		if (!selectedElement) return;
 
-		updateElementProperties({
-			elementId: element.id,
-			properties: { [property]: value },
-			pageId: element.pageId
+		appStore.updateElement({
+			elementId: selectedElement.id,
+			updates: { [property]: value },
+			pageId: selectedElement.pageId
 		});
 	}
 </script>
 
 <div class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4">
-	{#if element}
+	{#if selectedElement}
 		<div class="space-y-4">
 			<h3 class="mb-4 text-lg font-semibold text-gray-800">
-				{element.type.charAt(0).toUpperCase() + element.type.slice(1)} Properties
+				{selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)} Properties
 			</h3>
 
 			<!-- Position and Size -->
@@ -55,7 +30,7 @@
 						<span class="block text-sm text-gray-600">X</span>
 						<input
 							type="number"
-							bind:value={element.x}
+							value={selectedElement.x}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('x', parseInt(e.currentTarget.value))}
 						/>
@@ -64,7 +39,7 @@
 						<span class="block text-sm text-gray-600">Y</span>
 						<input
 							type="number"
-							bind:value={element.y}
+							value={selectedElement.y}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('y', parseInt(e.currentTarget.value))}
 						/>
@@ -73,7 +48,7 @@
 						<span class="block text-sm text-gray-600">Width</span>
 						<input
 							type="number"
-							bind:value={element.width}
+							value={selectedElement.width}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('width', parseInt(e.currentTarget.value))}
 						/>
@@ -82,7 +57,7 @@
 						<span class="block text-sm text-gray-600">Height</span>
 						<input
 							type="number"
-							bind:value={element.height}
+							value={selectedElement.height}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('height', parseInt(e.currentTarget.value))}
 						/>
@@ -91,22 +66,25 @@
 			</div>
 
 			<!-- Text Properties -->
-			{#if element.type === 'text'}
+			{#if selectedElement.type === 'text'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-gray-700">Text Properties</h4>
-					<div>
+
+					<!-- For now there's no point showing the text field here again since it's editable directly in the element. -->
+					<!-- <div>
 						<span class="block text-sm text-gray-600">Text</span>
 						<textarea
-							value={element.properties.text}
+							value={selectedElement.text}
 							class="w-full resize-none rounded border px-2 py-1 text-sm"
 							rows="3"
 							onchange={(e) => handlePropertyChange('text', e.currentTarget.value)}
 						></textarea>
-					</div>
+					</div> -->
+
 					<div>
 						<span class="block text-sm text-gray-600">Font Family</span>
 						<select
-							value={element.properties.fontFamily}
+							value={selectedElement.fontFamily}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontFamily', e.currentTarget.value)}
 						>
@@ -118,7 +96,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Size</span>
 						<select
-							value={element.properties.fontSize}
+							value={selectedElement.fontSize}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontSize', parseInt(e.currentTarget.value))}
 						>
@@ -130,7 +108,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Weight</span>
 						<select
-							value={element.properties.fontWeight}
+							value={selectedElement.fontWeight}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontWeight', e.currentTarget.value)}
 						>
@@ -141,7 +119,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Style</span>
 						<select
-							value={element.properties.fontStyle}
+							value={selectedElement.fontStyle}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontStyle', e.currentTarget.value)}
 						>
@@ -153,7 +131,7 @@
 						<span class="block text-sm text-gray-600">Color</span>
 						<input
 							type="color"
-							value={element.properties.color}
+							value={selectedElement.color}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('color', e.currentTarget.value)}
 						/>
@@ -162,13 +140,13 @@
 			{/if}
 
 			<!-- Shape Properties -->
-			{#if element.type === 'shape'}
+			{#if selectedElement.type === 'shape'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-gray-700">Shape Properties</h4>
 					<div>
 						<span class="block text-sm text-gray-600">Shape Type</span>
 						<select
-							value={element.properties.shapeType}
+							value={selectedElement.shapeType}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('shapeType', e.currentTarget.value)}
 						>
@@ -180,7 +158,7 @@
 						<span class="block text-sm text-gray-600">Stroke Color</span>
 						<input
 							type="color"
-							value={element.properties.strokeColor}
+							value={selectedElement.strokeColor}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('strokeColor', e.currentTarget.value)}
 						/>
@@ -191,24 +169,24 @@
 							type="range"
 							min="1"
 							max="10"
-							value={element.properties.strokeWidth}
+							value={selectedElement.strokeWidth}
 							class="w-full"
 							onchange={(e) => handlePropertyChange('strokeWidth', parseInt(e.currentTarget.value))}
 						/>
-						<span class="text-sm text-gray-600">{element.properties.strokeWidth}px</span>
+						<span class="text-sm text-gray-600">{selectedElement.strokeWidth}px</span>
 					</div>
 				</div>
 			{/if}
 
 			<!-- Image Properties -->
-			{#if element.type === 'image'}
+			{#if selectedElement.type === 'image'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-gray-700">Image Properties</h4>
 					<div>
 						<span class="block text-sm text-gray-600">Image URL</span>
 						<input
 							type="url"
-							value={element.properties.src}
+							value={selectedElement.src}
 							class="w-full rounded border px-2 py-1 text-sm"
 							placeholder="https://example.com/image.jpg"
 							onchange={(e) => handlePropertyChange('src', e.currentTarget.value)}
@@ -218,7 +196,7 @@
 						<span class="block text-sm text-gray-600">Alt Text</span>
 						<input
 							type="text"
-							value={element.properties.alt}
+							value={selectedElement.alt}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('alt', e.currentTarget.value)}
 						/>
@@ -229,7 +207,7 @@
 			<!-- Delete Button -->
 			<div class="border-t pt-4">
 				<button
-					onclick={() => deleteElement(element)}
+					onclick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}
 					class="w-full rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
 				>
 					Delete Element

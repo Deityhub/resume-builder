@@ -4,46 +4,47 @@ export type ResizeDirection = 'nw' | 'ne' | 'sw' | 'se';
 interface BaseElement {
 	id: string;
 	type: ElementType;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	selected?: boolean;
 	pageId: string;
 }
 
 export interface TextElement extends BaseElement {
 	type: 'text';
-	properties: {
-		text: string;
-		fontFamily: string;
-		fontSize: number;
-		fontWeight: string;
-		fontStyle: string;
-		color: string;
-	};
+	text: string;
+	fontFamily: string;
+	fontSize: number;
+	fontWeight: string;
+	fontStyle: string;
+	color: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 export interface ShapeElement extends BaseElement {
 	type: 'shape';
-	properties: {
-		shapeType: string;
-		strokeColor: string;
-		strokeWidth: number;
-	};
+	shapeType: string;
+	strokeColor: string;
+	strokeWidth: number;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 export interface ImageElement extends BaseElement {
 	type: 'image';
-	properties: {
-		src: string;
-		alt: string;
-	};
+	src: string;
+	alt: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 export type ResumeElement = TextElement | ShapeElement | ImageElement;
 
 export interface ResumePage {
 	id: string;
-	elements: ResumeElement[];
+	elements: Record<string, ResumeElement>;
 }

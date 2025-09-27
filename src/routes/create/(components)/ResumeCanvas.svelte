@@ -2,18 +2,12 @@
 	import Button from '$lib/components/Button.svelte';
 	import ResumeElementComponent from './ResumeElement.svelte';
 	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
+	import { appStore } from '$lib/stores/appStore.svelte.ts';
+
+	let selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
 		page: ResumePage;
-		selectedElement: ResumeElement | null;
-		selectElement: (element: ResumeElement | null) => void;
-		updateElement: (params: {
-			elementId: string;
-			updates: Partial<ResumeElement>;
-			pageId: string;
-		}) => void;
-		deleteElement: (element: ResumeElement) => void;
-		deletePage: (pageId: string) => void;
 		showDeleteButton: boolean;
 		width: number;
 		height: number;
@@ -23,11 +17,6 @@
 
 	let {
 		page,
-		selectedElement,
-		selectElement,
-		updateElement,
-		deleteElement,
-		deletePage,
 		showDeleteButton = false,
 		width,
 		height,
@@ -46,7 +35,7 @@
 
 	function handleCanvasClick(event: MouseEvent) {
 		if (event.target === canvasRef) {
-			selectElement(null);
+			appStore.selectElement(null);
 		}
 	}
 
@@ -59,7 +48,7 @@
 			const deltaX = (event.clientX - dragStart.x) * scaleX;
 			const deltaY = (event.clientY - dragStart.y) * scaleY;
 
-			updateElement({
+			appStore.updateElement({
 				elementId: element.id,
 				updates: {
 					x: Math.max(0, Math.min(width - element.width, element.x + deltaX)),
@@ -118,7 +107,7 @@
 					break;
 			}
 
-			updateElement({
+			appStore.updateElement({
 				elementId: element.id,
 				updates: {
 					x: newX,
@@ -154,12 +143,12 @@
 	ondrop={onDrop}
 >
 	<!-- Delete Page Button -->
-	{#if showDeleteButton && deletePage}
+	{#if showDeleteButton}
 		<Button
 			variant="destructive"
 			onClick={(e) => {
 				e.stopPropagation();
-				deletePage(page.id);
+				appStore.deletePage(page.id);
 			}}
 			className="absolute top-2 right-2 z-20"
 		>
@@ -175,7 +164,7 @@
 	{/if}
 
 	<!-- Render all elements -->
-	{#each page.elements as element (element.id)}
+	{#each Object.values(page.elements) as element (element.id)}
 		{@const isSelected = selectedElement?.id === element.id}
 		<div
 			role="button"
@@ -202,15 +191,13 @@
 			<ResumeElementComponent
 				{element}
 				{isSelected}
-				onSelect={() => selectElement(element)}
-				onDelete={() => deleteElement(element)}
 				onResize={(event, direction) => handleElementResize(event, element, direction)}
 			/>
 		</div>
 	{/each}
 
 	<!-- Selection outline for empty canvas -->
-	{#if !selectedElement && page.elements.length === 0}
+	{#if !selectedElement && Object.values(page.elements).length === 0}
 		<div
 			class="absolute inset-4 flex items-center justify-center border-2 border-dashed border-gray-300 text-gray-400"
 		>
