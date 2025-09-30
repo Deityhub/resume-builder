@@ -8,6 +8,7 @@ export function getDefaultProperties({
 	pageId,
 	width = CANVAS_WIDTH - 200, // Default to canvas width minus margins
 	height = 500,
+	zIndex = 0,
 }: {
 	type: ElementType;
 	x: number;
@@ -15,11 +16,13 @@ export function getDefaultProperties({
 	pageId: string;
 	width?: number;
 	height?: number;
+	zIndex?: number;
 }): ResumeElement {
 	const baseElement = {
-		id: `element-${Date.now()}`,
-		selected: true,
+		id: crypto.randomUUID(),
 		pageId,
+		zIndex,
+		elements: {},
 		x,
 		y,
 		width,
