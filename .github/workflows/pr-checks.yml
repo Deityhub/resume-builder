@@ -29,15 +29,15 @@ jobs:
         uses: codelytv/pr-size-labeler@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          xs_label: "size/xs"
+          xs_label: 'size/xs'
           xs_max_size: 10
-          s_label: "size/s"
+          s_label: 'size/s'
           s_max_size: 100
-          m_label: "size/m"
+          m_label: 'size/m'
           m_max_size: 500
-          l_label: "size/l"
+          l_label: 'size/l'
           l_max_size: 1000
-          xl_label: "size/xl"
+          xl_label: 'size/xl'
           fail_if_xl: false
 
   comment-coverage:
@@ -56,11 +56,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
       - name: Run tests with coverage
         run: yarn test:unit --run --coverage
