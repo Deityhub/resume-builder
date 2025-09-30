@@ -31,7 +31,7 @@
 	class:border-blue-300={isDragging}
 >
 	<div class="space-y-2" data-testid="toolbar">
-		{#each tools as tool}
+		{#each tools as tool (tool.type)}
 			<div
 				data-testid="tool-{tool.type}"
 				draggable="true"

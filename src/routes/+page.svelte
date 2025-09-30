@@ -1,7 +1,7 @@
 <script>
-    import Button from '$lib/components/Button.svelte';
-    import Tooltip from '$lib/components/Tooltip.svelte';
-    const comingSoon = 'Templates feature is coming soon';
+	import Button from '$lib/components/Button.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
+	const comingSoon = 'Templates feature is coming soon';
 </script>
 
 <div class="flex min-h-screen flex-col justify-between p-6 text-center">

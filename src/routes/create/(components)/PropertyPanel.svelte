@@ -2,9 +2,9 @@
 	import { fontFamilies, fontSizes } from '$lib/const/font';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 
-	let selectedElement = $derived(appStore.getSelectedElement());
+	const selectedElement = $derived(appStore.getSelectedElement());
 
-	function handlePropertyChange(property: string, value: any) {
+	function handlePropertyChange(property: string, value: string | number) {
 		if (!selectedElement) return;
 
 		appStore.updateElement({
@@ -15,7 +15,10 @@
 	}
 </script>
 
-<div class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4" data-testid="property-panel">
+<div
+	class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4"
+	data-testid="property-panel"
+>
 	{#if selectedElement}
 		<div class="space-y-4">
 			<h3 class="mb-4 text-lg font-semibold text-gray-800" data-testid="property-panel-title">
@@ -93,7 +96,7 @@
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontFamily', e.currentTarget.value)}
 						>
-							{#each fontFamilies as font}
+							{#each fontFamilies as font (font)}
 								<option value={font}>{font}</option>
 							{/each}
 						</select>
@@ -106,7 +109,7 @@
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontSize', parseInt(e.currentTarget.value))}
 						>
-							{#each fontSizes as size}
+							{#each fontSizes as size (size)}
 								<option value={size}>{size}px</option>
 							{/each}
 						</select>
@@ -230,6 +233,8 @@
 			</div>
 		</div>
 	{:else}
-		<div class="py-8 text-center text-gray-400" data-testid="no-selection-message">Select an element to edit its properties</div>
+		<div class="py-8 text-center text-gray-400" data-testid="no-selection-message">
+			Select an element to edit its properties
+		</div>
 	{/if}
 </div>

@@ -48,8 +48,9 @@
 
 		<h2 class="mt-8 mb-4 text-2xl font-semibold text-gray-800">Get Started</h2>
 		<p class="mb-6">
-			Ready to create your professional resume?{' '}
-			<Button href="/create" variant="text" noPadding>Get started now</Button>
+			Ready to create your professional resume? <Button href="/create" variant="text" noPadding
+				>Get started now</Button
+			>
 		</p>
 	</div>
 </div>

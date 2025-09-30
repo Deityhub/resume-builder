@@ -8,7 +8,7 @@ jobs:
   pr-info:
     name: PR Information
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: PR Details
         run: |
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    
+
     steps:
       - name: Add size label
         uses: codelytv/pr-size-labeler@v1
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

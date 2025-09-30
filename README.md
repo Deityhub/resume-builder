@@ -5,6 +5,7 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 ## 🚀 Features
 
 ### Core Features
+
 - **Drag-and-Drop Interface**: Intuitive canvas-based resume creation with real-time preview
 - **Multiple Element Types**: Text, shapes, and images with full customization
 - **Real-time Editing**: Live preview with instant updates and inline text editing
@@ -13,12 +14,12 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 - **UUID-based IDs**: Cryptographically secure unique identifiers for all elements
 
 ### Advanced Canvas Tools
-- **Professional Ruler System**: 
+
+- **Professional Ruler System**:
   - Horizontal and vertical rulers with tick marks (major, minor, tiny)
   - Draggable triangle markers for boundary adjustment
   - Google Docs/Word-style design
   - Real-time boundary visualization
-  
 - **Smart Element Positioning**:
   - Snap-to-grid with 10px threshold
   - Boundary enforcement (elements stay within defined areas)
@@ -32,29 +33,30 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
   - Visual feedback with hover states
 
 ### Element Management
-- **Text Elements**: 
+
+- **Text Elements**:
   - Inline contenteditable text
   - Font family, size, weight, and style customization
   - Color picker
   - Full typography control
 
-- **Shape Elements**: 
+- **Shape Elements**:
   - Horizontal and vertical lines
   - Customizable stroke color and width
   - Perfect for dividers and visual organization
 
-- **Image Elements**: 
+- **Image Elements**:
   - URL-based image loading
   - Alt text support
   - Responsive sizing
 
 ### Visual Feedback System
+
 - **Element Highlighting**:
   - Blue ring: Selected element
   - Yellow ring: Elements underneath (overlapping)
   - Green ring: Element being hovered during drag
   - Purple dashed outline: Drag preview
-  
 - **Drag Operations**:
   - Real-time drag preview
   - ESC key to cancel drag
@@ -62,6 +64,7 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
   - Parent detection and highlighting
 
 ### Property Panel
+
 - **Position & Size**: Precise X, Y, width, height controls
 - **Typography**: Font family, size, weight, style, color
 - **Shape Properties**: Type, stroke color, stroke width
@@ -89,17 +92,20 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/resume-builder.git
    cd resume-builder
    ```
 
 2. **Install dependencies**
+
    ```bash
    yarn install
    ```
 
 3. **Start development server**
+
    ```bash
    yarn dev
    ```
@@ -153,7 +159,9 @@ src/
 ## 🎨 Key Components
 
 ### ResumeCanvas
+
 The main canvas component that handles:
+
 - Element rendering with zIndex sorting
 - Drag-and-drop with real-time preview
 - Boundary enforcement and snapping
@@ -162,7 +170,9 @@ The main canvas component that handles:
 - Nested element flattening for display
 
 ### Ruler System
+
 Professional boundary controls featuring:
+
 - Horizontal and vertical rulers (Google Docs style)
 - Draggable triangle markers (blue for start, red for end)
 - Three-tier tick marks:
@@ -173,7 +183,9 @@ Professional boundary controls featuring:
 - Coordinate scaling for accurate positioning
 
 ### Property Panel
+
 Comprehensive styling interface for:
+
 - Position and dimensions (X, Y, width, height)
 - Typography (7 font families, 12 font sizes)
 - Font weight (normal, bold) and style (normal, italic)
@@ -182,7 +194,9 @@ Comprehensive styling interface for:
 - Delete functionality
 
 ### Resize Tool
+
 Advanced resize system with:
+
 - **4 Edge Handles**: 60px × 4px bars for width/height
 - **4 Corner Handles**: 12px circles for proportional resize
 - **8 Resize Directions**: n, s, e, w, nw, ne, sw, se
@@ -190,7 +204,9 @@ Advanced resize system with:
 - Boundary-aware resizing
 
 ### Store Architecture
+
 Reactive state management with:
+
 - Svelte 5 runes ($state, $derived, $effect)
 - Nested element structure (Record<string, ResumeElement>)
 - Recursive element operations (find, move, flatten)
@@ -225,6 +241,7 @@ yarn test:e2e        # End-to-end tests
 ### Code Style
 
 This project follows:
+
 - **Prettier** for code formatting
 - **ESLint** for linting
 - **TypeScript** for type safety
@@ -266,11 +283,13 @@ This project follows:
 This project has comprehensive test coverage for all features.
 
 ### Unit Tests
+
 ```bash
 yarn test:unit
 ```
 
 **Test Coverage:**
+
 - ✅ Page Management (create, delete, UUID generation)
 - ✅ Ruler Boundaries (initialization, updates, validation)
 - ✅ Element Management (add, update, delete, UUID generation)
@@ -282,11 +301,13 @@ yarn test:unit
 **Total Unit Tests**: 20+ tests covering all store functionality
 
 ### End-to-End Tests
+
 ```bash
 yarn test:e2e
 ```
 
 **Test Coverage:**
+
 - ✅ Navigation (home, create, about pages)
 - ✅ Page Management (add pages, page counter)
 - ✅ Drag and Drop (text, shape, image elements)
@@ -300,6 +321,7 @@ yarn test:e2e
 **Total E2E Tests**: 14 comprehensive workflow tests
 
 ### Run All Tests
+
 ```bash
 yarn test
 ```

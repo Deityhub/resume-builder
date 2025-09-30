@@ -8,7 +8,8 @@
 		onAnchorChange: (start: number, end: number) => void;
 	}
 
-	let { orientation, size, displaySize, startAnchor, endAnchor, onAnchorChange }: RulerProps = $props();
+	const { orientation, size, displaySize, startAnchor, endAnchor, onAnchorChange }: RulerProps =
+		$props();
 
 	let isDraggingStart = $state(false);
 	let isDraggingEnd = $state(false);
@@ -21,17 +22,24 @@
 
 	// Generate tick marks with different sizes
 	const majorTicks = $derived(
-		Array.from({ length: Math.floor(size / MAJOR_TICK_INTERVAL) + 1 }, (_, i) => i * MAJOR_TICK_INTERVAL)
+		Array.from(
+			{ length: Math.floor(size / MAJOR_TICK_INTERVAL) + 1 },
+			(_, i) => i * MAJOR_TICK_INTERVAL
+		)
 	);
-	
+
 	const minorTicks = $derived(
-		Array.from({ length: Math.floor(size / MINOR_TICK_INTERVAL) + 1 }, (_, i) => i * MINOR_TICK_INTERVAL)
-			.filter(tick => tick % MAJOR_TICK_INTERVAL !== 0)
+		Array.from(
+			{ length: Math.floor(size / MINOR_TICK_INTERVAL) + 1 },
+			(_, i) => i * MINOR_TICK_INTERVAL
+		).filter((tick) => tick % MAJOR_TICK_INTERVAL !== 0)
 	);
-	
+
 	const tinyTicks = $derived(
-		Array.from({ length: Math.floor(size / TINY_TICK_INTERVAL) + 1 }, (_, i) => i * TINY_TICK_INTERVAL)
-			.filter(tick => tick % MINOR_TICK_INTERVAL !== 0)
+		Array.from(
+			{ length: Math.floor(size / TINY_TICK_INTERVAL) + 1 },
+			(_, i) => i * TINY_TICK_INTERVAL
+		).filter((tick) => tick % MINOR_TICK_INTERVAL !== 0)
 	);
 
 	function handleStartAnchorMouseDown(event: MouseEvent) {
@@ -100,7 +108,7 @@
 
 <div
 	bind:this={rulerRef}
-	class="relative bg-gray-100 select-none border-gray-300"
+	class="relative border-gray-300 bg-gray-100 select-none"
 	class:h-full={orientation === 'vertical'}
 	class:w-full={orientation === 'horizontal'}
 	class:border-r={orientation === 'vertical'}
@@ -109,7 +117,7 @@
 	style:height={orientation === 'horizontal' ? `${RULER_SIZE}px` : `${displaySize}px`}
 >
 	<!-- Major tick marks (tallest) -->
-	{#each majorTicks as tick}
+	{#each majorTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
 				class="absolute bottom-0 w-[1px] bg-gray-500"
@@ -126,7 +134,7 @@
 	{/each}
 
 	<!-- Minor tick marks (medium) -->
-	{#each minorTicks as tick}
+	{#each minorTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
 				class="absolute bottom-0 w-[1px] bg-gray-400"
@@ -143,7 +151,7 @@
 	{/each}
 
 	<!-- Tiny tick marks (shortest) -->
-	{#each tinyTicks as tick}
+	{#each tinyTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
 				class="absolute bottom-0 w-[1px] bg-gray-300"

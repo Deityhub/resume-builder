@@ -8,7 +8,7 @@ describe('appStore', () => {
 		// Get the first page ID
 		const pages = appStore.getPages();
 		firstPageId = Object.keys(pages)[0];
-		
+
 		// Clean up any additional pages
 		Object.keys(pages).forEach((pageId) => {
 			if (pageId !== firstPageId) {
@@ -32,9 +32,11 @@ describe('appStore', () => {
 		it('should create page with UUID', () => {
 			const pages = appStore.getPages();
 			const firstPage = Object.values(pages)[0];
-			
+
 			// UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-			expect(firstPage.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+			expect(firstPage.id).toMatch(
+				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+			);
 		});
 
 		it('should add new page', () => {
@@ -46,8 +48,8 @@ describe('appStore', () => {
 		it('should delete page', () => {
 			appStore.addPage();
 			const pages = appStore.getPages();
-			const secondPageId = Object.keys(pages).find(id => id !== firstPageId)!;
-			
+			const secondPageId = Object.keys(pages).find((id) => id !== firstPageId)!;
+
 			appStore.deletePage(secondPageId);
 			const updatedPages = appStore.getPages();
 			expect(Object.keys(updatedPages).length).toBe(1);
@@ -130,7 +132,7 @@ describe('appStore', () => {
 
 			const pages = appStore.getPages();
 			const elements = Object.values(pages[firstPageId].elements);
-			
+
 			expect(elements.length).toBe(1);
 			expect(elements[0].type).toBe('text');
 			expect(elements[0].x).toBe(100);
@@ -149,7 +151,7 @@ describe('appStore', () => {
 
 			const pages = appStore.getPages();
 			const elements = Object.values(pages[firstPageId].elements);
-			
+
 			expect(elements.length).toBe(1);
 			expect(elements[0].type).toBe('shape');
 		});
@@ -166,7 +168,7 @@ describe('appStore', () => {
 
 			const pages = appStore.getPages();
 			const elements = Object.values(pages[firstPageId].elements);
-			
+
 			expect(elements.length).toBe(1);
 			expect(elements[0].type).toBe('image');
 		});
@@ -181,7 +183,7 @@ describe('appStore', () => {
 
 			const pages = appStore.getPages();
 			const element = Object.values(pages[firstPageId].elements)[0];
-			
+
 			expect(element.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 		});
 
@@ -202,7 +204,7 @@ describe('appStore', () => {
 
 			const pages = appStore.getPages();
 			const elements = Object.values(pages[firstPageId].elements);
-			
+
 			expect(elements[0].zIndex).toBe(0);
 			expect(elements[1].zIndex).toBe(1);
 		});

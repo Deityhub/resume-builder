@@ -7,8 +7,11 @@
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
-	let pages = $derived(Object.values(appStore.getPages()));
-	let canvasRefs: Record<string, any> = {};
+	const pages = $derived(Object.values(appStore.getPages()));
+	const canvasRefs: Record<
+		string,
+		{ updateDragPreview?: (event: DragEvent) => void; clearDragPreview?: () => void }
+	> = {};
 
 	function handleDragOver(event: DragEvent, pageId: string) {
 		event.preventDefault();
@@ -55,7 +58,7 @@
 			// Ensure minimum dimensions
 			const MIN_WIDTH = 100;
 			const MIN_HEIGHT = 50;
-			
+
 			if (elementWidth < MIN_WIDTH) {
 				elementWidth = Math.min(MIN_WIDTH, horizontal.end - horizontal.start);
 			}
@@ -112,8 +115,8 @@
 			if (canvasComponent && canvasComponent.clearDragPreview) {
 				canvasComponent.clearDragPreview();
 			}
-		} catch (error) {
-			console.error('Error parsing drag data:', error);
+		} catch (_error) {
+			// Error parsing drag data - silently handle for better UX
 		}
 	}
 </script>
@@ -133,7 +136,9 @@
 				</span>
 			</div>
 
-			<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn">Add Page</Button>
+			<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn"
+				>Add Page</Button
+			>
 		</div>
 
 		<!-- Canvas -->

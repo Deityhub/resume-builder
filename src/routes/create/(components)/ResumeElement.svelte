@@ -5,15 +5,14 @@
 	interface Props {
 		element: ResumeElement;
 		isSelected: boolean;
-		onResize: (e: MouseEvent, direction: ResizeDirection) => void;
+		onResize: (event: MouseEvent, direction: ResizeDirection) => void;
 	}
 
-	let { element, isSelected, onResize }: Props = $props();
+	const { element, isSelected, onResize }: Props = $props();
 
 	// Local reactive state for the text content to enable proper two-way binding
-	let textContent = $state(element.type === 'text' ? element.text : '');
+	let textContent = $state('');
 
-	// Keep local state in sync with the element when it changes externally
 	$effect(() => {
 		if (element.type === 'text') {
 			textContent = element.text;
@@ -22,10 +21,26 @@
 
 	// Edge handles for width and height
 	const edgeHandles: Array<{ direction: ResizeDirection; class: string; style: string }> = [
-		{ direction: 'n', class: 'top-0 left-1/2 -translate-x-1/2 cursor-n-resize', style: 'width: 60px; height: 4px;' },
-		{ direction: 's', class: 'bottom-0 left-1/2 -translate-x-1/2 cursor-s-resize', style: 'width: 60px; height: 4px;' },
-		{ direction: 'e', class: 'right-0 top-1/2 -translate-y-1/2 cursor-e-resize', style: 'width: 4px; height: 60px;' },
-		{ direction: 'w', class: 'left-0 top-1/2 -translate-y-1/2 cursor-w-resize', style: 'width: 4px; height: 60px;' }
+		{
+			direction: 'n',
+			class: 'top-0 left-1/2 -translate-x-1/2 cursor-n-resize',
+			style: 'width: 60px; height: 4px;'
+		},
+		{
+			direction: 's',
+			class: 'bottom-0 left-1/2 -translate-x-1/2 cursor-s-resize',
+			style: 'width: 60px; height: 4px;'
+		},
+		{
+			direction: 'e',
+			class: 'right-0 top-1/2 -translate-y-1/2 cursor-e-resize',
+			style: 'width: 4px; height: 60px;'
+		},
+		{
+			direction: 'w',
+			class: 'left-0 top-1/2 -translate-y-1/2 cursor-w-resize',
+			style: 'width: 4px; height: 60px;'
+		}
 	];
 
 	// Corner handles for proportional resize
@@ -94,9 +109,9 @@
 	<!-- Resize handles (only show when selected) -->
 	{#if isSelected}
 		<!-- Edge handles for width/height resize -->
-		{#each edgeHandles as handle}
+		{#each edgeHandles as handle (handle.direction)}
 			<div
-				class="absolute bg-blue-500 hover:bg-blue-600 transition-colors {handle.class}"
+				class="absolute bg-blue-500 transition-colors hover:bg-blue-600 {handle.class}"
 				style={handle.style}
 				onmousedown={(e) => {
 					e.stopPropagation();
@@ -109,9 +124,9 @@
 		{/each}
 
 		<!-- Corner handles for proportional resize -->
-		{#each cornerHandles as handle}
+		{#each cornerHandles as handle (handle.direction)}
 			<div
-				class="absolute h-3 w-3 rounded-full border-2 border-white bg-blue-500 hover:bg-blue-600 transition-colors shadow-md {handle.class}"
+				class="absolute h-3 w-3 rounded-full border-2 border-white bg-blue-500 shadow-md transition-colors hover:bg-blue-600 {handle.class}"
 				onmousedown={(e) => {
 					e.stopPropagation();
 					onResize(e, handle.direction);

@@ -9,14 +9,17 @@ To enable these rules, go to: **Settings → Branches → Add rule**
 ### Required Settings for `main` branch:
 
 #### 1. Require a pull request before merging
+
 - ✅ **Require approvals**: 1 (or more for team projects)
 - ✅ **Dismiss stale pull request approvals when new commits are pushed**
 - ✅ **Require review from Code Owners** (optional)
 
 #### 2. Require status checks to pass before merging
+
 - ✅ **Require branches to be up to date before merging**
 
 **Required status checks:**
+
 - `Lint & Format Check`
 - `Type Check`
 - `Unit Tests`
@@ -25,22 +28,28 @@ To enable these rules, go to: **Settings → Branches → Add rule**
 - `All Checks Passed`
 
 #### 3. Require conversation resolution before merging
+
 - ✅ **Require conversation resolution before merging**
 
 #### 4. Require linear history (optional)
+
 - ✅ **Require linear history** (prevents merge commits)
 
 #### 5. Do not allow bypassing the above settings
+
 - ✅ **Do not allow bypassing the above settings**
 - ⚠️ **Include administrators** (recommended for team projects)
 
 #### 6. Restrict who can push to matching branches (optional)
+
 - Configure if you want to restrict direct pushes
 
 #### 7. Allow force pushes
+
 - ❌ **Allow force pushes** (disabled for safety)
 
 #### 8. Allow deletions
+
 - ❌ **Allow deletions** (disabled for safety)
 
 ## Develop Branch Protection (Optional)
@@ -66,6 +75,7 @@ For projects using a `develop` branch, apply similar rules with potentially rela
 The following checks run automatically on every PR:
 
 ### CI Workflow (`ci.yml`)
+
 - **Lint & Format Check**: Ensures code follows style guidelines
 - **Type Check**: Validates TypeScript types
 - **Unit Tests**: Runs all unit tests (22+ tests)
@@ -73,6 +83,7 @@ The following checks run automatically on every PR:
 - **Build Check**: Verifies the project builds successfully
 
 ### PR Checks Workflow (`pr-checks.yml`)
+
 - **PR Information**: Displays PR details
 - **Auto Label**: Automatically labels PRs based on changed files
 - **Size Label**: Labels PR size (xs, s, m, l, xl)

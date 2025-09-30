@@ -28,9 +28,9 @@ Related to #
 
 <!-- List the main changes made in this PR -->
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Screenshots (if applicable)
 
@@ -41,19 +41,22 @@ Related to #
 <!-- Describe the tests you ran and how to reproduce them -->
 
 ### Unit Tests
+
 - [ ] All existing unit tests pass
 - [ ] Added new unit tests for new functionality
 
 ### E2E Tests
+
 - [ ] All existing e2e tests pass
 - [ ] Added new e2e tests for new functionality
 
 ### Manual Testing
+
 <!-- Describe manual testing steps -->
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Checklist
 

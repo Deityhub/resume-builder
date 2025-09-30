@@ -17,7 +17,7 @@
 		'data-testid'?: string;
 	};
 
-	let {
+	const {
 		variant = 'primary',
 		type = 'button',
 		href,
@@ -38,7 +38,8 @@
 		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg',
 		secondary: 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50',
 		destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg',
-		ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-300',
+		ghost:
+			'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-300',
 		text: 'text-indigo-600 hover:text-indigo-800'
 	};
 
@@ -46,9 +47,10 @@
 	const disabledClasses = 'opacity-50 cursor-not-allowed';
 	const widthClass = fullWidth ? 'w-full' : '';
 
-	const spinnerColor = variant === 'primary' || variant === 'destructive' ? 'text-white' : 'text-indigo-600';
+	const spinnerColor =
+		variant === 'primary' || variant === 'destructive' ? 'text-white' : 'text-indigo-600';
 
-	let buttonClasses = $state(
+	const buttonClasses = $state(
 		[
 			baseClasses,
 			variantClasses[variant],
@@ -62,7 +64,7 @@
 			.join(' ')
 	);
 
-	let isDisabled = $derived(disabled || pending);
+	const isDisabled = $derived(disabled || pending);
 
 	function handleClick(event: MouseEvent) {
 		if (isDisabled) {

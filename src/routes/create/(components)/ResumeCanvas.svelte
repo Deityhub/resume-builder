@@ -2,33 +2,32 @@
 	import Button from '$lib/components/Button.svelte';
 	import ResumeElementComponent from './ResumeElement.svelte';
 	import Ruler from './Ruler.svelte';
-	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
-
-	let selectedElement = $derived(appStore.getSelectedElement());
+	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
+	const selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
 		page: ResumePage;
-		showDeleteButton: boolean;
+		showDeleteButton?: boolean;
 		width: number;
 		height: number;
-		onDragover: (event: DragEvent) => void;
-		onDrop: (event: DragEvent) => void;
+		onDragover?: (event: DragEvent) => void;
+		onDrop?: (event: DragEvent) => void;
 	}
 
-	let {
+	const {
 		page,
 		showDeleteButton = false,
 		width,
 		height,
-		onDragover,
-		onDrop
+		onDragover = (_event: DragEvent) => {},
+		onDrop = (_event: DragEvent) => {}
 	}: ResumeCanvasProps = $props();
 
 	let canvasRef: HTMLDivElement;
 	let isDragging = $state(false);
 	let dragStart = $state({ x: 0, y: 0 });
-	
+
 	// Drag preview and highlighting states
 	let dragPreview = $state<{ x: number; y: number; width: number; height: number } | null>(null);
 	let hoveredElementId = $state<string | null>(null);
@@ -37,7 +36,10 @@
 	const SNAP_THRESHOLD = 10; // pixels
 
 	// Helper to check if two elements overlap
-	function elementsOverlap(el1: { x: number; y: number; width: number; height: number }, el2: { x: number; y: number; width: number; height: number }): boolean {
+	function elementsOverlap(
+		el1: { x: number; y: number; width: number; height: number },
+		el2: { x: number; y: number; width: number; height: number }
+	): boolean {
 		return !(
 			el1.x + el1.width < el2.x ||
 			el2.x + el2.width < el1.x ||
@@ -59,9 +61,7 @@
 	// Get elements that overlap with the given element
 	function getOverlappingElements(element: ResumeElement): ResumeElement[] {
 		const allElements = getAllElements(page.elements);
-		return allElements.filter(
-			(el) => el.id !== element.id && elementsOverlap(element, el)
-		);
+		return allElements.filter((el) => el.id !== element.id && elementsOverlap(element, el));
 	}
 
 	// Find which element (if any) contains the given point
@@ -69,7 +69,7 @@
 		const allElements = getAllElements(page.elements);
 		// Sort by zIndex descending to check top elements first
 		const sorted = allElements.sort((a, b) => b.zIndex - a.zIndex);
-		
+
 		for (const el of sorted) {
 			if (el.id === excludeId) continue;
 			if (x >= el.x && x <= el.x + el.width && y >= el.y && y <= el.y + el.height) {
@@ -83,7 +83,7 @@
 	$effect(() => {
 		if (selectedElement && selectedElement.pageId === page.id) {
 			const overlapping = getOverlappingElements(selectedElement);
-			highlightedElementIds = overlapping.map(el => el.id);
+			highlightedElementIds = overlapping.map((el) => el.id);
 		} else {
 			highlightedElementIds = [];
 		}
@@ -149,7 +149,7 @@
 	// Watch for boundary changes and constrain elements
 	$effect(() => {
 		// Access boundaries to make this effect reactive
-		const _ = page.boundaries;
+		void page.boundaries;
 		constrainElementsToBoundaries();
 	});
 
@@ -372,7 +372,7 @@
 	// Exposed methods for drag preview
 	export function updateDragPreview(event: DragEvent) {
 		if (!canvasRef) return;
-		
+
 		const rect = canvasRef.getBoundingClientRect();
 		const scaleX = width / rect.width;
 		const scaleY = height / rect.height;
@@ -527,7 +527,7 @@
 						role="button"
 						tabindex="0"
 						onkeydown={null}
-						class="absolute cursor-move select-none transition-all"
+						class="absolute cursor-move transition-all select-none"
 						class:hover:ring-2={isSelected}
 						class:hover:ring-blue-500={isSelected}
 						class:ring-2={isSelected || isHighlighted || isHovered}
