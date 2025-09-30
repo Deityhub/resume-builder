@@ -8,12 +8,19 @@
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
 	let pages = $derived(Object.values(appStore.getPages()));
+	let canvasRefs: Record<string, any> = {};
 
-	function handleDragOver(event: DragEvent) {
+	function handleDragOver(event: DragEvent, pageId: string) {
 		event.preventDefault();
 
 		if (event.dataTransfer) {
 			event.dataTransfer.dropEffect = 'copy';
+		}
+
+		// Update drag preview in the canvas component
+		const canvasComponent = canvasRefs[pageId];
+		if (canvasComponent && canvasComponent.updateDragPreview) {
+			canvasComponent.updateDragPreview(event);
 		}
 	}
 
@@ -39,13 +46,27 @@
 			const SNAP_THRESHOLD = 10;
 			const { horizontal, vertical } = page.boundaries;
 
-			// Calculate element dimensions to fit within boundaries
-			const elementWidth = horizontal.end - horizontal.start;
-			const elementHeight = Math.min(500, vertical.end - vertical.start);
+			// Calculate dynamic element dimensions based on drop position
+			// Width: from drop position to right boundary
+			let elementWidth = horizontal.end - x;
+			// Height: default 500px or remaining space, whichever is smaller
+			let elementHeight = Math.min(500, vertical.end - y);
+
+			// Ensure minimum dimensions
+			const MIN_WIDTH = 100;
+			const MIN_HEIGHT = 50;
+			
+			if (elementWidth < MIN_WIDTH) {
+				elementWidth = Math.min(MIN_WIDTH, horizontal.end - horizontal.start);
+			}
+			if (elementHeight < MIN_HEIGHT) {
+				elementHeight = Math.min(MIN_HEIGHT, vertical.end - vertical.start);
+			}
 
 			// Snap to boundaries
 			if (Math.abs(x - horizontal.start) < SNAP_THRESHOLD) {
 				x = horizontal.start;
+				elementWidth = horizontal.end - horizontal.start;
 			}
 			if (Math.abs(x - horizontal.end) < SNAP_THRESHOLD) {
 				x = horizontal.end - elementWidth;
@@ -61,18 +82,41 @@
 			const boundedX = Math.max(horizontal.start, Math.min(x, horizontal.end - elementWidth));
 			const boundedY = Math.max(vertical.start, Math.min(y, vertical.end - elementHeight));
 
+			// Check if dropping on an existing element
+			let parentElementId: string | null = null;
+			const elements = Object.values(page.elements);
+			for (const element of elements) {
+				if (
+					boundedX >= element.x &&
+					boundedX <= element.x + element.width &&
+					boundedY >= element.y &&
+					boundedY <= element.y + element.height
+				) {
+					parentElementId = element.id;
+					break;
+				}
+			}
+
 			appStore.addElement({
 				type: data.type as ElementType,
 				x: boundedX,
 				y: boundedY,
 				pageId: pageId,
 				width: elementWidth,
-				height: elementHeight
+				height: elementHeight,
+				parentElementId
 			});
+
+			// Clear drag preview
+			const canvasComponent = canvasRefs[pageId];
+			if (canvasComponent && canvasComponent.clearDragPreview) {
+				canvasComponent.clearDragPreview();
+			}
 		} catch (error) {
 			console.error('Error parsing drag data:', error);
 		}
 	}
+	$inspect(pages)
 </script>
 
 <div class="flex h-screen bg-gray-50">
@@ -98,11 +142,12 @@
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
 					<ResumeCanvas
+						bind:this={canvasRefs[page.id]}
 						{page}
 						showDeleteButton={pages.length > 1}
 						width={CANVAS_WIDTH}
 						height={CANVAS_HEIGHT}
-						onDragover={handleDragOver}
+						onDragover={(e) => handleDragOver(e, page.id)}
 						onDrop={(e) => handleDrop(e, page.id)}
 					/>
 				{/each}

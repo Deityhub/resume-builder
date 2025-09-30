@@ -28,8 +28,66 @@
 	let canvasRef: HTMLDivElement;
 	let isDragging = $state(false);
 	let dragStart = $state({ x: 0, y: 0 });
+	
+	// Drag preview and highlighting states
+	let dragPreview = $state<{ x: number; y: number; width: number; height: number } | null>(null);
+	let hoveredElementId = $state<string | null>(null);
+	let highlightedElementIds = $state<string[]>([]);
 
 	const SNAP_THRESHOLD = 10; // pixels
+
+	// Helper to check if two elements overlap
+	function elementsOverlap(el1: { x: number; y: number; width: number; height: number }, el2: { x: number; y: number; width: number; height: number }): boolean {
+		return !(
+			el1.x + el1.width < el2.x ||
+			el2.x + el2.width < el1.x ||
+			el1.y + el1.height < el2.y ||
+			el2.y + el2.height < el1.y
+		);
+	}
+
+	// Get all elements recursively (flattened)
+	function getAllElements(elements: Record<string, ResumeElement>): ResumeElement[] {
+		const result: ResumeElement[] = [];
+		for (const el of Object.values(elements)) {
+			result.push(el);
+			result.push(...getAllElements(el.elements));
+		}
+		return result;
+	}
+
+	// Get elements that overlap with the given element
+	function getOverlappingElements(element: ResumeElement): ResumeElement[] {
+		const allElements = getAllElements(page.elements);
+		return allElements.filter(
+			(el) => el.id !== element.id && elementsOverlap(element, el)
+		);
+	}
+
+	// Find which element (if any) contains the given point
+	function findElementAtPosition(x: number, y: number, excludeId?: string): ResumeElement | null {
+		const allElements = getAllElements(page.elements);
+		// Sort by zIndex descending to check top elements first
+		const sorted = allElements.sort((a, b) => b.zIndex - a.zIndex);
+		
+		for (const el of sorted) {
+			if (el.id === excludeId) continue;
+			if (x >= el.x && x <= el.x + el.width && y >= el.y && y <= el.y + el.height) {
+				return el;
+			}
+		}
+		return null;
+	}
+
+	// Update highlighted elements when selection changes
+	$effect(() => {
+		if (selectedElement && selectedElement.pageId === page.id) {
+			const overlapping = getOverlappingElements(selectedElement);
+			highlightedElementIds = overlapping.map(el => el.id);
+		} else {
+			highlightedElementIds = [];
+		}
+	});
 
 	// Constrain all elements to boundaries when boundaries change
 	function constrainElementsToBoundaries() {
@@ -136,6 +194,8 @@
 		}
 	}
 
+	let elementBeingDragged = $state<string | null>(null);
+
 	function handleElementMove(event: MouseEvent, element: ResumeElement) {
 		if (isDragging && element) {
 			const rect = canvasRef.getBoundingClientRect();
@@ -163,6 +223,19 @@
 			// Enforce boundaries
 			const bounded = enforceBoundaries(newX, newY, element.width, element.height);
 
+			// Check if element should be reparented
+			const centerX = bounded.x + element.width / 2;
+			const centerY = bounded.y + element.height / 2;
+			const newParentElement = findElementAtPosition(centerX, centerY, element.id);
+			const newParentId = newParentElement ? newParentElement.id : null;
+
+			// If parent changed, use moveElement
+			if (elementBeingDragged !== element.id) {
+				elementBeingDragged = element.id;
+				// Store original parent (we'll need to track this differently)
+			}
+
+			// For now, just update position - reparenting happens on mouse up
 			appStore.updateElement({
 				elementId: element.id,
 				updates: {
@@ -172,8 +245,34 @@
 				pageId: element.pageId
 			});
 
+			// Update hover state
+			hoveredElementId = newParentId;
+
 			dragStart = { x: event.clientX, y: event.clientY };
 		}
+	}
+
+	function handleElementMouseUp(element: ResumeElement) {
+		if (isDragging && elementBeingDragged === element.id) {
+			// Check final position and reparent if needed
+			const centerX = element.x + element.width / 2;
+			const centerY = element.y + element.height / 2;
+			const newParentElement = findElementAtPosition(centerX, centerY, element.id);
+			const newParentId = newParentElement ? newParentElement.id : null;
+
+			// Move element to new parent
+			appStore.moveElement({
+				pageId: element.pageId,
+				elementId: element.id,
+				newParentId,
+				newX: element.x,
+				newY: element.y
+			});
+		}
+
+		isDragging = false;
+		elementBeingDragged = null;
+		hoveredElementId = null;
 	}
 
 	function handleElementResize(
@@ -202,6 +301,23 @@
 			const { horizontal, vertical } = page.boundaries;
 
 			switch (direction) {
+				// Edge handles - resize width or height only
+				case 'e': // East - resize width (right edge)
+					newWidth = Math.max(20, element.width + deltaX);
+					break;
+				case 'w': // West - resize width (left edge)
+					newWidth = Math.max(20, element.width - deltaX);
+					newX = Math.max(horizontal.start, element.x + deltaX);
+					break;
+				case 's': // South - resize height (bottom edge)
+					newHeight = Math.max(20, element.height + deltaY);
+					break;
+				case 'n': // North - resize height (top edge)
+					newHeight = Math.max(20, element.height - deltaY);
+					newY = Math.max(vertical.start, element.y + deltaY);
+					break;
+
+				// Corner handles - resize both width and height
 				case 'se': // Southeast
 					newWidth = Math.max(20, element.width + deltaX);
 					newHeight = Math.max(20, element.height + deltaY);
@@ -251,6 +367,72 @@
 
 		document.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseup', onMouseUp);
+	}
+
+	// Exposed methods for drag preview
+	export function updateDragPreview(event: DragEvent) {
+		if (!canvasRef) return;
+		
+		const rect = canvasRef.getBoundingClientRect();
+		const scaleX = width / rect.width;
+		const scaleY = height / rect.height;
+
+		let x = (event.clientX - rect.left) * scaleX;
+		let y = (event.clientY - rect.top) * scaleY;
+
+		const { horizontal, vertical } = page.boundaries;
+
+		// Calculate dynamic dimensions
+		let previewWidth = horizontal.end - x;
+		let previewHeight = Math.min(500, vertical.end - y);
+
+		const MIN_WIDTH = 100;
+		const MIN_HEIGHT = 50;
+
+		if (previewWidth < MIN_WIDTH) {
+			previewWidth = Math.min(MIN_WIDTH, horizontal.end - horizontal.start);
+		}
+		if (previewHeight < MIN_HEIGHT) {
+			previewHeight = Math.min(MIN_HEIGHT, vertical.end - vertical.start);
+		}
+
+		// Clamp to boundaries
+		x = Math.max(horizontal.start, Math.min(x, horizontal.end - previewWidth));
+		y = Math.max(vertical.start, Math.min(y, vertical.end - previewHeight));
+
+		dragPreview = { x, y, width: previewWidth, height: previewHeight };
+
+		// Check for hovered element
+		const allElements = getAllElements(page.elements);
+		let foundHover = false;
+		for (const element of allElements) {
+			if (
+				x >= element.x &&
+				x <= element.x + element.width &&
+				y >= element.y &&
+				y <= element.y + element.height
+			) {
+				hoveredElementId = element.id;
+				foundHover = true;
+				break;
+			}
+		}
+		if (!foundHover) {
+			hoveredElementId = null;
+		}
+	}
+
+	export function clearDragPreview() {
+		dragPreview = null;
+		hoveredElementId = null;
+	}
+
+	// Handle drag leave to clear highlights
+	function handleDragLeave(event: DragEvent) {
+		// Only clear if leaving the canvas entirely
+		if (!canvasRef?.contains(event.relatedTarget as Node)) {
+			clearDragPreview();
+		}
 	}
 </script>
 
@@ -303,9 +485,16 @@
 				onclick={handleCanvasClick}
 				role="button"
 				tabindex="0"
-				onkeydown={null}
+				onkeydown={(e) => {
+					if (e.key === 'Escape') {
+						clearDragPreview();
+						isDragging = false;
+						elementBeingDragged = null;
+					}
+				}}
 				ondragover={onDragover}
 				ondrop={onDrop}
+				ondragleave={handleDragLeave}
 			>
 				<!-- Delete Page Button -->
 				{#if showDeleteButton}
@@ -328,30 +517,33 @@
 					</Button>
 				{/if}
 
-				<!-- Render all elements -->
-				{#each Object.values(page.elements) as element (element.id)}
+				<!-- Render all elements (sorted by zIndex, flattened from nested structure) -->
+				{#each getAllElements(page.elements).sort((a, b) => a.zIndex - b.zIndex) as element (element.id)}
 					{@const isSelected = selectedElement?.id === element.id}
+					{@const isHighlighted = highlightedElementIds.includes(element.id)}
+					{@const isHovered = hoveredElementId === element.id}
 					<div
 						role="button"
 						tabindex="0"
 						onkeydown={null}
-						class="absolute cursor-move select-none"
+						class="absolute cursor-move select-none transition-all"
 						class:hover:ring-2={isSelected}
 						class:hover:ring-blue-500={isSelected}
-						class:ring-2={isSelected}
+						class:ring-2={isSelected || isHighlighted || isHovered}
 						class:ring-blue-500={isSelected}
+						class:ring-yellow-400={isHighlighted && !isSelected}
+						class:ring-green-400={isHovered}
 						style:left={pixelsToPercent(element.x, width)}
 						style:top={pixelsToPercent(element.y, height)}
 						style:width={pixelsToPercent(element.width, width)}
 						style:height={pixelsToPercent(element.height, height)}
+						style:z-index={element.zIndex}
 						onmousedown={(e) => {
 							isDragging = true;
 							dragStart = { x: e.clientX, y: e.clientY };
 						}}
 						onmousemove={(e) => handleElementMove(e, element)}
-						onmouseup={() => {
-							isDragging = false;
-						}}
+						onmouseup={() => handleElementMouseUp(element)}
 					>
 						<ResumeElementComponent
 							{element}
@@ -360,6 +552,17 @@
 						/>
 					</div>
 				{/each}
+
+				<!-- Drag preview -->
+				{#if dragPreview}
+					<div
+						class="pointer-events-none absolute border-2 border-dashed border-purple-500 bg-purple-100 opacity-50"
+						style:left={pixelsToPercent(dragPreview.x, width)}
+						style:top={pixelsToPercent(dragPreview.y, height)}
+						style:width={pixelsToPercent(dragPreview.width, width)}
+						style:height={pixelsToPercent(dragPreview.height, height)}
+					></div>
+				{/if}
 
 				<!-- Selection outline for empty canvas -->
 				{#if !selectedElement && Object.values(page.elements).length === 0}

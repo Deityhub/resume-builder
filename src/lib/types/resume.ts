@@ -1,10 +1,12 @@
 export type ElementType = 'text' | 'shape' | 'image';
-export type ResizeDirection = 'nw' | 'ne' | 'sw' | 'se';
+export type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 
 interface BaseElement {
 	id: string;
 	type: ElementType;
 	pageId: string;
+	zIndex: number; // For stacking order
+	elements: Record<string, ResumeElement>; // Nested child elements
 }
 
 export interface TextElement extends BaseElement {
