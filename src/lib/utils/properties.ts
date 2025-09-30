@@ -1,15 +1,20 @@
 import type { ElementType, ResumeElement } from '../types/resume';
+import { CANVAS_WIDTH } from '../const/dimension';
 
 export function getDefaultProperties({
 	type,
 	x,
 	y,
-	pageId
+	pageId,
+	width = CANVAS_WIDTH - 200, // Default to canvas width minus margins
+	height = 500,
 }: {
 	type: ElementType;
 	x: number;
 	y: number;
 	pageId: string;
+	width?: number;
+	height?: number;
 }): ResumeElement {
 	const baseElement = {
 		id: `element-${Date.now()}`,
@@ -17,8 +22,8 @@ export function getDefaultProperties({
 		pageId,
 		x,
 		y,
-		width: 2320,
-		height: 500
+		width,
+		height,
 	};
 
 	switch (type) {
