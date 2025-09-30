@@ -67,9 +67,3 @@ jobs:
 
       - name: Run tests with coverage
         run: yarn test:unit --run --coverage
-
-      - name: Comment PR with coverage
-        uses: davelosert/vitest-coverage-report-action@v2
-        if: always()
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
