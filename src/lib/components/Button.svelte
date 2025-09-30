@@ -14,6 +14,7 @@
 		noPadding?: boolean;
 		onClick?: (event: MouseEvent) => void;
 		children: Snippet;
+		'data-testid'?: string;
 	};
 
 	let {

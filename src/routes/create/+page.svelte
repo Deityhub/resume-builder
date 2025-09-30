@@ -116,7 +116,6 @@
 			console.error('Error parsing drag data:', error);
 		}
 	}
-	$inspect(pages)
 </script>
 
 <div class="flex h-screen bg-gray-50">
@@ -128,17 +127,17 @@
 		<!-- Page Navigation -->
 		<div class="flex items-center justify-between border-b bg-white p-4">
 			<div class="flex items-center gap-2">
-				<span class="text-sm text-gray-600">
+				<span class="text-sm text-gray-600" data-testid="page-count">
 					{pages.length}
 					{pages.length > 1 ? 'Pages' : 'Page'}
 				</span>
 			</div>
 
-			<Button onClick={appStore.addPage} variant="secondary">Add Page</Button>
+			<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn">Add Page</Button>
 		</div>
 
 		<!-- Canvas -->
-		<div class="flex-1 overflow-auto p-8">
+		<div class="flex-1 overflow-auto p-8" data-testid="canvas-container">
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
 					<ResumeCanvas

@@ -479,6 +479,7 @@
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
+				data-testid="resume-canvas"
 				class="relative overflow-hidden border-2 border-gray-300 bg-white shadow-lg"
 				style:width="{width * DISPLAY_SCALE}px"
 				style:height="{height * DISPLAY_SCALE}px"

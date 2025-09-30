@@ -15,10 +15,10 @@
 	}
 </script>
 
-<div class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4">
+<div class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4" data-testid="property-panel">
 	{#if selectedElement}
 		<div class="space-y-4">
-			<h3 class="mb-4 text-lg font-semibold text-gray-800">
+			<h3 class="mb-4 text-lg font-semibold text-gray-800" data-testid="property-panel-title">
 				{selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)} Properties
 			</h3>
 
@@ -29,6 +29,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">X</span>
 						<input
+							data-testid="input-x"
 							type="number"
 							value={selectedElement.x}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -38,6 +39,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Y</span>
 						<input
+							data-testid="input-y"
 							type="number"
 							value={selectedElement.y}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -47,6 +49,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Width</span>
 						<input
+							data-testid="input-width"
 							type="number"
 							value={selectedElement.width}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -56,6 +59,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Height</span>
 						<input
+							data-testid="input-height"
 							type="number"
 							value={selectedElement.height}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -84,6 +88,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Family</span>
 						<select
+							data-testid="select-font-family"
 							value={selectedElement.fontFamily}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontFamily', e.currentTarget.value)}
@@ -96,6 +101,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Size</span>
 						<select
+							data-testid="select-font-size"
 							value={selectedElement.fontSize}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontSize', parseInt(e.currentTarget.value))}
@@ -108,6 +114,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Weight</span>
 						<select
+							data-testid="select-font-weight"
 							value={selectedElement.fontWeight}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontWeight', e.currentTarget.value)}
@@ -119,6 +126,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Font Style</span>
 						<select
+							data-testid="select-font-style"
 							value={selectedElement.fontStyle}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontStyle', e.currentTarget.value)}
@@ -130,6 +138,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Color</span>
 						<input
+							data-testid="input-color"
 							type="color"
 							value={selectedElement.color}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
@@ -146,6 +155,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Shape Type</span>
 						<select
+							data-testid="select-shape-type"
 							value={selectedElement.shapeType}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('shapeType', e.currentTarget.value)}
@@ -157,6 +167,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Stroke Color</span>
 						<input
+							data-testid="input-stroke-color"
 							type="color"
 							value={selectedElement.strokeColor}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
@@ -166,6 +177,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Stroke Width</span>
 						<input
+							data-testid="input-stroke-width"
 							type="range"
 							min="1"
 							max="10"
@@ -185,6 +197,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Image URL</span>
 						<input
+							data-testid="input-image-src"
 							type="url"
 							value={selectedElement.src}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -195,6 +208,7 @@
 					<div>
 						<span class="block text-sm text-gray-600">Alt Text</span>
 						<input
+							data-testid="input-image-alt"
 							type="text"
 							value={selectedElement.alt}
 							class="w-full rounded border px-2 py-1 text-sm"
@@ -207,6 +221,7 @@
 			<!-- Delete Button -->
 			<div class="border-t pt-4">
 				<button
+					data-testid="delete-element-btn"
 					onclick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}
 					class="w-full rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
 				>
@@ -215,6 +230,6 @@
 			</div>
 		</div>
 	{:else}
-		<div class="py-8 text-center text-gray-400">Select an element to edit its properties</div>
+		<div class="py-8 text-center text-gray-400" data-testid="no-selection-message">Select an element to edit its properties</div>
 	{/if}
 </div>
