@@ -1,0 +1,12 @@
+{
+	"recommendations": [
+		"esbenp.prettier-vscode",
+		"dbaeumer.vscode-eslint",
+		"svelte.svelte-vscode",
+		"ms-vscode.vscode-typescript-next",
+		"bradlc.vscode-tailwindcss",
+		"ms-playwright.playwright",
+		"vitest.explorer"
+	],
+	"unwantedRecommendations": ["ms-vscode.vscode-typescript", "hookyqr.beautify"]
+}

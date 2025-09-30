@@ -30,9 +30,10 @@
 	class:bg-blue-50={isDragging}
 	class:border-blue-300={isDragging}
 >
-	<div class="space-y-2">
-		{#each tools as tool}
+	<div class="space-y-2" data-testid="toolbar">
+		{#each tools as tool (tool.type)}
 			<div
+				data-testid="tool-{tool.type}"
 				draggable="true"
 				ondragstart={(e) => handleDragStart(e, tool.type)}
 				ondragend={handleDragEnd}

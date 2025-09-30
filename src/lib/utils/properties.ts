@@ -8,7 +8,7 @@ export function getDefaultProperties({
 	pageId,
 	width = CANVAS_WIDTH - 200, // Default to canvas width minus margins
 	height = 500,
-	zIndex = 0,
+	zIndex = 0
 }: {
 	type: ElementType;
 	x: number;
@@ -26,7 +26,7 @@ export function getDefaultProperties({
 		x,
 		y,
 		width,
-		height,
+		height
 	};
 
 	switch (type) {

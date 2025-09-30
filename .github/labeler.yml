@@ -1,0 +1,38 @@
+# Automatically label PRs based on changed files
+
+'documentation':
+  - '**/*.md'
+  - 'docs/**/*'
+
+'dependencies':
+  - 'package.json'
+  - 'yarn.lock'
+
+'tests':
+  - '**/*.spec.ts'
+  - '**/*.test.ts'
+  - 'e2e/**/*'
+  - 'tests/**/*'
+
+'ci/cd':
+  - '.github/**/*'
+
+'components':
+  - 'src/lib/components/**/*'
+  - 'src/routes/**/components/**/*'
+
+'store':
+  - 'src/lib/stores/**/*'
+
+'types':
+  - 'src/lib/types/**/*'
+
+'styles':
+  - '**/*.css'
+  - 'tailwind.config.*'
+
+'config':
+  - '*.config.*'
+  - '.eslintrc.*'
+  - '.prettierrc.*'
+  - 'tsconfig.json'

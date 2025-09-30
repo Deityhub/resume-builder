@@ -5,23 +5,71 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 ## 🚀 Features
 
 ### Core Features
-- **Drag-and-Drop Interface**: Intuitive canvas-based resume creation
-- **Multiple Element Types**: Text, shapes, and images
-- **Real-time Editing**: Live preview with instant updates
-- **Multi-page Support**: Create resumes with multiple pages
-- **Responsive Design**: Works on desktop and tablet devices
 
-### Advanced Tools
-- **Ruler System**: Professional boundary controls with draggable anchors
-- **Snap-to-Grid**: Elements automatically align to boundaries
-- **Property Panel**: Comprehensive styling options for each element
-- **Element Manipulation**: Resize, move, and customize all elements
-- **Boundary Enforcement**: Elements stay within defined canvas boundaries
+- **Drag-and-Drop Interface**: Intuitive canvas-based resume creation with real-time preview
+- **Multiple Element Types**: Text, shapes, and images with full customization
+- **Real-time Editing**: Live preview with instant updates and inline text editing
+- **Multi-page Support**: Create resumes with unlimited pages
+- **Nested Elements**: Elements can contain other elements (hierarchical structure)
+- **UUID-based IDs**: Cryptographically secure unique identifiers for all elements
 
-### Element Types
-- **Text Elements**: Rich text editing with font customization
-- **Shape Elements**: Lines and dividers for visual organization
-- **Image Elements**: Support for images with alt text
+### Advanced Canvas Tools
+
+- **Professional Ruler System**:
+  - Horizontal and vertical rulers with tick marks (major, minor, tiny)
+  - Draggable triangle markers for boundary adjustment
+  - Google Docs/Word-style design
+  - Real-time boundary visualization
+- **Smart Element Positioning**:
+  - Snap-to-grid with 10px threshold
+  - Boundary enforcement (elements stay within defined areas)
+  - Dynamic sizing based on drop position
+  - Automatic element reparenting on drag
+
+- **Advanced Resize Tool**:
+  - 4 edge handles for width/height adjustment
+  - 4 corner handles for proportional resize
+  - Minimum size enforcement (20px)
+  - Visual feedback with hover states
+
+### Element Management
+
+- **Text Elements**:
+  - Inline contenteditable text
+  - Font family, size, weight, and style customization
+  - Color picker
+  - Full typography control
+
+- **Shape Elements**:
+  - Horizontal and vertical lines
+  - Customizable stroke color and width
+  - Perfect for dividers and visual organization
+
+- **Image Elements**:
+  - URL-based image loading
+  - Alt text support
+  - Responsive sizing
+
+### Visual Feedback System
+
+- **Element Highlighting**:
+  - Blue ring: Selected element
+  - Yellow ring: Elements underneath (overlapping)
+  - Green ring: Element being hovered during drag
+  - Purple dashed outline: Drag preview
+- **Drag Operations**:
+  - Real-time drag preview
+  - ESC key to cancel drag
+  - Automatic cleanup on drag leave
+  - Parent detection and highlighting
+
+### Property Panel
+
+- **Position & Size**: Precise X, Y, width, height controls
+- **Typography**: Font family, size, weight, style, color
+- **Shape Properties**: Type, stroke color, stroke width
+- **Image Properties**: URL, alt text
+- **Element Actions**: Delete button with confirmation
 
 ## 🛠️ Technology Stack
 
@@ -44,17 +92,20 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/resume-builder.git
    cd resume-builder
    ```
 
 2. **Install dependencies**
+
    ```bash
    yarn install
    ```
 
 3. **Start development server**
+
    ```bash
    yarn dev
    ```
@@ -108,25 +159,60 @@ src/
 ## 🎨 Key Components
 
 ### ResumeCanvas
+
 The main canvas component that handles:
-- Element rendering and positioning
-- Drag-and-drop functionality
-- Boundary enforcement
-- Ruler integration
+
+- Element rendering with zIndex sorting
+- Drag-and-drop with real-time preview
+- Boundary enforcement and snapping
+- Ruler integration and visualization
+- Element reparenting on drag
+- Nested element flattening for display
 
 ### Ruler System
+
 Professional boundary controls featuring:
-- Horizontal and vertical rulers
-- Draggable triangle markers
-- Three-tier tick marks (major, minor, tiny)
-- Real-time boundary updates
+
+- Horizontal and vertical rulers (Google Docs style)
+- Draggable triangle markers (blue for start, red for end)
+- Three-tier tick marks:
+  - Major ticks (12px) every 100px
+  - Minor ticks (8px) every 50px
+  - Tiny ticks (4px) every 10px
+- Real-time boundary updates with reactive effects
+- Coordinate scaling for accurate positioning
 
 ### Property Panel
+
 Comprehensive styling interface for:
-- Position and dimensions
-- Typography (fonts, sizes, weights)
-- Colors and styling
+
+- Position and dimensions (X, Y, width, height)
+- Typography (7 font families, 12 font sizes)
+- Font weight (normal, bold) and style (normal, italic)
+- Color picker for text and shapes
 - Element-specific properties
+- Delete functionality
+
+### Resize Tool
+
+Advanced resize system with:
+
+- **4 Edge Handles**: 60px × 4px bars for width/height
+- **4 Corner Handles**: 12px circles for proportional resize
+- **8 Resize Directions**: n, s, e, w, nw, ne, sw, se
+- Visual feedback with hover states
+- Boundary-aware resizing
+
+### Store Architecture
+
+Reactive state management with:
+
+- Svelte 5 runes ($state, $derived, $effect)
+- Nested element structure (Record<string, ResumeElement>)
+- Recursive element operations (find, move, flatten)
+- UUID-based identifiers (crypto.randomUUID())
+- Automatic zIndex management
+- Boundary constraint enforcement
 
 ## 🔧 Development
 
@@ -155,6 +241,7 @@ yarn test:e2e        # End-to-end tests
 ### Code Style
 
 This project follows:
+
 - **Prettier** for code formatting
 - **ESLint** for linting
 - **TypeScript** for type safety
@@ -193,26 +280,53 @@ This project follows:
 
 ## 🧪 Testing
 
+This project has comprehensive test coverage for all features.
+
 ### Unit Tests
+
 ```bash
 yarn test:unit
 ```
 
-Tests cover:
-- Store functionality
-- Boundary calculations
-- Element manipulation
-- Component rendering
+**Test Coverage:**
+
+- ✅ Page Management (create, delete, UUID generation)
+- ✅ Ruler Boundaries (initialization, updates, validation)
+- ✅ Element Management (add, update, delete, UUID generation)
+- ✅ Element Selection (select, deselect)
+- ✅ Nested Elements (parent-child relationships, finding, moving)
+- ✅ zIndex Management (automatic assignment)
+- ✅ Store State Management (reactive updates)
+
+**Total Unit Tests**: 20+ tests covering all store functionality
 
 ### End-to-End Tests
+
 ```bash
 yarn test:e2e
 ```
 
-Tests cover:
-- Complete user workflows
-- Canvas interactions
-- Element creation and editing
+**Test Coverage:**
+
+- ✅ Navigation (home, create, about pages)
+- ✅ Page Management (add pages, page counter)
+- ✅ Drag and Drop (text, shape, image elements)
+- ✅ Element Selection (select, deselect)
+- ✅ Element Manipulation (resize handles, delete)
+- ✅ Property Updates (font size, font family)
+- ✅ UI Components (toolbar, canvas, property panel, rulers)
+- ✅ Boundary Visualization (rulers, boundary box)
+- ✅ Multi-element Workflows (adding multiple elements)
+
+**Total E2E Tests**: 14 comprehensive workflow tests
+
+### Run All Tests
+
+```bash
+yarn test
+```
+
+This runs both unit and e2e tests sequentially.
 
 ## 🚀 Deployment
 
