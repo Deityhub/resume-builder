@@ -44,7 +44,19 @@ export interface ImageElement extends BaseElement {
 
 export type ResumeElement = TextElement | ShapeElement | ImageElement;
 
+export interface RulerBoundaries {
+	horizontal: {
+		start: number;
+		end: number;
+	};
+	vertical: {
+		start: number;
+		end: number;
+	};
+}
+
 export interface ResumePage {
 	id: string;
 	elements: Record<string, ResumeElement>;
+	boundaries: RulerBoundaries;
 }

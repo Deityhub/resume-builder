@@ -1,12 +1,17 @@
 import { getDefaultProperties } from '$lib/utils/properties';
-import type { ElementType, ResumeElement, ResumePage } from '../types/resume';
+import type { ElementType, ResumeElement, ResumePage, RulerBoundaries } from '../types/resume';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
 	let pages: Record<string, ResumePage> = $state({
 		'page-1': {
 			id: 'page-1',
-			elements: {}
+			elements: {},
+			boundaries: {
+				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
+				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
+			}
 		}
 	});
 
@@ -20,7 +25,11 @@ const createAppStore = () => {
 	const addPage = () => {
 		const newPage: ResumePage = {
 			id: `page-${Date.now()}`,
-			elements: {}
+			elements: {},
+			boundaries: {
+				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
+				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
+			}
 		};
 		pages = { ...pages, [newPage.id]: newPage };
 	};
@@ -29,12 +38,16 @@ const createAppStore = () => {
 		type,
 		x,
 		y,
-		pageId
+		pageId,
+		width,
+		height
 	}: {
 		type: ElementType;
 		x: number;
 		y: number;
 		pageId: string;
+		width?: number;
+		height?: number;
 	}) => {
 		const page = pages[pageId];
 		if (!page) {
@@ -45,7 +58,9 @@ const createAppStore = () => {
 			type,
 			x,
 			y,
-			pageId
+			pageId,
+			width,
+			height
 		});
 
 		page.elements = { ...page.elements, [newElement.id]: newElement };
@@ -124,6 +139,15 @@ const createAppStore = () => {
 		delete pages[pageId];
 	};
 
+	const updateBoundaries = (pageId: string, boundaries: RulerBoundaries) => {
+		const page = pages[pageId];
+		if (!page) {
+			return;
+		}
+
+		page.boundaries = boundaries;
+	};
+
 	return {
 		// State getters
 		getPages,
@@ -135,7 +159,8 @@ const createAppStore = () => {
 		updateElement,
 		selectElement,
 		deleteElement,
-		deletePage
+		deletePage,
+		updateBoundaries
 	};
 };
 

@@ -5,12 +5,9 @@
 	import { Button } from '$lib/components';
 	import type { ElementType } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
+	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
 	let pages = $derived(Object.values(appStore.getPages()));
-
-	// Canvas dimensions (A4 at 300 DPI)
-	const CANVAS_WIDTH = 2480; // A4 width in pixels at 300 DPI
-	const CANVAS_HEIGHT = 3508; // A4 height in pixels at 300 DPI
 
 	function handleDragOver(event: DragEvent) {
 		event.preventDefault();
@@ -28,20 +25,49 @@
 		try {
 			const data = JSON.parse(event.dataTransfer.getData('application/json'));
 			const rect = (event.target as HTMLElement).getBoundingClientRect();
+			const page = appStore.getPages()[pageId];
+
+			if (!page) return;
 
 			// Calculate position relative to the canvas
-			const x = event.clientX + rect.left;
-			const y = event.clientY + rect.top;
+			const scaleX = CANVAS_WIDTH / rect.width;
+			const scaleY = CANVAS_HEIGHT / rect.height;
 
-			// Ensure the element is within bounds
-			const boundedX = x || Math.max(0, Math.min(x, CANVAS_WIDTH - 100));
-			const boundedY = y || Math.max(0, Math.min(y, CANVAS_HEIGHT - 50));
+			let x = (event.clientX - rect.left) * scaleX;
+			let y = (event.clientY - rect.top) * scaleY;
+
+			const SNAP_THRESHOLD = 10;
+			const { horizontal, vertical } = page.boundaries;
+
+			// Calculate element dimensions to fit within boundaries
+			const elementWidth = horizontal.end - horizontal.start;
+			const elementHeight = Math.min(500, vertical.end - vertical.start);
+
+			// Snap to boundaries
+			if (Math.abs(x - horizontal.start) < SNAP_THRESHOLD) {
+				x = horizontal.start;
+			}
+			if (Math.abs(x - horizontal.end) < SNAP_THRESHOLD) {
+				x = horizontal.end - elementWidth;
+			}
+			if (Math.abs(y - vertical.start) < SNAP_THRESHOLD) {
+				y = vertical.start;
+			}
+			if (Math.abs(y - vertical.end) < SNAP_THRESHOLD) {
+				y = vertical.end - elementHeight;
+			}
+
+			// Enforce boundaries - ensure element fits within bounds
+			const boundedX = Math.max(horizontal.start, Math.min(x, horizontal.end - elementWidth));
+			const boundedY = Math.max(vertical.start, Math.min(y, vertical.end - elementHeight));
 
 			appStore.addElement({
 				type: data.type as ElementType,
 				x: boundedX,
 				y: boundedY,
-				pageId: pageId
+				pageId: pageId,
+				width: elementWidth,
+				height: elementHeight
 			});
 		} catch (error) {
 			console.error('Error parsing drag data:', error);
@@ -69,7 +95,7 @@
 
 		<!-- Canvas -->
 		<div class="flex-1 overflow-auto p-8">
-			<div class="flex flex-col justify-center gap-12">
+			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
 					<ResumeCanvas
 						{page}
