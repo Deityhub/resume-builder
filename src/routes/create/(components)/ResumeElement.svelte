@@ -170,22 +170,6 @@
 								? '2,2'
 								: 'none'}
 					/>
-				{:else if element.shapeType === 'star'}
-					<polygon
-						points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35"
-						fill={element.fillColor || 'none'}
-						fill-opacity={element.fillOpacity || 0}
-						stroke={element.strokeColor}
-						stroke-width={element.strokeWidth}
-						stroke-opacity={element.strokeOpacity || 1}
-						stroke-dasharray={element.strokeStyle === 'dashed'
-							? '5,5'
-							: element.strokeStyle === 'dotted'
-								? '2,2'
-								: 'none'}
-						transform="scale({element.width / 100}) translate({element.width * 0.5 -
-							50}, {element.height * 0.5 - 45})"
-					/>
 				{:else if element.shapeType === 'hexagon'}
 					<polygon
 						points="{element.width / 2},0 {element.width * 0.75},{element.height *

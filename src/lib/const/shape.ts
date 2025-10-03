@@ -4,7 +4,6 @@ export const shapeTypes = [
 	{ value: 'ellipse', label: 'Ellipse' },
 	{ value: 'triangle', label: 'Triangle' },
 	{ value: 'diamond', label: 'Diamond' },
-	{ value: 'star', label: 'Star' },
 	{ value: 'hexagon', label: 'Hexagon' },
 	{ value: 'pentagon', label: 'Pentagon' },
 	{ value: 'line-horizontal', label: 'Horizontal Line' },

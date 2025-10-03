@@ -37,7 +37,6 @@ export interface ShapeElement extends BaseElement {
 		| 'ellipse'
 		| 'triangle'
 		| 'diamond'
-		| 'star'
 		| 'hexagon'
 		| 'pentagon'
 		| 'line-horizontal'
