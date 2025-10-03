@@ -319,9 +319,10 @@
 			<div
 				class="absolute bg-blue-500 transition-colors hover:bg-blue-600 {handle.class}"
 				style={handle.style}
-				onmousedown={(e) => {
+				onpointerdown={(e) => {
+					e.preventDefault();
 					e.stopPropagation();
-					onResize(e, handle.direction);
+					onResize(e as unknown as MouseEvent, handle.direction);
 				}}
 				role="button"
 				tabindex="0"
@@ -333,9 +334,10 @@
 		{#each cornerHandles as handle (handle.direction)}
 			<div
 				class="absolute h-3 w-3 rounded-full border-2 border-white bg-blue-500 shadow-md transition-colors hover:bg-blue-600 {handle.class}"
-				onmousedown={(e) => {
+				onpointerdown={(e) => {
+					e.preventDefault();
 					e.stopPropagation();
-					onResize(e, handle.direction);
+					onResize(e as unknown as MouseEvent, handle.direction);
 				}}
 				role="button"
 				tabindex="0"

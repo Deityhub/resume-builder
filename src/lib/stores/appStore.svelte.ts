@@ -186,55 +186,37 @@ const createAppStore = () => {
 		pageId: string;
 	}) => {
 		const page = pages[pageId];
-		if (!page) {
-			return;
-		}
+		if (!page) return;
 
-		const currentElement = page.elements[elementId];
-		if (!currentElement) {
-			return;
-		}
+		// Support nested elements: find current element regardless of depth
+		const currentElement = findElement(pageId, elementId);
+		if (!currentElement) return;
 
 		const elementType = currentElement.type;
 		let updatedElement: ResumeElement;
 
 		switch (elementType) {
 			case 'text':
-				updatedElement = {
-					...currentElement,
-					...updates,
-					type: 'text'
-				} as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'text' } as ResumeElement;
 				break;
 			case 'shape':
-				updatedElement = {
-					...currentElement,
-					...updates,
-					type: 'shape'
-				} as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'shape' } as ResumeElement;
 				break;
 			case 'image':
-				updatedElement = {
-					...currentElement,
-					...updates,
-					type: 'image'
-				} as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'image' } as ResumeElement;
 				break;
 		}
 
-		// Update the page elements (this triggers reactivity)
+		// Write back recursively using updateNestedElements
 		pages = {
 			...pages,
 			[pageId]: {
 				...page,
-				elements: {
-					...page.elements,
-					[elementId]: updatedElement
-				}
+				elements: updateNestedElements(page.elements, elementId, () => updatedElement)
 			}
 		};
 
-		// If this is the currently selected element, update the selectedElement reference
+		// Update selected reference if needed
 		if (selectedElement && selectedElement.id === elementId) {
 			selectedElement = updatedElement;
 		}
