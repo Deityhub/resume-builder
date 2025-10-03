@@ -109,8 +109,6 @@
 								<option value={font}>{font}</option>
 							{/each}
 						</select>
-					</div>
-					<div>
 						<span class="block text-sm text-gray-600">Font Size</span>
 						<select
 							data-testid="select-font-size"
@@ -182,7 +180,7 @@
 							type="color"
 							value={selectedElement.color}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('color', e.currentTarget.value)}
+							oninput={(e) => handlePropertyChange('color', e.currentTarget.value)}
 						/>
 					</div>
 				</div>
@@ -212,7 +210,7 @@
 							type="color"
 							value={selectedElement.strokeColor}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('strokeColor', e.currentTarget.value)}
+							oninput={(e) => handlePropertyChange('strokeColor', e.currentTarget.value)}
 						/>
 					</div>
 					<div>
@@ -224,7 +222,7 @@
 							max="20"
 							value={selectedElement.strokeWidth}
 							class="w-full"
-							onchange={(e) => handlePropertyChange('strokeWidth', parseInt(e.currentTarget.value))}
+							oninput={(e) => handlePropertyChange('strokeWidth', parseInt(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600">{selectedElement.strokeWidth}px</span>
 					</div>
@@ -251,7 +249,7 @@
 							step="0.1"
 							value={selectedElement.strokeOpacity || 1}
 							class="w-full"
-							onchange={(e) =>
+							oninput={(e) =>
 								handlePropertyChange('strokeOpacity', parseFloat(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600"
@@ -265,7 +263,7 @@
 							type="color"
 							value={selectedElement.fillColor || '#ffffff'}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('fillColor', e.currentTarget.value)}
+							oninput={(e) => handlePropertyChange('fillColor', e.currentTarget.value)}
 						/>
 					</div>
 					<div>
@@ -278,7 +276,7 @@
 							step="0.1"
 							value={selectedElement.fillOpacity || 0}
 							class="w-full"
-							onchange={(e) =>
+							oninput={(e) =>
 								handlePropertyChange('fillOpacity', parseFloat(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600"
@@ -295,7 +293,7 @@
 								max="100"
 								value={selectedElement.cornerRadius || 0}
 								class="w-full"
-								onchange={(e) =>
+								oninput={(e) =>
 									handlePropertyChange('cornerRadius', parseInt(e.currentTarget.value))}
 							/>
 							<span class="text-sm text-gray-600">{selectedElement.cornerRadius || 0}%</span>
@@ -310,7 +308,7 @@
 							max="360"
 							value={selectedElement.rotation || 0}
 							class="w-full"
-							onchange={(e) => handlePropertyChange('rotation', parseInt(e.currentTarget.value))}
+							oninput={(e) => handlePropertyChange('rotation', parseInt(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600">{selectedElement.rotation || 0}°</span>
 					</div>
@@ -364,8 +362,7 @@
 							max="100"
 							value={selectedElement.borderRadius || 0}
 							class="w-full"
-							onchange={(e) =>
-								handlePropertyChange('borderRadius', parseInt(e.currentTarget.value))}
+							oninput={(e) => handlePropertyChange('borderRadius', parseInt(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600">{selectedElement.borderRadius || 0}%</span>
 					</div>
@@ -379,7 +376,7 @@
 							step="0.1"
 							value={selectedElement.opacity || 1}
 							class="w-full"
-							onchange={(e) => handlePropertyChange('opacity', parseFloat(e.currentTarget.value))}
+							oninput={(e) => handlePropertyChange('opacity', parseFloat(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600"
 							>{((selectedElement.opacity || 1) * 100).toFixed(0)}%</span
@@ -392,7 +389,7 @@
 							type="color"
 							value={selectedElement.borderColor || '#000000'}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('borderColor', e.currentTarget.value)}
+							oninput={(e) => handlePropertyChange('borderColor', e.currentTarget.value)}
 						/>
 					</div>
 					<div>
@@ -404,7 +401,7 @@
 							max="10"
 							value={selectedElement.borderWidth || 0}
 							class="w-full"
-							onchange={(e) => handlePropertyChange('borderWidth', parseInt(e.currentTarget.value))}
+							oninput={(e) => handlePropertyChange('borderWidth', parseInt(e.currentTarget.value))}
 						/>
 						<span class="text-sm text-gray-600">{selectedElement.borderWidth || 0}px</span>
 					</div>
@@ -439,7 +436,7 @@
 							type="color"
 							value={selectedElement.backgroundColor || '#ffffff'}
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('backgroundColor', e.currentTarget.value)}
+							oninput={(e) => handlePropertyChange('backgroundColor', e.currentTarget.value)}
 						/>
 					</div>
 				</div>
