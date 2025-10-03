@@ -8,11 +8,12 @@
 		textTransforms
 	} from '$lib/const/font';
 	import { shapeTypes, strokeStyles } from '$lib/const/shape';
+	import { objectFitOptions, borderStyles } from '$lib/const/image';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
-	function handlePropertyChange(property: string, value: string | number) {
+	function handlePropertyChange(property: string, value: string | number | object) {
 		if (!selectedElement) return;
 
 		appStore.updateElement({
@@ -291,13 +292,13 @@
 								data-testid="input-corner-radius"
 								type="range"
 								min="0"
-								max="50"
+								max="100"
 								value={selectedElement.cornerRadius || 0}
 								class="w-full"
 								onchange={(e) =>
 									handlePropertyChange('cornerRadius', parseInt(e.currentTarget.value))}
 							/>
-							<span class="text-sm text-gray-600">{selectedElement.cornerRadius || 0}px</span>
+							<span class="text-sm text-gray-600">{selectedElement.cornerRadius || 0}%</span>
 						</div>
 					{/if}
 					<div>
@@ -339,6 +340,106 @@
 							value={selectedElement.alt}
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('alt', e.currentTarget.value)}
+						/>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Object Fit</span>
+						<select
+							data-testid="select-object-fit"
+							value={selectedElement.objectFit || 'contain'}
+							class="w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('objectFit', e.currentTarget.value)}
+						>
+							{#each objectFitOptions as option (option.value)}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</select>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Border Radius</span>
+						<input
+							data-testid="input-border-radius"
+							type="range"
+							min="0"
+							max="100"
+							value={selectedElement.borderRadius || 0}
+							class="w-full"
+							onchange={(e) =>
+								handlePropertyChange('borderRadius', parseInt(e.currentTarget.value))}
+						/>
+						<span class="text-sm text-gray-600">{selectedElement.borderRadius || 0}%</span>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Opacity</span>
+						<input
+							data-testid="input-opacity"
+							type="range"
+							min="0"
+							max="1"
+							step="0.1"
+							value={selectedElement.opacity || 1}
+							class="w-full"
+							onchange={(e) => handlePropertyChange('opacity', parseFloat(e.currentTarget.value))}
+						/>
+						<span class="text-sm text-gray-600"
+							>{((selectedElement.opacity || 1) * 100).toFixed(0)}%</span
+						>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Border Color</span>
+						<input
+							data-testid="input-border-color"
+							type="color"
+							value={selectedElement.borderColor || '#000000'}
+							class="h-8 w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('borderColor', e.currentTarget.value)}
+						/>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Border Width</span>
+						<input
+							data-testid="input-border-width"
+							type="range"
+							min="0"
+							max="10"
+							value={selectedElement.borderWidth || 0}
+							class="w-full"
+							onchange={(e) => handlePropertyChange('borderWidth', parseInt(e.currentTarget.value))}
+						/>
+						<span class="text-sm text-gray-600">{selectedElement.borderWidth || 0}px</span>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Border Style</span>
+						<select
+							data-testid="select-border-style"
+							value={selectedElement.borderStyle || 'solid'}
+							class="w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('borderStyle', e.currentTarget.value)}
+						>
+							{#each borderStyles as style (style.value)}
+								<option value={style.value}>{style.label}</option>
+							{/each}
+						</select>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Box Shadow</span>
+						<input
+							data-testid="input-box-shadow"
+							type="text"
+							value={selectedElement.boxShadow || ''}
+							class="w-full rounded border px-2 py-1 text-sm"
+							placeholder="0px 2px 4px rgba(0,0,0,0.1)"
+							onchange={(e) => handlePropertyChange('boxShadow', e.currentTarget.value)}
+						/>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Background Color</span>
+						<input
+							data-testid="input-background-color"
+							type="color"
+							value={selectedElement.backgroundColor || '#ffffff'}
+							class="h-8 w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('backgroundColor', e.currentTarget.value)}
 						/>
 					</div>
 				</div>

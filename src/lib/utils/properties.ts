@@ -62,7 +62,15 @@ export function getDefaultProperties({
 				...baseElement,
 				type: 'image',
 				src: '',
-				alt: 'Image'
+				alt: 'Image',
+				objectFit: 'contain',
+				borderRadius: 0,
+				opacity: 1,
+				borderColor: '#000000',
+				borderWidth: 0,
+				borderStyle: 'solid',
+				boxShadow: '',
+				backgroundColor: 'transparent'
 			};
 	}
 }

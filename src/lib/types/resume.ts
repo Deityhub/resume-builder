@@ -52,7 +52,7 @@ export interface ShapeElement extends BaseElement {
 	strokeStyle?: 'solid' | 'dashed' | 'dotted';
 	fillColor?: string;
 	fillOpacity?: number;
-	cornerRadius?: number; // For rectangles
+	cornerRadius?: number; // Percentage (0-100) for rectangles
 	sides?: number; // For polygons
 	rotation?: number;
 }
@@ -61,10 +61,14 @@ export interface ImageElement extends BaseElement {
 	type: 'image';
 	src: string;
 	alt: string;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+	objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+	borderRadius?: number; // Percentage (0-100)
+	opacity?: number;
+	borderColor?: string;
+	borderWidth?: number;
+	borderStyle?: 'solid' | 'dashed' | 'dotted';
+	boxShadow?: string;
+	backgroundColor?: string;
 }
 
 export type ResumeElement = TextElement | ShapeElement | ImageElement;

@@ -104,8 +104,8 @@
 							: element.strokeStyle === 'dotted'
 								? '2,2'
 								: 'none'}
-						rx={element.cornerRadius || 0}
-						ry={element.cornerRadius || 0}
+						rx={element.cornerRadius ? `${(element.width * element.cornerRadius) / 100}px` : '0px'}
+						ry={element.cornerRadius ? `${(element.height * element.cornerRadius) / 100}px` : '0px'}
 					/>
 				{:else if element.shapeType === 'circle'}
 					<circle
@@ -298,9 +298,29 @@
 			</svg>
 		</div>
 	{:else if element.type === 'image'}
-		<div class="flex h-full w-full items-center justify-center bg-gray-100">
+		<div
+			class="flex h-full w-full items-center justify-center overflow-hidden"
+			style:background-color={element.backgroundColor || 'transparent'}
+			style:border-radius={`${element.borderRadius || 0}%`}
+			style:opacity={element.opacity || 1}
+			style:border={`${element.borderWidth || 0}px ${element.borderStyle || 'solid'} ${element.borderColor || '#000000'}`}
+			style:box-shadow={element.boxShadow || ''}
+			style:background-image={element.src ? `url(${element.src})` : 'none'}
+			style:background-size={element.objectFit === 'contain'
+				? 'contain'
+				: element.objectFit === 'cover'
+					? 'cover'
+					: element.objectFit === 'fill'
+						? '100% 100%'
+						: element.objectFit === 'scale-down'
+							? 'auto'
+							: 'auto'}
+			style:background-position="center"
+			style:background-repeat="no-repeat"
+		>
+			<!-- Hidden img for accessibility and image loading -->
 			{#if element.src}
-				<img src={element.src} alt={element.alt} class="max-h-full max-w-full object-contain" />
+				<img src={element.src} alt={element.alt} style="display: none;" />
 			{:else}
 				<div class="text-sm text-gray-400">No image</div>
 			{/if}
