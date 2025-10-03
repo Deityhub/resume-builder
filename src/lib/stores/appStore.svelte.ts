@@ -10,8 +10,8 @@ const createAppStore = () => {
 			id: firstPageId,
 			elements: {},
 			boundaries: {
-				horizontal: { start: 20, end: CANVAS_WIDTH - 20 },
-				vertical: { start: 20, end: CANVAS_HEIGHT - 20 }
+				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
+				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
 			}
 		}
 	});
