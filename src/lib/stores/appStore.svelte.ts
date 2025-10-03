@@ -21,7 +21,6 @@ const createAppStore = () => {
 	// Helper to get next zIndex for a page
 	const getNextZIndex = (pageId: string): number => {
 		const page = pages[pageId];
-		if (!page) return 0;
 		const elements = Object.values(page.elements);
 		if (elements.length === 0) return 0;
 		return Math.max(...elements.map((el) => el.zIndex)) + 1;
@@ -44,8 +43,6 @@ const createAppStore = () => {
 		};
 		pages = { ...pages, [newPage.id]: newPage };
 	};
-
-	// Helper to find an element by ID (searches recursively through nested elements)
 	const findElement = (pageId: string, elementId: string): ResumeElement | null => {
 		const page = pages[pageId];
 		if (!page) return null;
@@ -60,6 +57,47 @@ const createAppStore = () => {
 		};
 
 		return searchInElements(page.elements);
+	};
+
+	// Helper to update nested elements recursively
+	const updateNestedElements = (
+		elements: Record<string, ResumeElement>,
+		targetId: string,
+		updateFn: (element: ResumeElement) => ResumeElement
+	): Record<string, ResumeElement> => {
+		const result: Record<string, ResumeElement> = {};
+
+		for (const [id, element] of Object.entries(elements)) {
+			if (id === targetId) {
+				result[id] = updateFn(element);
+			} else {
+				result[id] = {
+					...element,
+					elements: updateNestedElements(element.elements, targetId, updateFn)
+				};
+			}
+		}
+
+		return result;
+	};
+
+	// Helper to create elements structure without a specific element
+	const createElementsWithout = (
+		elements: Record<string, ResumeElement>,
+		elementId: string
+	): Record<string, ResumeElement> => {
+		const result: Record<string, ResumeElement> = {};
+
+		for (const [id, element] of Object.entries(elements)) {
+			if (id !== elementId) {
+				result[id] = {
+					...element,
+					elements: createElementsWithout(element.elements, elementId)
+				};
+			}
+		}
+
+		return result;
 	};
 
 	const addElement = ({
@@ -98,13 +136,40 @@ const createAppStore = () => {
 		if (parentElementId) {
 			const parentElement = findElement(pageId, parentElementId);
 			if (parentElement) {
-				parentElement.elements = { ...parentElement.elements, [newElement.id]: newElement };
+				// Update the entire pages object with proper reactivity
+				pages = {
+					...pages,
+					[pageId]: {
+						...page,
+						elements: updateNestedElements(
+							page.elements,
+							parentElementId,
+							(parent: ResumeElement) => ({
+								...parent,
+								elements: { ...parent.elements, [newElement.id]: newElement }
+							})
+						)
+					}
+				};
 			} else {
-				// Parent not found, add to page root
-				page.elements = { ...page.elements, [newElement.id]: newElement };
+				// Parent not found, add to page root with proper reactivity
+				pages = {
+					...pages,
+					[pageId]: {
+						...page,
+						elements: { ...page.elements, [newElement.id]: newElement }
+					}
+				};
 			}
 		} else {
-			page.elements = { ...page.elements, [newElement.id]: newElement };
+			// Add to page root with proper reactivity
+			pages = {
+				...pages,
+				[pageId]: {
+					...page,
+					elements: { ...page.elements, [newElement.id]: newElement }
+				}
+			};
 		}
 
 		// select the new element
@@ -127,7 +192,6 @@ const createAppStore = () => {
 
 		const currentElement = page.elements[elementId];
 		if (!currentElement) {
-			// we shouldn't get to this point, since you can't update element not in the view
 			return;
 		}
 
@@ -140,25 +204,40 @@ const createAppStore = () => {
 					...currentElement,
 					...updates,
 					type: 'text'
-				};
+				} as ResumeElement;
 				break;
 			case 'shape':
 				updatedElement = {
 					...currentElement,
 					...updates,
 					type: 'shape'
-				};
+				} as ResumeElement;
 				break;
 			case 'image':
 				updatedElement = {
 					...currentElement,
 					...updates,
 					type: 'image'
-				};
+				} as ResumeElement;
 				break;
 		}
 
-		page.elements[elementId] = updatedElement;
+		// Update the page elements (this triggers reactivity)
+		pages = {
+			...pages,
+			[pageId]: {
+				...page,
+				elements: {
+					...page.elements,
+					[elementId]: updatedElement
+				}
+			}
+		};
+
+		// If this is the currently selected element, update the selectedElement reference
+		if (selectedElement && selectedElement.id === elementId) {
+			selectedElement = updatedElement;
+		}
 	};
 
 	const selectElement = (element: ResumeElement | null) => {
@@ -171,10 +250,23 @@ const createAppStore = () => {
 			return;
 		}
 
-		delete page.elements[elementId];
+		// Create new elements object without the deleted element
+		const newElements = { ...page.elements };
+		delete newElements[elementId];
+
+		// Update pages with reactivity
+		pages = {
+			...pages,
+			[pageId]: {
+				...page,
+				elements: newElements
+			}
+		};
 
 		// Deselect the element after deletion
-		selectElement(null);
+		if (selectedElement && selectedElement.id === elementId) {
+			selectedElement = null;
+		}
 	};
 
 	const deletePage = (pageId: string) => {
@@ -219,17 +311,43 @@ const createAppStore = () => {
 		element.x = newX;
 		element.y = newY;
 
+		// Create new elements structure without the moved element
+		const newElements = createElementsWithout(page.elements, elementId);
+
 		// Add to new parent
 		if (newParentId) {
 			const newParent = findElement(pageId, newParentId);
 			if (newParent) {
-				newParent.elements = { ...newParent.elements, [element.id]: element };
+				// Update the entire pages object with proper reactivity
+				pages = {
+					...pages,
+					[pageId]: {
+						...page,
+						elements: updateNestedElements(newElements, newParentId, (parent: ResumeElement) => ({
+							...parent,
+							elements: { ...parent.elements, [element.id]: element }
+						}))
+					}
+				};
 			} else {
 				// Parent not found, add to page root
-				page.elements = { ...page.elements, [element.id]: element };
+				pages = {
+					...pages,
+					[pageId]: {
+						...page,
+						elements: { ...newElements, [element.id]: element }
+					}
+				};
 			}
 		} else {
-			page.elements = { ...page.elements, [element.id]: element };
+			// Add back to page root
+			pages = {
+				...pages,
+				[pageId]: {
+					...page,
+					elements: { ...newElements, [element.id]: element }
+				}
+			};
 		}
 	};
 
@@ -239,7 +357,14 @@ const createAppStore = () => {
 			return;
 		}
 
-		page.boundaries = boundaries;
+		// Update with proper reactivity
+		pages = {
+			...pages,
+			[pageId]: {
+				...page,
+				boundaries
+			}
+		};
 	};
 
 	return {
