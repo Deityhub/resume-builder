@@ -63,10 +63,12 @@
 	{#if element.type === 'text'}
 		<div
 			class="h-full w-full overflow-hidden p-2"
-			style:font-family={element.fontFamily}
+			style:font-family="{element.fontFamily}, sans-serif"
 			style:font-size="{element.fontSize}px"
 			style:font-weight={element.fontWeight}
 			style:font-style={element.fontStyle}
+			style:text-decoration={element.textDecoration}
+			style:text-transform={element.textTransform}
 			style:color={element.color}
 			contenteditable="true"
 			bind:textContent

@@ -37,8 +37,10 @@ export function getDefaultProperties({
 				text: 'Your text here',
 				fontFamily: 'Inter',
 				fontSize: 16,
-				fontWeight: 'normal',
+				fontWeight: '400',
 				fontStyle: 'normal',
+				textDecoration: 'none',
+				textTransform: 'none',
 				color: '#000000'
 			};
 		case 'shape':

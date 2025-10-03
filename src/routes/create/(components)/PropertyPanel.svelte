@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { fontFamilies, fontSizes } from '$lib/const/font';
+	import {
+		fontFamilies,
+		fontSizes,
+		fontWeights,
+		fontStyles,
+		textDecorations,
+		textTransforms
+	} from '$lib/const/font';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
@@ -122,8 +129,9 @@
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontWeight', e.currentTarget.value)}
 						>
-							<option value="normal">Normal</option>
-							<option value="bold">Bold</option>
+							{#each fontWeights as weight (weight.value)}
+								<option value={weight.value}>{weight.label}</option>
+							{/each}
 						</select>
 					</div>
 					<div>
@@ -134,8 +142,35 @@
 							class="w-full rounded border px-2 py-1 text-sm"
 							onchange={(e) => handlePropertyChange('fontStyle', e.currentTarget.value)}
 						>
-							<option value="normal">Normal</option>
-							<option value="italic">Italic</option>
+							{#each fontStyles as style (style.value)}
+								<option value={style.value}>{style.label}</option>
+							{/each}
+						</select>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Text Decoration</span>
+						<select
+							data-testid="select-text-decoration"
+							value={selectedElement.textDecoration || 'none'}
+							class="w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('textDecoration', e.currentTarget.value)}
+						>
+							{#each textDecorations as decoration (decoration.value)}
+								<option value={decoration.value}>{decoration.label}</option>
+							{/each}
+						</select>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Text Transform</span>
+						<select
+							data-testid="select-text-transform"
+							value={selectedElement.textTransform || 'none'}
+							class="w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('textTransform', e.currentTarget.value)}
+						>
+							{#each textTransforms as transform (transform.value)}
+								<option value={transform.value}>{transform.label}</option>
+							{/each}
 						</select>
 					</div>
 					<div>
@@ -188,7 +223,6 @@
 							class="w-full"
 							onchange={(e) => handlePropertyChange('strokeWidth', parseInt(e.currentTarget.value))}
 						/>
-						<span class="text-sm text-gray-600">{selectedElement.strokeWidth}px</span>
 					</div>
 				</div>
 			{/if}
@@ -222,7 +256,7 @@
 			{/if}
 
 			<!-- Delete Button -->
-			<div class="border-t pt-4">
+			<div class="pt-4">
 				<button
 					data-testid="delete-element-btn"
 					onclick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}

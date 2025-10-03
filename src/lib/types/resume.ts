@@ -16,6 +16,8 @@ export interface TextElement extends BaseElement {
 	fontSize: number;
 	fontWeight: string;
 	fontStyle: string;
+	textDecoration?: string;
+	textTransform?: string;
 	color: string;
 	x: number;
 	y: number;
