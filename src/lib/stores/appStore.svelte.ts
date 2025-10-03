@@ -4,16 +4,21 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
-	const firstPageId = crypto.randomUUID();
-	let pages: Record<string, ResumePage> = $state({
-		[firstPageId]: {
-			id: firstPageId,
+	const getDefaultPage = (id: string): ResumePage => {
+		return {
+			id,
 			elements: {},
 			boundaries: {
 				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
 				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
 			}
-		}
+		};
+	};
+
+	const firstPageId = crypto.randomUUID();
+
+	let pages: Record<string, ResumePage> = $state({
+		[firstPageId]: getDefaultPage(firstPageId)
 	});
 
 	let selectedElement: ResumeElement | null = $state(null);
@@ -33,14 +38,7 @@ const createAppStore = () => {
 
 	// Mutations
 	const addPage = () => {
-		const newPage: ResumePage = {
-			id: crypto.randomUUID(),
-			elements: {},
-			boundaries: {
-				horizontal: { start: 20, end: CANVAS_WIDTH - 20 },
-				vertical: { start: 20, end: CANVAS_HEIGHT - 20 }
-			}
-		};
+		const newPage = getDefaultPage(crypto.randomUUID());
 		pages = { ...pages, [newPage.id]: newPage };
 	};
 	const findElement = (pageId: string, elementId: string): ResumeElement | null => {
