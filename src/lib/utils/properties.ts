@@ -37,24 +37,40 @@ export function getDefaultProperties({
 				text: 'Your text here',
 				fontFamily: 'Inter',
 				fontSize: 16,
-				fontWeight: 'normal',
+				fontWeight: '400',
 				fontStyle: 'normal',
+				textDecoration: 'none',
+				textTransform: 'none',
 				color: '#000000'
 			};
 		case 'shape':
 			return {
 				...baseElement,
 				type: 'shape',
-				shapeType: 'horizontal-line',
+				shapeType: 'line-horizontal',
 				strokeColor: '#000000',
-				strokeWidth: 2
+				strokeWidth: 8,
+				strokeOpacity: 1,
+				strokeStyle: 'solid',
+				fillColor: '#ffffff',
+				fillOpacity: 0,
+				cornerRadius: 0,
+				rotation: 0
 			};
 		case 'image':
 			return {
 				...baseElement,
 				type: 'image',
 				src: '',
-				alt: 'Image'
+				alt: 'Image',
+				objectFit: 'contain',
+				borderRadius: 0,
+				opacity: 1,
+				borderColor: '#000000',
+				borderWidth: 0,
+				borderStyle: 'solid',
+				boxShadow: '',
+				backgroundColor: 'transparent'
 			};
 	}
 }

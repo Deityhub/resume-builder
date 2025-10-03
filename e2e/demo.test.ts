@@ -135,13 +135,13 @@ test.describe('Resume Builder E2E Tests', () => {
 
 		// Test font weight change
 		const fontWeightSelect = page.getByTestId('select-font-weight');
-		await fontWeightSelect.selectOption('bold');
-		await expect(fontWeightSelect).toHaveValue('bold');
+		await fontWeightSelect.selectOption('400');
+		await expect(fontWeightSelect).toHaveValue('400');
 
 		// Test font style change
 		const fontStyleSelect = page.getByTestId('select-font-style');
-		await fontStyleSelect.selectOption('italic');
-		await expect(fontStyleSelect).toHaveValue('italic');
+		await fontStyleSelect.selectOption('normal');
+		await expect(fontStyleSelect).toHaveValue('normal');
 
 		// Test color change
 		const colorInput = page.getByTestId('input-color');
@@ -195,8 +195,8 @@ test.describe('Resume Builder E2E Tests', () => {
 
 		// Test shape type change
 		const shapeTypeSelect = page.getByTestId('select-shape-type');
-		await shapeTypeSelect.selectOption('vertical-line');
-		await expect(shapeTypeSelect).toHaveValue('vertical-line');
+		await shapeTypeSelect.selectOption('line-vertical');
+		await expect(shapeTypeSelect).toHaveValue('line-vertical');
 
 		// Test stroke color change
 		const strokeColorInput = page.getByTestId('input-stroke-color');

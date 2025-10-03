@@ -34,7 +34,8 @@
 
 		try {
 			const data = JSON.parse(event.dataTransfer.getData('application/json'));
-			const rect = (event.target as HTMLElement).getBoundingClientRect();
+			// Use currentTarget (the canvas element), not target (which could be a child)
+			const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 			const page = appStore.getPages()[pageId];
 
 			if (!page) return;
@@ -85,10 +86,20 @@
 			const boundedX = Math.max(horizontal.start, Math.min(x, horizontal.end - elementWidth));
 			const boundedY = Math.max(vertical.start, Math.min(y, vertical.end - elementHeight));
 
-			// Check if dropping on an existing element
+			// Check if dropping on an existing element (search all elements, topmost first)
+			function flatten(
+				elements: Record<string, import('$lib/types/resume').ResumeElement>,
+				acc: import('$lib/types/resume').ResumeElement[] = []
+			): import('$lib/types/resume').ResumeElement[] {
+				for (const el of Object.values(elements)) {
+					acc.push(el);
+					flatten(el.elements, acc);
+				}
+				return acc;
+			}
+			const allElements = flatten(page.elements).sort((a, b) => b.zIndex - a.zIndex);
 			let parentElementId: string | null = null;
-			const elements = Object.values(page.elements);
-			for (const element of elements) {
+			for (const element of allElements) {
 				if (
 					boundedX >= element.x &&
 					boundedX <= element.x + element.width &&

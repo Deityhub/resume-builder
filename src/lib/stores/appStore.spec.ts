@@ -291,7 +291,7 @@ describe('appStore', () => {
 				height: 300
 			});
 
-			const pages = appStore.getPages();
+			let pages = appStore.getPages();
 			const parentId = Object.keys(pages[firstPageId].elements)[0];
 
 			// Add child element
@@ -305,6 +305,7 @@ describe('appStore', () => {
 				parentElementId: parentId
 			});
 
+			pages = appStore.getPages();
 			const parent = pages[firstPageId].elements[parentId];
 			expect(Object.keys(parent.elements).length).toBe(1);
 		});
@@ -318,7 +319,7 @@ describe('appStore', () => {
 				pageId: firstPageId
 			});
 
-			const pages = appStore.getPages();
+			let pages = appStore.getPages();
 			const parentId = Object.keys(pages[firstPageId].elements)[0];
 
 			// Add child
@@ -330,6 +331,7 @@ describe('appStore', () => {
 				parentElementId: parentId
 			});
 
+			pages = appStore.getPages();
 			const parent = pages[firstPageId].elements[parentId];
 			const childId = Object.keys(parent.elements)[0];
 
@@ -354,7 +356,7 @@ describe('appStore', () => {
 				pageId: firstPageId
 			});
 
-			const pages = appStore.getPages();
+			let pages = appStore.getPages();
 			const elementIds = Object.keys(pages[firstPageId].elements);
 			const parent1Id = elementIds[0];
 			const parent2Id = elementIds[1];
@@ -368,6 +370,7 @@ describe('appStore', () => {
 				parentElementId: parent1Id
 			});
 
+			pages = appStore.getPages();
 			const parent1 = pages[firstPageId].elements[parent1Id];
 			const childId = Object.keys(parent1.elements)[0];
 
@@ -380,9 +383,9 @@ describe('appStore', () => {
 				newY: 550
 			});
 
-			const updatedPages = appStore.getPages();
-			const updatedParent1 = updatedPages[firstPageId].elements[parent1Id];
-			const updatedParent2 = updatedPages[firstPageId].elements[parent2Id];
+			pages = appStore.getPages();
+			const updatedParent1 = pages[firstPageId].elements[parent1Id];
+			const updatedParent2 = pages[firstPageId].elements[parent2Id];
 
 			expect(Object.keys(updatedParent1.elements).length).toBe(0);
 			expect(Object.keys(updatedParent2.elements).length).toBe(1);

@@ -2,6 +2,9 @@
 
 A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwind CSS. Create professional resumes with an intuitive drag-and-drop interface, featuring advanced ruler boundaries and real-time editing capabilities.
 
+![CI](https://github.com/Deityhub/resume-builder/workflows/CI/badge.svg)
+![PR Checks](https://github.com/Deityhub/resume-builder/workflows/PR%20Checks/badge.svg)
+
 ## 🚀 Features
 
 ### Core Features
