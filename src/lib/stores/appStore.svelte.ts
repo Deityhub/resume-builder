@@ -10,8 +10,8 @@ const createAppStore = () => {
 			id: firstPageId,
 			elements: {},
 			boundaries: {
-				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
-				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
+				horizontal: { start: 20, end: CANVAS_WIDTH - 20 },
+				vertical: { start: 20, end: CANVAS_HEIGHT - 20 }
 			}
 		}
 	});
@@ -37,8 +37,8 @@ const createAppStore = () => {
 			id: crypto.randomUUID(),
 			elements: {},
 			boundaries: {
-				horizontal: { start: 100, end: CANVAS_WIDTH - 100 },
-				vertical: { start: 100, end: CANVAS_HEIGHT - 100 }
+				horizontal: { start: 20, end: CANVAS_WIDTH - 20 },
+				vertical: { start: 20, end: CANVAS_HEIGHT - 20 }
 			}
 		};
 		pages = { ...pages, [newPage.id]: newPage };

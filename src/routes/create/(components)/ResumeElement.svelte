@@ -87,7 +87,8 @@
 			<svg
 				class="h-full w-full"
 				style:transform="rotate({element.rotation || 0}deg)"
-				viewBox="0 0 {element.width} {element.height}"
+				viewBox="{-element.strokeWidth / 2} {-element.strokeWidth / 2} {element.width +
+					element.strokeWidth} {element.height + element.strokeWidth}"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				{#if element.shapeType === 'rectangle'}
@@ -111,7 +112,7 @@
 					<circle
 						cx={element.width / 2}
 						cy={element.height / 2}
-						r={Math.min(element.width, element.height) / 2}
+						r={Math.min(element.width, element.height) / 2 - element.strokeWidth / 2}
 						fill={element.fillColor || 'none'}
 						fill-opacity={element.fillOpacity || 0}
 						stroke={element.strokeColor}
