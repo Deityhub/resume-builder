@@ -47,9 +47,15 @@ export function getDefaultProperties({
 			return {
 				...baseElement,
 				type: 'shape',
-				shapeType: 'horizontal-line',
+				shapeType: 'line-horizontal',
 				strokeColor: '#000000',
-				strokeWidth: 2
+				strokeWidth: 8,
+				strokeOpacity: 1,
+				strokeStyle: 'solid',
+				fillColor: '#ffffff',
+				fillOpacity: 0,
+				cornerRadius: 0,
+				rotation: 0
 			};
 		case 'image':
 			return {

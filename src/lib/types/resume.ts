@@ -7,6 +7,10 @@ interface BaseElement {
 	pageId: string;
 	zIndex: number; // For stacking order
 	elements: Record<string, ResumeElement>; // Nested child elements
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 export interface TextElement extends BaseElement {
@@ -27,13 +31,30 @@ export interface TextElement extends BaseElement {
 
 export interface ShapeElement extends BaseElement {
 	type: 'shape';
-	shapeType: string;
+	shapeType:
+		| 'rectangle'
+		| 'circle'
+		| 'ellipse'
+		| 'triangle'
+		| 'diamond'
+		| 'star'
+		| 'hexagon'
+		| 'pentagon'
+		| 'line-horizontal'
+		| 'line-vertical'
+		| 'arrow-right'
+		| 'arrow-left'
+		| 'arrow-up'
+		| 'arrow-down';
 	strokeColor: string;
 	strokeWidth: number;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+	strokeOpacity?: number;
+	strokeStyle?: 'solid' | 'dashed' | 'dotted';
+	fillColor?: string;
+	fillOpacity?: number;
+	cornerRadius?: number; // For rectangles
+	sides?: number; // For polygons
+	rotation?: number;
 }
 
 export interface ImageElement extends BaseElement {

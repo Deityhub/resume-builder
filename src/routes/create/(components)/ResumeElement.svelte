@@ -83,20 +83,219 @@
 			}}
 		></div>
 	{:else if element.type === 'shape'}
-		<div class="flex h-full w-full items-center justify-center">
-			{#if element.shapeType === 'horizontal-line'}
-				<div
-					class="w-full"
-					style:height="{element.strokeWidth}px"
-					style:background-color={element.strokeColor}
-				></div>
-			{:else if element.shapeType === 'vertical-line'}
-				<div
-					class="h-full"
-					style:width="{element.strokeWidth}px"
-					style:background-color={element.strokeColor}
-				></div>
-			{/if}
+		<div class="flex h-full w-full items-center justify-center overflow-hidden">
+			<svg
+				class="h-full w-full"
+				style:transform="rotate({element.rotation || 0}deg)"
+				viewBox="0 0 {element.width} {element.height}"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				{#if element.shapeType === 'rectangle'}
+					<rect
+						width={element.width}
+						height={element.height}
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+						rx={element.cornerRadius || 0}
+						ry={element.cornerRadius || 0}
+					/>
+				{:else if element.shapeType === 'circle'}
+					<circle
+						cx={element.width / 2}
+						cy={element.height / 2}
+						r={Math.min(element.width, element.height) / 2}
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'ellipse'}
+					<ellipse
+						cx={element.width / 2}
+						cy={element.height / 2}
+						rx={element.width / 2}
+						ry={element.height / 2}
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'triangle'}
+					<polygon
+						points="{element.width / 2},0 {element.width},{element.height} 0,{element.height}"
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'diamond'}
+					<polygon
+						points="{element.width / 2},0 {element.width},{element.height / 2} {element.width /
+							2},{element.height} 0,{element.height / 2}"
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'star'}
+					<polygon
+						points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35"
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+						transform="scale({element.width / 100}) translate({element.width * 0.5 -
+							50}, {element.height * 0.5 - 45})"
+					/>
+				{:else if element.shapeType === 'hexagon'}
+					<polygon
+						points="{element.width / 2},0 {element.width * 0.75},{element.height *
+							0.25} {element.width * 0.75},{element.height * 0.75} {element.width /
+							2},{element.height} {element.width * 0.25},{element.height * 0.75} {element.width *
+							0.25},{element.height * 0.25}"
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'pentagon'}
+					<polygon
+						points="{element.width / 2},0 {element.width * 0.85},{element.height *
+							0.3} {element.width * 0.95},{element.height * 0.8} {element.width *
+							0.5},{element.height} {element.width * 0.05},{element.height * 0.8} {element.width *
+							0.15},{element.height * 0.3}"
+						fill={element.fillColor || 'none'}
+						fill-opacity={element.fillOpacity || 0}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'line-horizontal'}
+					<line
+						x1="0"
+						y1={element.height / 2}
+						x2={element.width}
+						y2={element.height / 2}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'line-vertical'}
+					<line
+						x1={element.width / 2}
+						y1="0"
+						x2={element.width / 2}
+						y2={element.height}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+						stroke-dasharray={element.strokeStyle === 'dashed'
+							? '5,5'
+							: element.strokeStyle === 'dotted'
+								? '2,2'
+								: 'none'}
+					/>
+				{:else if element.shapeType === 'arrow-right'}
+					<polygon
+						points="0,{element.height / 2} {element.width * 0.7},{element.height /
+							2} {element.width * 0.7},0 {element.width},{element.height / 2} {element.width *
+							0.7},{element.height} {element.width * 0.7},{element.height / 2}"
+						fill={element.fillColor || element.strokeColor}
+						fill-opacity={element.fillOpacity || 1}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+					/>
+				{:else if element.shapeType === 'arrow-left'}
+					<polygon
+						points="{element.width},{element.height / 2} {element.width * 0.3},{element.height /
+							2} {element.width * 0.3},0 0,{element.height / 2} {element.width *
+							0.3},{element.height} {element.width * 0.3},{element.height / 2}"
+						fill={element.fillColor || element.strokeColor}
+						fill-opacity={element.fillOpacity || 1}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+					/>
+				{:else if element.shapeType === 'arrow-up'}
+					<polygon
+						points="{element.width / 2},0 {element.width / 2},{element.height *
+							0.7} 0,{element.height * 0.7} {element.width /
+							2},{element.height} {element.width},{element.height * 0.7} {element.width /
+							2},{element.height * 0.7}"
+						fill={element.fillColor || element.strokeColor}
+						fill-opacity={element.fillOpacity || 1}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+					/>
+				{:else if element.shapeType === 'arrow-down'}
+					<polygon
+						points="{element.width / 2},{element.height} {element.width / 2},{element.height *
+							0.3} 0,{element.height * 0.3} {element.width / 2},0 {element.width},{element.height *
+							0.3} {element.width / 2},{element.height * 0.3}"
+						fill={element.fillColor || element.strokeColor}
+						fill-opacity={element.fillOpacity || 1}
+						stroke={element.strokeColor}
+						stroke-width={element.strokeWidth}
+						stroke-opacity={element.strokeOpacity || 1}
+					/>
+				{/if}
+			</svg>
 		</div>
 	{:else if element.type === 'image'}
 		<div class="flex h-full w-full items-center justify-center bg-gray-100">

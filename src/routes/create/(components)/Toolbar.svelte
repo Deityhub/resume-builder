@@ -3,7 +3,7 @@
 
 	const tools = [
 		{ type: 'text' as ElementType, label: 'Text', icon: 'T' },
-		{ type: 'shape' as ElementType, label: 'Shape', icon: '━' },
+		{ type: 'shape' as ElementType, label: 'Shape', icon: '◇' },
 		{ type: 'image' as ElementType, label: 'Image', icon: '🖼️' }
 	];
 
