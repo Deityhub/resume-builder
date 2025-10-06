@@ -24,10 +24,7 @@
 		onDrop = (_event: DragEvent) => {}
 	}: ResumeCanvasProps = $props();
 
-	let canvasRef: HTMLDivElement;
-	let isDragging = $state(false);
-	let dragStart = $state({ x: 0, y: 0 });
-	let isResizing = $state(false);
+	let showBoundary = $state(true);
 
 	// High-performance drag state (document-level + rAF)
 	let dragRafId: number | null = null;
@@ -45,6 +42,11 @@
 	let dragPreview = $state<{ x: number; y: number; width: number; height: number } | null>(null);
 	let hoveredElementId = $state<string | null>(null);
 	let highlightedElementIds = $state<string[]>([]);
+
+	let canvasRef: HTMLDivElement;
+	let isDragging = $state(false);
+	let dragStart = $state({ x: 0, y: 0 });
+	let isResizing = $state(false);
 
 	const SNAP_THRESHOLD = 10; // pixels
 
@@ -167,9 +169,23 @@
 
 	// Watch for boundary changes and constrain elements
 	$effect(() => {
-		// Access boundaries to make this effect reactive
+		// Access boundaries to make this reactive effect reactive
 		void page.boundaries;
 		constrainElementsToBoundaries();
+	});
+
+	// Handle clicks outside the canvas to hide boundary
+	$effect(() => {
+		const handleDocumentClick = (event: MouseEvent) => {
+			if (!canvasRef?.contains(event.target as Node)) {
+				showBoundary = false;
+			}
+		};
+
+		document.addEventListener('click', handleDocumentClick);
+		return () => {
+			document.removeEventListener('click', handleDocumentClick);
+		};
 	});
 
 	// Snap position to ruler boundaries
@@ -209,8 +225,14 @@
 
 	function handleCanvasClick(event: MouseEvent) {
 		if (event.target === canvasRef) {
+			showBoundary = true;
 			appStore.selectElement(null);
 		}
+	}
+
+	function handleCanvasDragOver(event: DragEvent) {
+		showBoundary = true;
+		onDragover(event);
 	}
 
 	// Track current drag using dragMeta alone (no separate flag/id var)
@@ -539,7 +561,13 @@
 		</div>
 
 		<!-- Canvas wrapper with left margin -->
-		<div class="flex">
+		<div
+			class="flex"
+			onclick={() => (showBoundary = true)}
+			role="button"
+			tabindex="0"
+			onkeydown={null}
+		>
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
@@ -556,7 +584,7 @@
 						cancelDrag();
 					}
 				}}
-				ondragover={onDragover}
+				ondragover={handleCanvasDragOver}
 				ondrop={onDrop}
 				ondragleave={handleDragLeave}
 			>
@@ -603,6 +631,7 @@
 						style:width={pixelsToPercent(element.width, width)}
 						style:height={pixelsToPercent(element.height, height)}
 						style:z-index={element.zIndex}
+						onclick={() => (showBoundary = true)}
 						onpointerdown={(e) => {
 							// Start global, rAF-throttled drag
 							e.preventDefault();
@@ -658,19 +687,21 @@
 				{/if}
 
 				<!-- Boundary visualization -->
-				<div
-					class="pointer-events-none absolute border-2 border-dashed border-blue-400"
-					style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
-					style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
-					style:width={pixelsToPercent(
-						page.boundaries.horizontal.end - page.boundaries.horizontal.start,
-						width
-					)}
-					style:height={pixelsToPercent(
-						page.boundaries.vertical.end - page.boundaries.vertical.start,
-						height
-					)}
-				></div>
+				{#if showBoundary}
+					<div
+						class="pointer-events-none absolute border-2 border-dashed border-blue-400"
+						style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
+						style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
+						style:width={pixelsToPercent(
+							page.boundaries.horizontal.end - page.boundaries.horizontal.start,
+							width
+						)}
+						style:height={pixelsToPercent(
+							page.boundaries.vertical.end - page.boundaries.vertical.start,
+							height
+						)}
+					></div>
+				{/if}
 			</div>
 		</div>
 	</div>
