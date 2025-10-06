@@ -10,6 +10,7 @@
 	import { shapeTypes, strokeStyles } from '$lib/const/shape';
 	import { objectFitOptions, borderStyles } from '$lib/const/image';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
+	import { slide } from 'svelte/transition';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -24,11 +25,12 @@
 	}
 </script>
 
-<div
-	class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4"
-	data-testid="property-panel"
->
-	{#if selectedElement}
+{#if selectedElement}
+	<div
+		transition:slide={{ duration: 300, axis: 'x' }}
+		class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4"
+		data-testid="property-panel"
+	>
 		<div class="space-y-4">
 			<h3 class="mb-4 text-lg font-semibold text-gray-800" data-testid="property-panel-title">
 				{selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)} Properties
@@ -85,18 +87,6 @@
 			{#if selectedElement.type === 'text'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-gray-700">Text Properties</h4>
-
-					<!-- For now there's no point showing the text field here again since it's editable directly in the element. -->
-					<!-- <div>
-						<span class="block text-sm text-gray-600">Text</span>
-						<textarea
-							value={selectedElement.text}
-							class="w-full resize-none rounded border px-2 py-1 text-sm"
-							rows="3"
-							onchange={(e) => handlePropertyChange('text', e.currentTarget.value)}
-						></textarea>
-					</div> -->
-
 					<div>
 						<span class="block text-sm text-gray-600">Font Family</span>
 						<select
@@ -453,9 +443,5 @@
 				</button>
 			</div>
 		</div>
-	{:else}
-		<div class="py-8 text-center text-gray-400" data-testid="no-selection-message">
-			Select an element to edit its properties
-		</div>
-	{/if}
-</div>
+	</div>
+{/if}
