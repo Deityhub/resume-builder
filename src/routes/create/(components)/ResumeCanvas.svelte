@@ -633,7 +633,6 @@
 						}}
 						onpointerdown={(e) => {
 							// Start global, rAF-throttled drag
-							e.preventDefault();
 							// Bring to front to ensure pointer events are not blocked by overlaps
 							const targetTopZ = getNextZIndex();
 							if (element.zIndex < targetTopZ) {
