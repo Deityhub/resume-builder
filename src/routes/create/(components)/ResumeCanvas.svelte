@@ -4,6 +4,8 @@
 	import Ruler from './Ruler.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
+	import { DISPLAY_SCALE } from '$lib/const/dimension';
+	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
@@ -13,6 +15,7 @@
 		height: number;
 		onDragover?: (event: DragEvent) => void;
 		onDrop?: (event: DragEvent) => void;
+		'data-page-id'?: string;
 	}
 
 	const {
@@ -21,13 +24,11 @@
 		width,
 		height,
 		onDragover = (_event: DragEvent) => {},
-		onDrop = (_event: DragEvent) => {}
+		onDrop = (_event: DragEvent) => {},
+		'data-page-id': dataPageId
 	}: ResumeCanvasProps = $props();
 
-	let canvasRef: HTMLDivElement;
-	let isDragging = $state(false);
-	let dragStart = $state({ x: 0, y: 0 });
-	let isResizing = $state(false);
+	let showBoundary = $state(true);
 
 	// High-performance drag state (document-level + rAF)
 	let dragRafId: number | null = null;
@@ -45,6 +46,12 @@
 	let dragPreview = $state<{ x: number; y: number; width: number; height: number } | null>(null);
 	let hoveredElementId = $state<string | null>(null);
 	let highlightedElementIds = $state<string[]>([]);
+
+	let canvasRef: HTMLDivElement;
+	let canvasPageRef: HTMLDivElement;
+	let isDragging = $state(false);
+	let dragStart = $state({ x: 0, y: 0 });
+	let isResizing = $state(false);
 
 	const SNAP_THRESHOLD = 10; // pixels
 
@@ -167,9 +174,23 @@
 
 	// Watch for boundary changes and constrain elements
 	$effect(() => {
-		// Access boundaries to make this effect reactive
+		// Access boundaries to make this reactive effect reactive
 		void page.boundaries;
 		constrainElementsToBoundaries();
+	});
+
+	// Handle clicks outside the canvas to hide boundary
+	$effect(() => {
+		const handleDocumentClick = (event: MouseEvent) => {
+			if (!canvasPageRef?.contains(event.target as Node)) {
+				showBoundary = false;
+			}
+		};
+
+		document.addEventListener('click', handleDocumentClick);
+		return () => {
+			document.removeEventListener('click', handleDocumentClick);
+		};
 	});
 
 	// Snap position to ruler boundaries
@@ -199,18 +220,16 @@
 		return { x: clampedX, y: clampedY };
 	}
 
-	// Scale factor for display (adjust this to control canvas display size)
-	const DISPLAY_SCALE = 0.35; // 35% of actual size for better viewing
-
-	// Convert pixel coordinates to percentage for responsive design
-	function pixelsToPercent(pixels: number, total: number): string {
-		return `${(pixels / total) * 100}%`;
-	}
-
 	function handleCanvasClick(event: MouseEvent) {
 		if (event.target === canvasRef) {
+			showBoundary = true;
 			appStore.selectElement(null);
 		}
+	}
+
+	function handleCanvasDragOver(event: DragEvent) {
+		showBoundary = true;
+		onDragover(event);
 	}
 
 	// Track current drag using dragMeta alone (no separate flag/id var)
@@ -500,7 +519,7 @@
 	}
 </script>
 
-<div class="relative flex">
+<div class="relative flex" data-page-id={dataPageId} bind:this={canvasPageRef}>
 	<div class="relative flex flex-col">
 		<!-- Corner spacer and Horizontal Ruler -->
 		<div class="flex">
@@ -539,7 +558,13 @@
 		</div>
 
 		<!-- Canvas wrapper with left margin -->
-		<div class="flex">
+		<div
+			class="flex"
+			onclick={() => (showBoundary = true)}
+			role="button"
+			tabindex="0"
+			onkeydown={null}
+		>
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
@@ -556,7 +581,7 @@
 						cancelDrag();
 					}
 				}}
-				ondragover={onDragover}
+				ondragover={handleCanvasDragOver}
 				ondrop={onDrop}
 				ondragleave={handleDragLeave}
 			>
@@ -603,9 +628,11 @@
 						style:width={pixelsToPercent(element.width, width)}
 						style:height={pixelsToPercent(element.height, height)}
 						style:z-index={element.zIndex}
+						onclick={() => {
+							showBoundary = true;
+						}}
 						onpointerdown={(e) => {
 							// Start global, rAF-throttled drag
-							e.preventDefault();
 							// Bring to front to ensure pointer events are not blocked by overlaps
 							const targetTopZ = getNextZIndex();
 							if (element.zIndex < targetTopZ) {
@@ -658,19 +685,21 @@
 				{/if}
 
 				<!-- Boundary visualization -->
-				<div
-					class="pointer-events-none absolute border-2 border-dashed border-blue-400"
-					style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
-					style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
-					style:width={pixelsToPercent(
-						page.boundaries.horizontal.end - page.boundaries.horizontal.start,
-						width
-					)}
-					style:height={pixelsToPercent(
-						page.boundaries.vertical.end - page.boundaries.vertical.start,
-						height
-					)}
-				></div>
+				{#if showBoundary}
+					<div
+						class="pointer-events-none absolute border-2 border-dashed border-blue-400"
+						style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
+						style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
+						style:width={pixelsToPercent(
+							page.boundaries.horizontal.end - page.boundaries.horizontal.start,
+							width
+						)}
+						style:height={pixelsToPercent(
+							page.boundaries.vertical.end - page.boundaries.vertical.start,
+							height
+						)}
+					></div>
+				{/if}
 			</div>
 		</div>
 	</div>

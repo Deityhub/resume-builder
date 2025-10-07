@@ -2,8 +2,9 @@
 	import ResumeCanvas from './(components)/ResumeCanvas.svelte';
 	import Toolbar from './(components)/Toolbar.svelte';
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
+	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import type { ElementType } from '$lib/types/resume';
+	import type { ElementType, ResumeElement } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
@@ -12,6 +13,8 @@
 		string,
 		{ updateDragPreview?: (event: DragEvent) => void; clearDragPreview?: () => void }
 	> = {};
+
+	let exportModalOpen = $state(false);
 
 	function handleDragOver(event: DragEvent, pageId: string) {
 		event.preventDefault();
@@ -88,9 +91,9 @@
 
 			// Check if dropping on an existing element (search all elements, topmost first)
 			function flatten(
-				elements: Record<string, import('$lib/types/resume').ResumeElement>,
-				acc: import('$lib/types/resume').ResumeElement[] = []
-			): import('$lib/types/resume').ResumeElement[] {
+				elements: Record<string, ResumeElement>,
+				acc: ResumeElement[] = []
+			): ResumeElement[] {
 				for (const el of Object.values(elements)) {
 					acc.push(el);
 					flatten(el.elements, acc);
@@ -147,9 +150,14 @@
 				</span>
 			</div>
 
-			<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn"
-				>Add Page</Button
-			>
+			<div class="flex items-center gap-2">
+				<Button onClick={() => (exportModalOpen = true)} variant="ghost" data-testid="export-btn">
+					Export PDF
+				</Button>
+				<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn"
+					>Add Page</Button
+				>
+			</div>
 		</div>
 
 		<!-- Canvas -->
@@ -162,6 +170,7 @@
 						showDeleteButton={pages.length > 1}
 						width={CANVAS_WIDTH}
 						height={CANVAS_HEIGHT}
+						data-page-id={page.id}
 						onDragover={(e) => handleDragOver(e, page.id)}
 						onDrop={(e) => handleDrop(e, page.id)}
 					/>
@@ -172,4 +181,7 @@
 
 	<!-- Property Panel -->
 	<PropertyPanel />
+
+	<!-- Export Modal -->
+	<ExportModal isOpen={exportModalOpen} onClose={() => (exportModalOpen = false)} />
 </div>

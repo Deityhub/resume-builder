@@ -88,6 +88,7 @@
 		aria-disabled={isDisabled}
 		tabindex={isDisabled ? -1 : undefined}
 		onclick={handleClick}
+		data-html2canvas-ignore
 		{...restProps}
 	>
 		{#if pending}
@@ -113,7 +114,14 @@
 		{/if}
 	</a>
 {:else}
-	<button {type} class={buttonClasses} disabled={isDisabled} onclick={handleClick} {...restProps}>
+	<button
+		data-html2canvas-ignore
+		{type}
+		class={buttonClasses}
+		disabled={isDisabled}
+		onclick={handleClick}
+		{...restProps}
+	>
 		{#if pending}
 			<span class="inline-flex items-center">
 				<svg

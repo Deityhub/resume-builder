@@ -23,23 +23,23 @@
 	const edgeHandles: Array<{ direction: ResizeDirection; class: string; style: string }> = [
 		{
 			direction: 'n',
-			class: 'top-0 left-1/2 -translate-x-1/2 cursor-n-resize',
-			style: 'width: 60px; height: 4px;'
+			class: 'top-0 left-1/2 -translate-x-1/2 cursor-n-resize w-[50%] max-w-[60px]',
+			style: 'height: 2px;'
 		},
 		{
 			direction: 's',
-			class: 'bottom-0 left-1/2 -translate-x-1/2 cursor-s-resize',
-			style: 'width: 60px; height: 4px;'
+			class: 'bottom-0 left-1/2 -translate-x-1/2 cursor-s-resize w-[50%] max-w-[60px]',
+			style: 'height: 2px;'
 		},
 		{
 			direction: 'e',
-			class: 'right-0 top-1/2 -translate-y-1/2 cursor-e-resize',
-			style: 'width: 4px; height: 60px;'
+			class: 'right-0 top-1/2 -translate-y-1/2 cursor-e-resize h-[50%] max-h-[60px]',
+			style: 'width: 2px;'
 		},
 		{
 			direction: 'w',
-			class: 'left-0 top-1/2 -translate-y-1/2 cursor-w-resize',
-			style: 'width: 4px; height: 60px;'
+			class: 'left-0 top-1/2 -translate-y-1/2 cursor-w-resize h-[50%] max-h-[60px]',
+			style: 'width: 2px;'
 		}
 	];
 
