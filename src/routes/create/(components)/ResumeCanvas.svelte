@@ -4,6 +4,8 @@
 	import Ruler from './Ruler.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
+	import { DISPLAY_SCALE } from '$lib/const/dimension';
+	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
@@ -13,6 +15,7 @@
 		height: number;
 		onDragover?: (event: DragEvent) => void;
 		onDrop?: (event: DragEvent) => void;
+		'data-page-id'?: string;
 	}
 
 	const {
@@ -21,7 +24,8 @@
 		width,
 		height,
 		onDragover = (_event: DragEvent) => {},
-		onDrop = (_event: DragEvent) => {}
+		onDrop = (_event: DragEvent) => {},
+		'data-page-id': dataPageId
 	}: ResumeCanvasProps = $props();
 
 	let showBoundary = $state(true);
@@ -44,6 +48,7 @@
 	let highlightedElementIds = $state<string[]>([]);
 
 	let canvasRef: HTMLDivElement;
+	let canvasPageRef: HTMLDivElement;
 	let isDragging = $state(false);
 	let dragStart = $state({ x: 0, y: 0 });
 	let isResizing = $state(false);
@@ -177,7 +182,7 @@
 	// Handle clicks outside the canvas to hide boundary
 	$effect(() => {
 		const handleDocumentClick = (event: MouseEvent) => {
-			if (!canvasRef?.contains(event.target as Node)) {
+			if (!canvasPageRef?.contains(event.target as Node)) {
 				showBoundary = false;
 			}
 		};
@@ -213,14 +218,6 @@
 		const clampedY = Math.max(vertical.start, Math.min(y, vertical.end - elementHeight));
 
 		return { x: clampedX, y: clampedY };
-	}
-
-	// Scale factor for display (adjust this to control canvas display size)
-	const DISPLAY_SCALE = 0.35; // 35% of actual size for better viewing
-
-	// Convert pixel coordinates to percentage for responsive design
-	function pixelsToPercent(pixels: number, total: number): string {
-		return `${(pixels / total) * 100}%`;
 	}
 
 	function handleCanvasClick(event: MouseEvent) {
@@ -522,7 +519,7 @@
 	}
 </script>
 
-<div class="relative flex">
+<div class="relative flex" data-page-id={dataPageId} bind:this={canvasPageRef}>
 	<div class="relative flex flex-col">
 		<!-- Corner spacer and Horizontal Ruler -->
 		<div class="flex">
@@ -631,7 +628,9 @@
 						style:width={pixelsToPercent(element.width, width)}
 						style:height={pixelsToPercent(element.height, height)}
 						style:z-index={element.zIndex}
-						onclick={() => (showBoundary = true)}
+						onclick={() => {
+							showBoundary = true;
+						}}
 						onpointerdown={(e) => {
 							// Start global, rAF-throttled drag
 							e.preventDefault();

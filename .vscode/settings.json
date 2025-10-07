@@ -7,14 +7,10 @@
 	},
 	"eslint.format.enable": true,
 	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "explicit"
+		"source.fixAll.eslint": "always"
 	},
 	"typescript.preferences.importModuleSpecifier": "shortest",
 	"typescript.suggest.autoImports": true,
-	"typescript.inlayHints.parameterNames.enabled": "all",
-	"typescript.inlayHints.variableTypes.enabled": true,
-	"typescript.inlayHints.functionLikeReturnTypes.enabled": true,
-	"typescript.inlayHints.propertyDeclarationTypes.enabled": true,
 	"svelte.enable-ts-plugin": true,
 	"svelte.plugin.svelte.format.enable": true,
 	"svelte.plugin.svelte.completions.enable": true,
