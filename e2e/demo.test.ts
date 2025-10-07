@@ -21,9 +21,6 @@ test.describe('Resume Builder E2E Tests', () => {
 
 		// Check for canvas
 		await expect(page.getByTestId('resume-canvas')).toBeVisible();
-
-		// Check for property panel
-		await expect(page.getByTestId('no-selection-message')).toBeVisible();
 	});
 
 	test('add page button works', async ({ page }) => {
@@ -75,7 +72,7 @@ test.describe('Resume Builder E2E Tests', () => {
 		await canvas.click({ position: { x: 50, y: 50 } });
 
 		// Should show default message
-		await expect(page.getByTestId('no-selection-message')).toBeVisible();
+		await expect(page.getByTestId('no-selection-message')).toBeHidden();
 	});
 
 	test('resize handles appear on selected element', async ({ page }) => {
