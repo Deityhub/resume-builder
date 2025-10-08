@@ -7,7 +7,7 @@ import type {
 	TextElement
 } from '$lib/types/resume';
 import html2canvas from 'html2canvas';
-import { pixelsToPercent } from '.';
+import { getAllElements, pixelsToPercent } from '.';
 
 /**
  * Utility function to render a page's elements into a DOM container
@@ -22,16 +22,6 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
 	container.style.position = 'relative';
 	container.style.backgroundColor = '#ffffff';
 
-	// Recursive function to flatten nested elements by z-index
-	function getAllElements(elements: Record<string, ResumeElement>): ResumeElement[] {
-		const result: ResumeElement[] = [];
-		for (const el of Object.values(elements)) {
-			result.push(el);
-			result.push(...getAllElements(el.elements));
-		}
-		return result;
-	}
-
 	// Get all elements sorted by z-index (bottom to top)
 	const allElements = getAllElements(page.elements).sort((a, b) => a.zIndex - b.zIndex);
 
@@ -44,6 +34,25 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
 
 /**
  * Create a DOM element representing a resume element
+ */
+/**
+ * Creates a DOM element representing a resume element with correct positioning and styling.
+ * Handles positioning, sizing, and z-index for the base element before type-specific rendering.
+ *
+ * @param element - The resume element to create a DOM representation for
+ * @returns HTMLElement with base styling applied
+ *
+ * @example
+ * ```ts
+ * const domElement = createElementDiv({
+ *   type: 'text',
+ *   x: 100,
+ *   y: 100,
+ *   width: 200,
+ *   height: 50,
+ *   zIndex: 1
+ * });
+ * ```
  */
 function createElementDiv(element: ResumeElement): HTMLElement {
 	const div = document.createElement('div');
@@ -75,6 +84,23 @@ function createElementDiv(element: ResumeElement): HTMLElement {
 /**
  * Render text element with exact styling
  */
+/**
+ * Applies text-specific styling and content to a DOM element.
+ * Handles font properties, text transformations, and content placement.
+ *
+ * @param div - The DOM element to style
+ * @param element - The text element containing styling properties
+ *
+ * @example
+ * ```ts
+ * renderTextElement(div, {
+ *   fontFamily: 'Inter',
+ *   fontSize: 16,
+ *   fontWeight: '400',
+ *   text: 'Hello World'
+ * });
+ * ```
+ */
 function renderTextElement(div: HTMLElement, element: TextElement): void {
 	div.style.fontFamily = `${element.fontFamily}, sans-serif`;
 	div.style.fontSize = `${element.fontSize}px`;
@@ -91,6 +117,23 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
 
 /**
  * Render shape element with SVG - handles all supported shapes with exact styling
+ */
+/**
+ * Renders a shape element using SVG for precise vector graphics.
+ * Handles shape creation, styling, and transformations.
+ * Supports multiple shape types including lines, rectangles, circles, etc.
+ *
+ * @param div - The container DOM element
+ * @param element - The shape element with type and styling properties
+ *
+ * @example
+ * ```ts
+ * renderShapeElement(div, {
+ *   shapeType: 'line-horizontal',
+ *   strokeColor: '#000000',
+ *   strokeWidth: 2
+ * });
+ * ```
  */
 function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 	div.style.display = 'flex';

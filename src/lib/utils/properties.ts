@@ -1,6 +1,31 @@
 import type { ElementType, ResumeElement } from '../types/resume';
 import { CANVAS_WIDTH } from '../const/dimension';
 
+/**
+ * Creates a new resume element with default properties based on the element type.
+ * Each element type (text, shape, image) gets its own set of default styling and attributes.
+ *
+ * @param params - Element creation parameters
+ * @param params.type - The type of element to create ('text', 'shape', or 'image')
+ * @param params.x - Horizontal position on the canvas
+ * @param params.y - Vertical position on the canvas
+ * @param params.pageId - ID of the page this element belongs to
+ * @param params.width - Width of the element (defaults to canvas width minus margins)
+ * @param params.height - Height of the element (defaults to 500)
+ * @param params.zIndex - Stack order of the element (defaults to 0)
+ *
+ * @returns A new ResumeElement with type-specific default properties
+ *
+ * @example
+ * ```ts
+ * const textElement = getDefaultProperties({
+ *   type: 'text',
+ *   x: 100,
+ *   y: 100,
+ *   pageId: 'page1'
+ * });
+ * ```
+ */
 export function getDefaultProperties({
 	type,
 	x,

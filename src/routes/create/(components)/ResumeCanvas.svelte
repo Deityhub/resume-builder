@@ -5,7 +5,7 @@
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
 	import { DISPLAY_SCALE } from '$lib/const/dimension';
-	import { pixelsToPercent } from '$lib/utils';
+	import { getAllElements, pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
@@ -66,16 +66,6 @@
 			el1.y + el1.height < el2.y ||
 			el2.y + el2.height < el1.y
 		);
-	}
-
-	// Get all elements recursively (flattened)
-	function getAllElements(elements: Record<string, ResumeElement>): ResumeElement[] {
-		const result: ResumeElement[] = [];
-		for (const el of Object.values(elements)) {
-			result.push(el);
-			result.push(...getAllElements(el.elements));
-		}
-		return result;
 	}
 
 	// Get elements that overlap with the given element
