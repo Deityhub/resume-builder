@@ -257,7 +257,7 @@
 						stroke-width={element.strokeWidth}
 						stroke-opacity={element.strokeOpacity || 1}
 					/>
-				{:else if element.shapeType === 'arrow-up'}
+				{:else if element.shapeType === 'arrow-down'}
 					<polygon
 						points="{element.width / 2},0 {element.width / 2},{element.height *
 							0.7} 0,{element.height * 0.7} {element.width /
@@ -269,7 +269,7 @@
 						stroke-width={element.strokeWidth}
 						stroke-opacity={element.strokeOpacity || 1}
 					/>
-				{:else if element.shapeType === 'arrow-down'}
+				{:else if element.shapeType === 'arrow-up'}
 					<polygon
 						points="{element.width / 2},{element.height} {element.width / 2},{element.height *
 							0.3} 0,{element.height * 0.3} {element.width / 2},0 {element.width},{element.height *
