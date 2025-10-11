@@ -32,7 +32,7 @@
 	}: ButtonProps = $props();
 
 	const focusRingClass = variant === 'destructive' ? 'focus:ring-red-500' : 'focus:ring-indigo-500';
-	const baseClasses = `cursor-pointer inline-flex items-center justify-center font-medium rounded-lg transition-colors ${variant !== 'text' && variant !== 'ghost' ? `focus:outline-none focus:ring-2 focus:ring-offset-2 ${focusRingClass}` : ''}`;
+	const baseClasses = `inline-flex items-center justify-center font-medium rounded-lg transition-colors ${variant !== 'text' && variant !== 'ghost' ? `focus:outline-none focus:ring-2 focus:ring-offset-2 ${focusRingClass}` : ''}`;
 
 	const variantClasses: Record<ButtonVariant, string> = {
 		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg',
@@ -50,12 +50,14 @@
 	const spinnerColor =
 		variant === 'primary' || variant === 'destructive' ? 'text-white' : 'text-indigo-600';
 
-	const buttonClasses = $state(
+	const isDisabled = $derived(disabled || pending);
+
+	const buttonClasses = $derived(
 		[
 			baseClasses,
 			variantClasses[variant],
 			sizeClasses,
-			disabled || pending ? disabledClasses : '',
+			isDisabled ? disabledClasses : 'cursor-pointer',
 			widthClass,
 			className,
 			pending ? 'relative' : ''
@@ -63,8 +65,6 @@
 			.filter(Boolean)
 			.join(' ')
 	);
-
-	const isDisabled = $derived(disabled || pending);
 
 	function handleClick(event: MouseEvent) {
 		if (isDisabled) {
