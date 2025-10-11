@@ -1,11 +1,5 @@
 export const fontFamilies = [
 	'Inter',
-	'Arial',
-	'Helvetica',
-	'Times New Roman',
-	'Georgia',
-	'Verdana',
-	'Courier New',
 	'Roboto',
 	'Open Sans',
 	'Montserrat',
@@ -13,13 +7,19 @@ export const fontFamilies = [
 	'Raleway',
 	'Merriweather',
 	'Playfair Display',
-	'Source Sans Pro',
+	'Source Code Pro',
 	'Nunito',
 	'Lato',
 	'Roboto Condensed',
 	'Oswald',
-	'PT Sans',
-	'Roboto Slab'
+	'Roboto Slab',
+	/** System Fonts */
+	'Arial',
+	'Helvetica',
+	'Times New Roman',
+	'Georgia',
+	'Verdana',
+	'Courier New'
 ] as const;
 
 export const fontSizes = [
@@ -41,8 +41,7 @@ export const fontWeights = [
 
 export const fontStyles = [
 	{ value: 'normal', label: 'Normal' },
-	{ value: 'italic', label: 'Italic' },
-	{ value: 'oblique', label: 'Oblique' }
+	{ value: 'italic', label: 'Italic' }
 ] as const;
 
 export const textDecorations = [
