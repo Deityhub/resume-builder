@@ -207,10 +207,10 @@
 					/>
 				{:else if element.shapeType === 'line-horizontal'}
 					<line
-						x1="0"
-						y1={element.height / 2}
-						x2={element.width}
-						y2={element.height / 2}
+						x1="-100%"
+						y1="50%"
+						x2="120%"
+						y2="50%"
 						stroke={element.strokeColor}
 						stroke-width={element.strokeWidth}
 						stroke-opacity={element.strokeOpacity || 1}
@@ -222,10 +222,10 @@
 					/>
 				{:else if element.shapeType === 'line-vertical'}
 					<line
-						x1={element.width / 2}
-						y1="0"
-						x2={element.width / 2}
-						y2={element.height}
+						x1="50%"
+						y1="-100%"
+						x2="50%"
+						y2="120%"
 						stroke={element.strokeColor}
 						stroke-width={element.strokeWidth}
 						stroke-opacity={element.strokeOpacity || 1}

@@ -410,10 +410,10 @@ function createPentagon(svg: SVGSVGElement, element: ShapeElement): void {
 function createHorizontalLine(svg: SVGSVGElement, element: ShapeElement): void {
 	const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
-	line.setAttribute('x1', '0');
-	line.setAttribute('y1', (element.height / 2).toString());
-	line.setAttribute('x2', element.width.toString());
-	line.setAttribute('y2', (element.height / 2).toString());
+	line.setAttribute('x1', '-100%');
+	line.setAttribute('y1', '50%');
+	line.setAttribute('x2', '120%');
+	line.setAttribute('y2', '50%');
 
 	line.setAttribute('stroke', element.strokeColor || '#000000');
 	line.setAttribute('stroke-width', (element.strokeWidth || 1).toString());
@@ -432,10 +432,10 @@ function createHorizontalLine(svg: SVGSVGElement, element: ShapeElement): void {
 function createVerticalLine(svg: SVGSVGElement, element: ShapeElement): void {
 	const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
-	line.setAttribute('x1', (element.width / 2).toString());
-	line.setAttribute('y1', '0');
-	line.setAttribute('x2', (element.width / 2).toString());
-	line.setAttribute('y2', element.height.toString());
+	line.setAttribute('x1', '50%');
+	line.setAttribute('y1', '-100%');
+	line.setAttribute('x2', '50%');
+	line.setAttribute('y2', '120%');
 
 	line.setAttribute('stroke', element.strokeColor || '#000000');
 	line.setAttribute('stroke-width', (element.strokeWidth || 1).toString());
