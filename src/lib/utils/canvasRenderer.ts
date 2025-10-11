@@ -108,6 +108,7 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
 	div.style.fontStyle = element.fontStyle;
 	div.style.textDecoration = element.textDecoration || 'none';
 	div.style.textTransform = element.textTransform || 'none';
+	div.style.textAlign = element.textAlign || 'left';
 	div.style.color = element.color;
 
 	// Handle text content

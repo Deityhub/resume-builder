@@ -58,3 +58,10 @@ export const textTransforms = [
 	{ value: 'capitalize', label: 'Capitalize' },
 	{ value: 'full-width', label: 'Full Width' }
 ] as const;
+
+export const textAlignments = [
+	{ value: 'left', label: 'Left' },
+	{ value: 'center', label: 'Center' },
+	{ value: 'right', label: 'Right' },
+	{ value: 'justify', label: 'Justify' }
+] as const;

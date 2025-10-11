@@ -5,7 +5,8 @@
 		fontWeights,
 		fontStyles,
 		textDecorations,
-		textTransforms
+		textTransforms,
+		textAlignments
 	} from '$lib/const/font';
 	import { shapeTypes, strokeStyles } from '$lib/const/shape';
 	import { objectFitOptions, borderStyles } from '$lib/const/image';
@@ -172,6 +173,19 @@
 							class="h-8 w-full rounded border px-2 py-1 text-sm"
 							oninput={(e) => handlePropertyChange('color', e.currentTarget.value)}
 						/>
+					</div>
+					<div>
+						<span class="block text-sm text-gray-600">Text Alignment</span>
+						<select
+							data-testid="select-text-alignment"
+							value={selectedElement.textAlign || 'left'}
+							class="w-full rounded border px-2 py-1 text-sm"
+							onchange={(e) => handlePropertyChange('textAlign', e.currentTarget.value)}
+						>
+							{#each textAlignments as alignment (alignment.value)}
+								<option value={alignment.value}>{alignment.label}</option>
+							{/each}
+						</select>
 					</div>
 				</div>
 			{/if}
