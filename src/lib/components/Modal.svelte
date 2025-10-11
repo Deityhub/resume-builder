@@ -1,0 +1,90 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import Button from './Button.svelte';
+
+	interface Props {
+		open: boolean;
+		title?: string;
+		description?: string;
+		onCancel?: () => void;
+		onAccept?: () => void;
+		cancelLabel?: string;
+		acceptLabel?: string;
+		disableActions?: boolean;
+		showCancelAction?: boolean;
+		showAcceptAction?: boolean;
+		closeFromBackdrop?: boolean;
+		children: Snippet;
+	}
+
+	const {
+		open = false,
+		title = '',
+		description = '',
+		onCancel = () => {},
+		onAccept = () => {},
+		cancelLabel = 'Cancel',
+		acceptLabel = 'OK',
+		disableActions = false,
+		showCancelAction = true,
+		showAcceptAction = true,
+		closeFromBackdrop = false,
+		children
+	}: Props = $props();
+
+	function handleBackdropClick(e: MouseEvent) {
+		if (e.target === e.currentTarget && closeFromBackdrop) {
+			onCancel?.();
+		}
+	}
+</script>
+
+{#if open}
+	<div
+		class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black"
+		onclick={handleBackdropClick}
+		onkeydown={null}
+		role="dialog"
+		aria-modal="true"
+		tabindex="0"
+	>
+		<div class="mx-4 w-full max-w-lg rounded-lg bg-white shadow-xl">
+			<div class="flex items-start justify-between p-6">
+				<div class="pr-4">
+					{#if title}
+						<h2 class="text-lg font-semibold">{title}</h2>
+					{/if}
+					{#if description}
+						<p class="mt-1 text-sm text-gray-600">{description}</p>
+					{/if}
+				</div>
+				<Button variant="text" onClick={onCancel} disabled={disableActions}>
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						></path>
+					</svg>
+				</Button>
+			</div>
+
+			<div class="px-6 pb-6">
+				{@render children()}
+			</div>
+
+			<div class="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+				{#if showCancelAction}
+					<Button variant="ghost" onClick={onCancel} disabled={disableActions}>{cancelLabel}</Button
+					>
+				{/if}
+				{#if showAcceptAction}
+					<Button variant="primary" onClick={onAccept} disabled={disableActions}
+						>{acceptLabel}</Button
+					>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}

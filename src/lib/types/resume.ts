@@ -22,6 +22,7 @@ export interface TextElement extends BaseElement {
 	fontStyle: string;
 	textDecoration?: string;
 	textTransform?: string;
+	textAlign?: 'left' | 'center' | 'right' | 'justify';
 	color: string;
 	x: number;
 	y: number;

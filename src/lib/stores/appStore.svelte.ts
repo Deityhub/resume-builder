@@ -224,22 +224,41 @@ const createAppStore = () => {
 		selectedElement = element;
 	};
 
+	// Recursively delete element from anywhere in the hierarchy
+	const deleteFromElements = (
+		elements: Record<string, ResumeElement>,
+		elementId: string
+	): Record<string, ResumeElement> => {
+		const result: Record<string, ResumeElement> = {};
+
+		for (const [id, element] of Object.entries(elements)) {
+			if (id === elementId) {
+				// Skip this element (delete it)
+				continue;
+			}
+
+			// Recursively process nested elements
+			result[id] = {
+				...element,
+				elements: deleteFromElements(element.elements, elementId)
+			};
+		}
+
+		return result;
+	};
+
 	const deleteElement = (elementId: string, pageId: string) => {
 		const page = pages[pageId];
 		if (!page) {
 			return;
 		}
 
-		// Create new elements object without the deleted element
-		const newElements = { ...page.elements };
-		delete newElements[elementId];
-
 		// Update pages with reactivity
 		pages = {
 			...pages,
 			[pageId]: {
 				...page,
-				elements: newElements
+				elements: deleteFromElements(page.elements, elementId)
 			}
 		};
 

@@ -69,6 +69,7 @@
 			style:font-style={element.fontStyle}
 			style:text-decoration={element.textDecoration}
 			style:text-transform={element.textTransform}
+			style:text-align={element.textAlign || 'left'}
 			style:color={element.color}
 			contenteditable="true"
 			bind:textContent

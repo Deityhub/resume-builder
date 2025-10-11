@@ -1,3 +1,6 @@
 # allow crawling everything by default
 User-agent: *
 Disallow:
+
+# crawl delay for respectful crawling (e.g., 10 seconds between requests)
+Crawl-delay: 10
