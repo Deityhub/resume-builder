@@ -55,8 +55,7 @@ export const textTransforms = [
 	{ value: 'none', label: 'None' },
 	{ value: 'uppercase', label: 'Uppercase' },
 	{ value: 'lowercase', label: 'Lowercase' },
-	{ value: 'capitalize', label: 'Capitalize' },
-	{ value: 'full-width', label: 'Full Width' }
+	{ value: 'capitalize', label: 'Capitalize' }
 ] as const;
 
 export const textAlignments = [
