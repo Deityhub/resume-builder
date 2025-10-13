@@ -3,7 +3,12 @@
 	import ResumeElementComponent from './ResumeElement.svelte';
 	import Ruler from './Ruler.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
-	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
+	import type {
+		ResumeElement,
+		ResumePage,
+		ResizeDirection,
+		TCanvasInstance
+	} from '$lib/types/resume';
 	import { DISPLAY_SCALE } from '$lib/const/dimension';
 	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
@@ -16,6 +21,7 @@
 		onDragover?: (event: DragEvent) => void;
 		onDrop?: (event: DragEvent) => void;
 		'data-page-id'?: string;
+		onMount?: (instance: TCanvasInstance) => void;
 	}
 
 	const {
@@ -25,12 +31,24 @@
 		height,
 		onDragover = (_event: DragEvent) => {},
 		onDrop = (_event: DragEvent) => {},
-		'data-page-id': dataPageId
+		'data-page-id': dataPageId,
+		onMount
 	}: ResumeCanvasProps = $props();
 
-	let showBoundary = $state(true);
+	// Create component instance for onMount callback
+	const componentInstance: TCanvasInstance = {
+		updateDragPreview,
+		clearDragPreview
+	};
 
-	// High-performance drag state (document-level + rAF)
+	// Call onMount when component is initialized
+	$effect(() => {
+		if (onMount) {
+			onMount(componentInstance);
+		}
+	});
+
+	let showBoundary = $state(true);
 	let dragRafId: number | null = null;
 	let lastPointer = { x: 0, y: 0 };
 	let dragMeta: {

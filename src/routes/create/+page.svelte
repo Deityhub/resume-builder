@@ -4,15 +4,20 @@
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import type { ElementType } from '$lib/types/resume';
+	import type { ElementType, TCanvasInstance } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
 	const pages = $derived(Object.values(appStore.getPages()));
-	const canvasRefs: Record<
-		string,
-		{ updateDragPreview?: (event: DragEvent) => void; clearDragPreview?: () => void }
-	> = {};
+	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
+
+	function setCanvasRefInstance(pageId: string, instance: TCanvasInstance) {
+		canvasInstances[pageId] = instance;
+	}
+
+	function getCanvasRefInstance(pageId: string): TCanvasInstance | undefined {
+		return canvasInstances[pageId];
+	}
 
 	let exportModalOpen = $state(false);
 
@@ -24,7 +29,7 @@
 		}
 
 		// Update drag preview in the canvas component
-		const canvasComponent = canvasRefs[pageId];
+		const canvasComponent = getCanvasRefInstance(pageId);
 		if (canvasComponent && canvasComponent.updateDragPreview) {
 			canvasComponent.updateDragPreview(event);
 		}
@@ -115,7 +120,7 @@
 			});
 
 			// Clear drag preview
-			const canvasComponent = canvasRefs[pageId];
+			const canvasComponent = getCanvasRefInstance(pageId);
 			if (canvasComponent && canvasComponent.clearDragPreview) {
 				canvasComponent.clearDragPreview();
 			}
@@ -155,7 +160,7 @@
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
 					<ResumeCanvas
-						bind:this={canvasRefs[page.id]}
+						bind:this={canvasInstances[page.id]}
 						{page}
 						showDeleteButton={pages.length > 1}
 						width={CANVAS_WIDTH}
@@ -163,6 +168,7 @@
 						data-page-id={page.id}
 						onDragover={(e) => handleDragOver(e, page.id)}
 						onDrop={(e) => handleDrop(e, page.id)}
+						onMount={(instance: TCanvasInstance) => setCanvasRefInstance(page.id, instance)}
 					/>
 				{/each}
 			</div>
