@@ -107,8 +107,12 @@
 							: element.strokeStyle === 'dotted'
 								? '2,2'
 								: 'none'}
-						rx={element.cornerRadius ? `${((element.width - element.strokeWidth) * element.cornerRadius) / 100}px` : '0px'}
-						ry={element.cornerRadius ? `${((element.height - element.strokeWidth) * element.cornerRadius) / 100}px` : '0px'}
+						rx={element.cornerRadius
+							? `${((element.width - element.strokeWidth) * element.cornerRadius) / 100}px`
+							: '0px'}
+						ry={element.cornerRadius
+							? `${((element.height - element.strokeWidth) * element.cornerRadius) / 100}px`
+							: '0px'}
 					/>
 				{:else if element.shapeType === 'circle'}
 					<circle
