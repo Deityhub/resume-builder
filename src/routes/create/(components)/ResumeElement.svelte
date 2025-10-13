@@ -88,14 +88,15 @@
 			<svg
 				class="h-full w-full"
 				style:transform="rotate({element.rotation || 0}deg)"
-				viewBox="{-element.strokeWidth / 2} {-element.strokeWidth / 2} {element.width +
-					element.strokeWidth} {element.height + element.strokeWidth}"
+				viewBox="0 0 {element.width} {element.height}"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				{#if element.shapeType === 'rectangle'}
 					<rect
-						width={element.width}
-						height={element.height}
+						x={element.strokeWidth / 2}
+						y={element.strokeWidth / 2}
+						width={element.width - element.strokeWidth}
+						height={element.height - element.strokeWidth}
 						fill={element.fillColor || 'none'}
 						fill-opacity={element.fillOpacity || 0}
 						stroke={element.strokeColor}
@@ -106,8 +107,8 @@
 							: element.strokeStyle === 'dotted'
 								? '2,2'
 								: 'none'}
-						rx={element.cornerRadius ? `${(element.width * element.cornerRadius) / 100}px` : '0px'}
-						ry={element.cornerRadius ? `${(element.height * element.cornerRadius) / 100}px` : '0px'}
+						rx={element.cornerRadius ? `${((element.width - element.strokeWidth) * element.cornerRadius) / 100}px` : '0px'}
+						ry={element.cornerRadius ? `${((element.height - element.strokeWidth) * element.cornerRadius) / 100}px` : '0px'}
 					/>
 				{:else if element.shapeType === 'circle'}
 					<circle
