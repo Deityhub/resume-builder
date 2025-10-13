@@ -4,7 +4,7 @@
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import type { ElementType, ResumeElement } from '$lib/types/resume';
+	import type { ElementType } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
@@ -90,17 +90,7 @@
 			const boundedY = Math.max(vertical.start, Math.min(y, vertical.end - elementHeight));
 
 			// Check if dropping on an existing element (search all elements, topmost first)
-			function flatten(
-				elements: Record<string, ResumeElement>,
-				acc: ResumeElement[] = []
-			): ResumeElement[] {
-				for (const el of Object.values(elements)) {
-					acc.push(el);
-					flatten(el.elements, acc);
-				}
-				return acc;
-			}
-			const allElements = flatten(page.elements).sort((a, b) => b.zIndex - a.zIndex);
+			const allElements = Object.values(page.elements).sort((a, b) => b.zIndex - a.zIndex);
 			let parentElementId: string | null = null;
 			for (const element of allElements) {
 				if (

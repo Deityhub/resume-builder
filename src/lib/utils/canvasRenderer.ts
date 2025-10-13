@@ -7,7 +7,7 @@ import type {
 	TextElement
 } from '$lib/types/resume';
 import html2canvas from 'html2canvas';
-import { getAllElements, pixelsToPercent } from '.';
+import { pixelsToPercent } from './index';
 
 /**
  * Utility function to render a page's elements into a DOM container
@@ -23,7 +23,7 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
 	container.style.backgroundColor = '#ffffff';
 
 	// Get all elements sorted by z-index (bottom to top)
-	const allElements = getAllElements(page.elements).sort((a, b) => a.zIndex - b.zIndex);
+	const allElements = Object.values(page.elements).sort((a, b) => a.zIndex - b.zIndex);
 
 	// Render each element
 	for (const element of allElements) {

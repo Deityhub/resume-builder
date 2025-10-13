@@ -13,6 +13,7 @@ import { CANVAS_WIDTH } from '../const/dimension';
  * @param params.width - Width of the element (defaults to canvas width minus margins)
  * @param params.height - Height of the element (defaults to 500)
  * @param params.zIndex - Stack order of the element (defaults to 0)
+ * @param params.parentElementId - ID of the parent element (defaults to null)
  *
  * @returns A new ResumeElement with type-specific default properties
  *
@@ -22,7 +23,8 @@ import { CANVAS_WIDTH } from '../const/dimension';
  *   type: 'text',
  *   x: 100,
  *   y: 100,
- *   pageId: 'page1'
+ *   pageId: 'page1',
+ *   parentElementId: 'parentElementId'
  * });
  * ```
  */
@@ -33,7 +35,8 @@ export function getDefaultProperties({
 	pageId,
 	width = CANVAS_WIDTH - 200, // Default to canvas width minus margins
 	height = 500,
-	zIndex = 0
+	zIndex = 0,
+	parentElementId = null
 }: {
 	type: ElementType;
 	x: number;
@@ -42,11 +45,13 @@ export function getDefaultProperties({
 	width?: number;
 	height?: number;
 	zIndex?: number;
+	parentElementId?: string | null;
 }): ResumeElement {
 	const baseElement = {
 		id: crypto.randomUUID(),
 		pageId,
 		zIndex,
+		parentElementId,
 		elements: {},
 		x,
 		y,

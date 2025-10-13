@@ -5,7 +5,7 @@
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type { ResumeElement, ResumePage, ResizeDirection } from '$lib/types/resume';
 	import { DISPLAY_SCALE } from '$lib/const/dimension';
-	import { getAllElements, pixelsToPercent } from '$lib/utils';
+	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
 	interface ResumeCanvasProps {
@@ -70,21 +70,21 @@
 
 	// Get elements that overlap with the given element
 	function getOverlappingElements(element: ResumeElement): ResumeElement[] {
-		const allElements = getAllElements(page.elements);
-		return allElements.filter((el) => el.id !== element.id && elementsOverlap(element, el));
+		return Object.values(page.elements).filter(
+			(el) => el.id !== element.id && elementsOverlap(element, el)
+		);
 	}
 
 	function getNextZIndex(): number {
-		const all = getAllElements(page.elements);
-		if (all.length === 0) return 0;
-		return Math.max(...all.map((e) => e.zIndex)) + 1;
+		const elements = Object.values(page.elements);
+		if (elements.length === 0) return 0;
+		return Math.max(...elements.map((e) => e.zIndex)) + 1;
 	}
 
 	// Find which element (if any) contains the given point
 	function findElementAtPosition(x: number, y: number, excludeId?: string): ResumeElement | null {
-		const allElements = getAllElements(page.elements);
 		// Sort by zIndex descending to check top elements first
-		const sorted = allElements.sort((a, b) => b.zIndex - a.zIndex);
+		const sorted = [...Object.values(page.elements)].sort((a, b) => b.zIndex - a.zIndex);
 
 		for (const el of sorted) {
 			if (el.id === excludeId) continue;
@@ -476,9 +476,8 @@
 		dragPreview = { x, y, width: previewWidth, height: previewHeight };
 
 		// Check for hovered element
-		const allElements = getAllElements(page.elements);
 		let foundHover = false;
-		for (const element of allElements) {
+		for (const element of Object.values(page.elements)) {
 			if (
 				x >= element.x &&
 				x <= element.x + element.width &&
@@ -596,8 +595,8 @@
 					</Button>
 				{/if}
 
-				<!-- Render all elements (sorted by zIndex, flattened from nested structure) -->
-				{#each getAllElements(page.elements).sort((a, b) => a.zIndex - b.zIndex) as element (element.id)}
+				<!-- Render all elements (sorted by zIndex) -->
+				{#each Object.values(page.elements).sort((a, b) => a.zIndex - b.zIndex) as element (element.id)}
 					{@const isSelected = selectedElement?.id === element.id}
 					{@const isHighlighted = highlightedElementIds.includes(element.id)}
 					{@const isHovered = hoveredElementId === element.id}
@@ -668,7 +667,7 @@
 				{/if}
 
 				<!-- Selection outline for empty canvas -->
-				{#if !selectedElement && Object.values(page.elements).length === 0}
+				{#if !selectedElement && Object.keys(page.elements).length === 0}
 					<div class="absolute inset-4 flex items-center justify-center text-gray-400">
 						Drag and drop elements from toolbar to create them
 					</div>
