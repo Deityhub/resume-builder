@@ -173,10 +173,9 @@
 					/>
 				{:else if element.shapeType === 'hexagon'}
 					<polygon
-						points="{element.width / 2},0 {element.width * 0.75},{element.height *
-							0.25} {element.width * 0.75},{element.height * 0.75} {element.width /
-							2},{element.height} {element.width * 0.25},{element.height * 0.75} {element.width *
-							0.25},{element.height * 0.25}"
+						points="{element.width / 2},0 {element.width},{element.height *
+							0.25} {element.width},{element.height * 0.75} {element.width /
+							2},{element.height} 0,{element.height * 0.75} 0,{element.height * 0.25}"
 						fill={element.fillColor || 'none'}
 						fill-opacity={element.fillOpacity || 0}
 						stroke={element.strokeColor}

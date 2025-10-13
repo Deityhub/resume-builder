@@ -360,7 +360,7 @@ function createDiamond(svg: SVGSVGElement, element: ShapeElement): void {
 function createHexagon(svg: SVGSVGElement, element: ShapeElement): void {
 	const hexagon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width * 0.75},${element.height * 0.25} ${element.width * 0.75},${element.height * 0.75} ${element.width / 2},${element.height} ${element.width * 0.25},${element.height * 0.75} ${element.width * 0.25},${element.height * 0.25}`;
+	const points = `${element.width / 2},0 ${element.width},${element.height * 0.25} ${element.width},${element.height * 0.75} ${element.width / 2},${element.height} 0,${element.height * 0.75} 0,${element.height * 0.25}`;
 	hexagon.setAttribute('points', points);
 
 	// Fill properties
