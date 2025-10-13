@@ -75,12 +75,6 @@
 		);
 	}
 
-	function getNextZIndex(): number {
-		const elements = Object.values(page.elements);
-		if (elements.length === 0) return 0;
-		return Math.max(...elements.map((e) => e.zIndex)) + 1;
-	}
-
 	// Find which element (if any) contains the given point
 	function findElementAtPosition(x: number, y: number, excludeId?: string): ResumeElement | null {
 		// Sort by zIndex descending to check top elements first
@@ -245,13 +239,6 @@
 				newY: latest.y
 			});
 
-			// Bring to front and select so it remains interactive after drop
-			const topZ = getNextZIndex();
-			appStore.updateElement({
-				elementId: latest.id,
-				updates: { zIndex: topZ },
-				pageId: latest.pageId
-			});
 			const updated = appStore.findElement(latest.pageId, latest.id);
 			if (updated) {
 				appStore.selectElement(updated);
@@ -622,15 +609,6 @@
 						}}
 						onpointerdown={(e) => {
 							// Start global, rAF-throttled drag
-							// Bring to front to ensure pointer events are not blocked by overlaps
-							const targetTopZ = getNextZIndex();
-							if (element.zIndex < targetTopZ) {
-								appStore.updateElement({
-									elementId: element.id,
-									updates: { zIndex: targetTopZ },
-									pageId: element.pageId
-								});
-							}
 							isDragging = true;
 							dragStart = { x: e.clientX, y: e.clientY };
 							dragMeta = {
