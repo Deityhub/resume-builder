@@ -151,11 +151,10 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 	svg.style.transform = `rotate(${element.rotation || 0}deg)`;
 
 	// Set viewBox to include stroke width for proper rendering
-	const strokeWidth = element.strokeWidth || 1;
-	const viewBoxX = -strokeWidth / 2;
-	const viewBoxY = -strokeWidth / 2;
-	const viewBoxWidth = element.width + strokeWidth;
-	const viewBoxHeight = element.height + strokeWidth;
+	const viewBoxX = 0;
+	const viewBoxY = 0;
+	const viewBoxWidth = element.width;
+	const viewBoxHeight = element.height;
 
 	svg.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
 
@@ -211,10 +210,10 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 function createRectangle(svg: SVGSVGElement, element: ShapeElement): void {
 	const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
-	rect.setAttribute('width', element.width.toString());
-	rect.setAttribute('height', element.height.toString());
-	rect.setAttribute('x', '0');
-	rect.setAttribute('y', '0');
+	rect.setAttribute('width', (element.width - element.strokeWidth).toString());
+	rect.setAttribute('height', (element.height - element.strokeWidth).toString());
+	rect.setAttribute('x', (element.strokeWidth / 2).toString());
+	rect.setAttribute('y', (element.strokeWidth / 2).toString());
 
 	// Fill properties
 	rect.setAttribute('fill', element.fillColor || 'none');
@@ -237,11 +236,15 @@ function createRectangle(svg: SVGSVGElement, element: ShapeElement): void {
 	// Corner radius for rounded rectangles
 	rect.setAttribute(
 		'rx',
-		element.cornerRadius ? `${(element.width * element.cornerRadius) / 100}px` : '0px'
+		element.cornerRadius
+			? `${((element.width - element.strokeWidth) * element.cornerRadius) / 100}px`
+			: '0px'
 	);
 	rect.setAttribute(
 		'ry',
-		element.cornerRadius ? `${(element.height * element.cornerRadius) / 100}px` : '0px'
+		element.cornerRadius
+			? `${((element.height - element.strokeWidth) * element.cornerRadius) / 100}px`
+			: '0px'
 	);
 
 	svg.appendChild(rect);
