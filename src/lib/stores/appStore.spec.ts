@@ -279,67 +279,7 @@ describe('appStore', () => {
 		});
 	});
 
-	describe('Nested Elements', () => {
-		it('should add element with parent', () => {
-			// Add parent element
-			appStore.addElement({
-				type: 'text',
-				x: 100,
-				y: 100,
-				pageId: firstPageId,
-				width: 400,
-				height: 300
-			});
-
-			let pages = appStore.getPages();
-			const parentId = Object.keys(pages[firstPageId].elements)[0];
-
-			// Add child element
-			appStore.addElement({
-				type: 'shape',
-				x: 150,
-				y: 150,
-				pageId: firstPageId,
-				width: 200,
-				height: 2,
-				parentElementId: parentId
-			});
-
-			pages = appStore.getPages();
-			const parent = pages[firstPageId].elements[parentId];
-			expect(Object.keys(parent.elements).length).toBe(1);
-		});
-
-		it('should find nested element', () => {
-			// Add parent
-			appStore.addElement({
-				type: 'text',
-				x: 100,
-				y: 100,
-				pageId: firstPageId
-			});
-
-			let pages = appStore.getPages();
-			const parentId = Object.keys(pages[firstPageId].elements)[0];
-
-			// Add child
-			appStore.addElement({
-				type: 'shape',
-				x: 150,
-				y: 150,
-				pageId: firstPageId,
-				parentElementId: parentId
-			});
-
-			pages = appStore.getPages();
-			const parent = pages[firstPageId].elements[parentId];
-			const childId = Object.keys(parent.elements)[0];
-
-			const foundElement = appStore.findElement(firstPageId, childId);
-			expect(foundElement).not.toBeNull();
-			expect(foundElement?.type).toBe('shape');
-		});
-
+	describe('Elements Dropped in Another Element', () => {
 		it('should move element between parents', () => {
 			// Add two parent elements
 			appStore.addElement({
@@ -371,9 +311,14 @@ describe('appStore', () => {
 			});
 
 			pages = appStore.getPages();
-			const parent1 = pages[firstPageId].elements[parent1Id];
-			const childId = Object.keys(parent1.elements)[0];
+			const foundChildElement = Object.values(pages[firstPageId].elements).find((element) => {
+				return element.parentElementId === parent1Id;
+			});
+			expect(foundChildElement?.x).toBe(150);
+			expect(foundChildElement?.y).toBe(150);
+			expect(foundChildElement?.parentElementId).toBe(parent1Id);
 
+			const childId = foundChildElement?.id || 'missing_id';
 			// Move child to parent2
 			appStore.moveElement({
 				pageId: firstPageId,
@@ -384,11 +329,13 @@ describe('appStore', () => {
 			});
 
 			pages = appStore.getPages();
-			const updatedParent1 = pages[firstPageId].elements[parent1Id];
-			const updatedParent2 = pages[firstPageId].elements[parent2Id];
+			const childElement = Object.values(pages[firstPageId].elements).find((element) => {
+				return element.parentElementId === parent2Id;
+			});
 
-			expect(Object.keys(updatedParent1.elements).length).toBe(0);
-			expect(Object.keys(updatedParent2.elements).length).toBe(1);
+			expect(childElement?.x).toBe(550);
+			expect(childElement?.y).toBe(550);
+			expect(childElement?.parentElementId).toBe(parent2Id);
 		});
 	});
 });
