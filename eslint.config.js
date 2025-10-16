@@ -35,7 +35,12 @@ export default defineConfig(
 				}
 			],
 			'@typescript-eslint/no-explicit-any': 'warn',
-			'no-console': 'warn',
+			'no-console': [
+				'error',
+				{
+					allow: ['warn', 'error']
+				}
+			],
 			'prefer-const': 'error',
 			'no-var': 'error'
 		}

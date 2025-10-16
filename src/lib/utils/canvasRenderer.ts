@@ -6,8 +6,8 @@ import type {
 	ShapeElement,
 	TextElement
 } from '$lib/types/resume';
-import html2canvas from 'html2canvas';
-import { getAllElements, pixelsToPercent } from '.';
+import { pixelsToPercent } from './index';
+import { toCanvas } from 'html-to-image';
 
 /**
  * Utility function to render a page's elements into a DOM container
@@ -23,7 +23,7 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
 	container.style.backgroundColor = '#ffffff';
 
 	// Get all elements sorted by z-index (bottom to top)
-	const allElements = getAllElements(page.elements).sort((a, b) => a.zIndex - b.zIndex);
+	const allElements = Object.values(page.elements).sort((a, b) => a.zIndex - b.zIndex);
 
 	// Render each element
 	for (const element of allElements) {
@@ -65,19 +65,25 @@ function createElementDiv(element: ResumeElement): HTMLElement {
 	div.style.height = pixelsToPercent(element.height, CANVAS_HEIGHT);
 	div.style.zIndex = element.zIndex.toString();
 
+	const elementDiv = document.createElement('div');
+	elementDiv.style.position = 'relative';
+	elementDiv.style.width = '100%';
+	elementDiv.style.height = '100%';
+
 	// Apply element-specific styling based on type
 	switch (element.type) {
 		case 'text':
-			renderTextElement(div, element);
+			renderTextElement(elementDiv, element);
 			break;
 		case 'shape':
-			renderShapeElement(div, element);
+			renderShapeElement(elementDiv, element);
 			break;
 		case 'image':
-			renderImageElement(div, element);
+			renderImageElement(elementDiv, element);
 			break;
 	}
 
+	div.appendChild(elementDiv);
 	return div;
 }
 
@@ -88,12 +94,12 @@ function createElementDiv(element: ResumeElement): HTMLElement {
  * Applies text-specific styling and content to a DOM element.
  * Handles font properties, text transformations, and content placement.
  *
- * @param div - The DOM element to style
+ * @param parentDiv - The parent DOM element to append the styled element to
  * @param element - The text element containing styling properties
  *
  * @example
  * ```ts
- * renderTextElement(div, {
+ * renderTextElement(parentDiv, {
  *   fontFamily: 'Inter',
  *   fontSize: 16,
  *   fontWeight: '400',
@@ -101,7 +107,11 @@ function createElementDiv(element: ResumeElement): HTMLElement {
  * });
  * ```
  */
-function renderTextElement(div: HTMLElement, element: TextElement): void {
+function renderTextElement(parentDiv: HTMLElement, element: TextElement): void {
+	const div = document.createElement('div');
+	div.style.height = '100%';
+	div.style.width = '100%';
+
 	div.style.fontFamily = `${element.fontFamily}, sans-serif`;
 	div.style.fontSize = `${element.fontSize}px`;
 	div.style.fontWeight = element.fontWeight;
@@ -110,10 +120,13 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
 	div.style.textTransform = element.textTransform || 'none';
 	div.style.textAlign = element.textAlign || 'left';
 	div.style.color = element.color;
+	div.style.padding = '8px';
 
 	// Handle text content
 	div.textContent = element.text;
 	div.style.overflow = 'hidden';
+
+	parentDiv.appendChild(div);
 }
 
 /**
@@ -124,19 +137,23 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
  * Handles shape creation, styling, and transformations.
  * Supports multiple shape types including lines, rectangles, circles, etc.
  *
- * @param div - The container DOM element
+ * @param parentDiv - The container DOM element to append the styled element to
  * @param element - The shape element with type and styling properties
  *
  * @example
  * ```ts
- * renderShapeElement(div, {
+ * renderShapeElement(parentDiv, {
  *   shapeType: 'line-horizontal',
  *   strokeColor: '#000000',
  *   strokeWidth: 2
  * });
  * ```
  */
-function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
+function renderShapeElement(parentDiv: HTMLElement, element: ShapeElement): void {
+	const div = document.createElement('div');
+	div.style.height = '100%';
+	div.style.width = '100%';
+
 	div.style.display = 'flex';
 	div.style.alignItems = 'center';
 	div.style.justifyContent = 'center';
@@ -151,11 +168,13 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 	svg.style.transform = `rotate(${element.rotation || 0}deg)`;
 
 	// Set viewBox to include stroke width for proper rendering
-	const strokeWidth = element.strokeWidth || 1;
-	const viewBoxX = -strokeWidth / 2;
-	const viewBoxY = -strokeWidth / 2;
-	const viewBoxWidth = element.width + strokeWidth;
-	const viewBoxHeight = element.height + strokeWidth;
+	const strokePadding = element.strokeWidth || 1;
+	const viewBoxX = 0;
+	const viewBoxY = 0;
+	const viewBoxWidth =
+		element.shapeType === 'rectangle' ? element.width : element.width + strokePadding;
+	const viewBoxHeight =
+		element.shapeType === 'rectangle' ? element.height : element.height + strokePadding;
 
 	svg.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
 
@@ -203,6 +222,7 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 	}
 
 	div.appendChild(svg);
+	parentDiv.appendChild(div);
 }
 
 /**
@@ -211,10 +231,11 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 function createRectangle(svg: SVGSVGElement, element: ShapeElement): void {
 	const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
-	rect.setAttribute('width', element.width.toString());
-	rect.setAttribute('height', element.height.toString());
-	rect.setAttribute('x', '0');
-	rect.setAttribute('y', '0');
+	const strokePadding = element.strokeWidth || 1;
+	rect.setAttribute('x', (strokePadding / 2).toString());
+	rect.setAttribute('y', (strokePadding / 2).toString());
+	rect.setAttribute('width', (element.width - strokePadding).toString());
+	rect.setAttribute('height', (element.height - strokePadding).toString());
 
 	// Fill properties
 	rect.setAttribute('fill', element.fillColor || 'none');
@@ -237,11 +258,15 @@ function createRectangle(svg: SVGSVGElement, element: ShapeElement): void {
 	// Corner radius for rounded rectangles
 	rect.setAttribute(
 		'rx',
-		element.cornerRadius ? `${(element.width * element.cornerRadius) / 100}px` : '0px'
+		element.cornerRadius
+			? `${((element.width - strokePadding) * element.cornerRadius) / 100}px`
+			: '0px'
 	);
 	rect.setAttribute(
 		'ry',
-		element.cornerRadius ? `${(element.height * element.cornerRadius) / 100}px` : '0px'
+		element.cornerRadius
+			? `${((element.height - strokePadding) * element.cornerRadius) / 100}px`
+			: '0px'
 	);
 
 	svg.appendChild(rect);
@@ -253,9 +278,10 @@ function createRectangle(svg: SVGSVGElement, element: ShapeElement): void {
 function createCircle(svg: SVGSVGElement, element: ShapeElement): void {
 	const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 
-	const cx = element.width / 2;
-	const cy = element.height / 2;
-	const radius = Math.min(element.width, element.height) / 2 - element.strokeWidth / 2;
+	const strokePadding = element.strokeWidth || 1;
+	const cx = element.width / 2 + strokePadding / 2;
+	const cy = element.height / 2 + strokePadding / 2;
+	const radius = Math.min(element.width, element.height) / 2;
 
 	circle.setAttribute('cx', cx.toString());
 	circle.setAttribute('cy', cy.toString());
@@ -283,8 +309,9 @@ function createCircle(svg: SVGSVGElement, element: ShapeElement): void {
 function createEllipse(svg: SVGSVGElement, element: ShapeElement): void {
 	const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
 
-	ellipse.setAttribute('cx', (element.width / 2).toString());
-	ellipse.setAttribute('cy', (element.height / 2).toString());
+	const strokePadding = element.strokeWidth || 1;
+	ellipse.setAttribute('cx', (element.width / 2 + strokePadding / 2).toString());
+	ellipse.setAttribute('cy', (element.height / 2 + strokePadding / 2).toString());
 	ellipse.setAttribute('rx', (element.width / 2).toString());
 	ellipse.setAttribute('ry', (element.height / 2).toString());
 
@@ -310,7 +337,8 @@ function createEllipse(svg: SVGSVGElement, element: ShapeElement): void {
 function createTriangle(svg: SVGSVGElement, element: ShapeElement): void {
 	const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width},${element.height} 0,${element.height}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width / 2 + strokePadding / 2},${strokePadding / 2} ${element.width + strokePadding / 2},${element.height + strokePadding / 2} ${strokePadding / 2},${element.height + strokePadding / 2}`;
 	triangle.setAttribute('points', points);
 
 	// Fill properties
@@ -335,7 +363,8 @@ function createTriangle(svg: SVGSVGElement, element: ShapeElement): void {
 function createDiamond(svg: SVGSVGElement, element: ShapeElement): void {
 	const diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width},${element.height / 2} ${element.width / 2},${element.height} 0,${element.height / 2}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width / 2 + strokePadding / 2},${strokePadding / 2} ${element.width + strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width / 2 + strokePadding / 2},${element.height + strokePadding / 2} ${strokePadding / 2},${element.height / 2 + strokePadding / 2}`;
 	diamond.setAttribute('points', points);
 
 	// Fill properties
@@ -360,7 +389,8 @@ function createDiamond(svg: SVGSVGElement, element: ShapeElement): void {
 function createHexagon(svg: SVGSVGElement, element: ShapeElement): void {
 	const hexagon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width * 0.75},${element.height * 0.25} ${element.width * 0.75},${element.height * 0.75} ${element.width / 2},${element.height} ${element.width * 0.25},${element.height * 0.75} ${element.width * 0.25},${element.height * 0.25}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width / 2 + strokePadding / 2},${strokePadding / 2} ${element.width + strokePadding / 2},${element.height * 0.25 + strokePadding / 2} ${element.width + strokePadding / 2},${element.height * 0.75 + strokePadding / 2} ${element.width / 2 + strokePadding / 2},${element.height + strokePadding / 2} ${strokePadding / 2},${element.height * 0.75 + strokePadding / 2} ${strokePadding / 2},${element.height * 0.25 + strokePadding / 2}`;
 	hexagon.setAttribute('points', points);
 
 	// Fill properties
@@ -385,7 +415,8 @@ function createHexagon(svg: SVGSVGElement, element: ShapeElement): void {
 function createPentagon(svg: SVGSVGElement, element: ShapeElement): void {
 	const pentagon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width * 0.85},${element.height * 0.3} ${element.width * 0.95},${element.height * 0.8} ${element.width * 0.5},${element.height} ${element.width * 0.05},${element.height * 0.8} ${element.width * 0.15},${element.height * 0.3}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width / 2 + strokePadding / 2},${strokePadding / 2} ${element.width * 0.85 + strokePadding / 2},${element.height * 0.3 + strokePadding / 2} ${element.width * 0.95 + strokePadding / 2},${element.height * 0.8 + strokePadding / 2} ${element.width * 0.5 + strokePadding / 2},${element.height + strokePadding / 2} ${element.width * 0.05 + strokePadding / 2},${element.height * 0.8 + strokePadding / 2} ${element.width * 0.15 + strokePadding / 2},${element.height * 0.3 + strokePadding / 2}`;
 	pentagon.setAttribute('points', points);
 
 	// Fill properties
@@ -410,10 +441,10 @@ function createPentagon(svg: SVGSVGElement, element: ShapeElement): void {
 function createHorizontalLine(svg: SVGSVGElement, element: ShapeElement): void {
 	const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
-	line.setAttribute('x1', '0');
-	line.setAttribute('y1', (element.height / 2).toString());
-	line.setAttribute('x2', element.width.toString());
-	line.setAttribute('y2', (element.height / 2).toString());
+	line.setAttribute('x1', '-100%');
+	line.setAttribute('y1', '50%');
+	line.setAttribute('x2', '120%');
+	line.setAttribute('y2', '50%');
 
 	line.setAttribute('stroke', element.strokeColor || '#000000');
 	line.setAttribute('stroke-width', (element.strokeWidth || 1).toString());
@@ -432,10 +463,10 @@ function createHorizontalLine(svg: SVGSVGElement, element: ShapeElement): void {
 function createVerticalLine(svg: SVGSVGElement, element: ShapeElement): void {
 	const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
-	line.setAttribute('x1', (element.width / 2).toString());
-	line.setAttribute('y1', '0');
-	line.setAttribute('x2', (element.width / 2).toString());
-	line.setAttribute('y2', element.height.toString());
+	line.setAttribute('x1', '50%');
+	line.setAttribute('y1', '-100%');
+	line.setAttribute('x2', '50%');
+	line.setAttribute('y2', '120%');
 
 	line.setAttribute('stroke', element.strokeColor || '#000000');
 	line.setAttribute('stroke-width', (element.strokeWidth || 1).toString());
@@ -454,7 +485,8 @@ function createVerticalLine(svg: SVGSVGElement, element: ShapeElement): void {
 function createArrowRight(svg: SVGSVGElement, element: ShapeElement): void {
 	const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `0,${element.height / 2} ${element.width * 0.7},${element.height / 2} ${element.width * 0.7},0 ${element.width},${element.height / 2} ${element.width * 0.7},${element.height} ${element.width * 0.7},${element.height / 2}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.7 + strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.7 + strokePadding / 2},${strokePadding / 2} ${element.width + strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.7 + strokePadding / 2},${element.height + strokePadding / 2} ${element.width * 0.7 + strokePadding / 2},${element.height / 2 + strokePadding / 2}`;
 	arrow.setAttribute('points', points);
 
 	// Fill properties - use strokeColor if no fillColor specified
@@ -476,7 +508,8 @@ function createArrowRight(svg: SVGSVGElement, element: ShapeElement): void {
 function createArrowLeft(svg: SVGSVGElement, element: ShapeElement): void {
 	const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width},${element.height / 2} ${element.width * 0.3},${element.height / 2} ${element.width * 0.3},0 0,${element.height / 2} ${element.width * 0.3},${element.height} ${element.width * 0.3},${element.height / 2}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width + strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.3 + strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.3 + strokePadding / 2},${strokePadding / 2} ${strokePadding / 2},${element.height / 2 + strokePadding / 2} ${element.width * 0.3 + strokePadding / 2},${element.height + strokePadding / 2} ${element.width * 0.3 + strokePadding / 2},${element.height / 2 + strokePadding / 2}`;
 	arrow.setAttribute('points', points);
 
 	// Fill properties - use strokeColor if no fillColor specified
@@ -498,7 +531,18 @@ function createArrowLeft(svg: SVGSVGElement, element: ShapeElement): void {
 function createArrowUp(svg: SVGSVGElement, element: ShapeElement): void {
 	const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},0 ${element.width / 2},${element.height * 0.7} 0,${element.height * 0.7} ${element.width / 2},${element.height} ${element.width},${element.height * 0.7} ${element.width / 2},${element.height * 0.7}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `
+	${element.width / 2 + strokePadding / 2},${
+		element.height + strokePadding / 2
+	} ${element.width / 2 + strokePadding / 2},${
+		element.height * 0.3 + strokePadding / 2
+	} ${strokePadding / 2},${element.height * 0.3 + strokePadding / 2} ${
+		element.width / 2 + strokePadding / 2
+	},${strokePadding / 2} ${element.width + strokePadding / 2},${
+		element.height * 0.3 + strokePadding / 2
+	} ${element.width / 2 + strokePadding / 2},${element.height * 0.3 + strokePadding / 2}
+	`;
 	arrow.setAttribute('points', points);
 
 	// Fill properties - use strokeColor if no fillColor specified
@@ -520,7 +564,18 @@ function createArrowUp(svg: SVGSVGElement, element: ShapeElement): void {
 function createArrowDown(svg: SVGSVGElement, element: ShapeElement): void {
 	const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-	const points = `${element.width / 2},${element.height} ${element.width / 2},${element.height * 0.3} 0,${element.height * 0.3} ${element.width / 2},0 ${element.width},${element.height * 0.3} ${element.width / 2},${element.height * 0.3}`;
+	const strokePadding = element.strokeWidth || 1;
+	const points = `${element.width / 2 + strokePadding / 2},${
+		strokePadding / 2
+	} ${element.width / 2 + strokePadding / 2},${
+		element.height * 0.7 + strokePadding / 2
+	} ${strokePadding / 2},${element.height * 0.7 + strokePadding / 2} ${
+		element.width / 2 + strokePadding / 2
+	},${element.height + strokePadding / 2} ${
+		element.width + strokePadding / 2
+	},${element.height * 0.7 + strokePadding / 2} ${
+		element.width / 2 + strokePadding / 2
+	},${element.height * 0.7 + strokePadding / 2}`;
 	arrow.setAttribute('points', points);
 
 	// Fill properties - use strokeColor if no fillColor specified
@@ -581,15 +636,12 @@ function getBackgroundSize(objectFit?: string): string {
  * Utility function to create a hidden canvas for export purposes
  * This can be used for PDF generation or preview
  */
-export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasElement> {
+export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasElement | void> {
 	const width = CANVAS_WIDTH * DISPLAY_SCALE;
 	const height = CANVAS_HEIGHT * DISPLAY_SCALE;
 
 	// Create a temporary container
 	const container = document.createElement('div');
-	container.style.position = 'absolute';
-	container.style.left = '-9999px';
-	container.style.top = '-9999px';
 	container.style.width = `${width}px`;
 	container.style.height = `${height}px`;
 	document.body.appendChild(container);
@@ -598,22 +650,15 @@ export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasEl
 		// Render the page into the container
 		renderPageToCanvas(container, page);
 
-		// Use html2canvas to capture the rendered content
-		// const { default: html2canvas } = await import('html2canvas');
-		const canvas = await html2canvas(container, {
-			backgroundColor: '#ffffff',
-			scale: 2, // High quality for export
-			useCORS: true,
-			allowTaint: false,
-			width: width,
-			height: height,
-			// Ensure clean capture without UI elements
-			ignoreElements: (element) => {
-				return element.tagName === 'SCRIPT' || element.tagName === 'STYLE';
-			}
+		const canvas = await toCanvas(container, {
+			canvasWidth: width,
+			canvasHeight: height,
+			backgroundColor: '#ffffff'
 		});
 
 		return canvas;
+	} catch (_error) {
+		console.error('Error creating export canvas: ', _error);
 	} finally {
 		// Clean up the temporary container
 		document.body.removeChild(container);
@@ -626,5 +671,9 @@ export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasEl
  */
 export async function getPageImageData(page: ResumePage): Promise<string> {
 	const canvas = await createExportCanvas(page);
+
+	if (!canvas) {
+		return '';
+	}
 	return canvas.toDataURL('image/png');
 }

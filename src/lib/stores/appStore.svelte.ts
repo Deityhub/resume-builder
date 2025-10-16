@@ -45,57 +45,7 @@ const createAppStore = () => {
 		const page = pages[pageId];
 		if (!page) return null;
 
-		const searchInElements = (elements: Record<string, ResumeElement>): ResumeElement | null => {
-			for (const el of Object.values(elements)) {
-				if (el.id === elementId) return el;
-				const found = searchInElements(el.elements);
-				if (found) return found;
-			}
-			return null;
-		};
-
-		return searchInElements(page.elements);
-	};
-
-	// Helper to update nested elements recursively
-	const updateNestedElements = (
-		elements: Record<string, ResumeElement>,
-		targetId: string,
-		updateFn: (element: ResumeElement) => ResumeElement
-	): Record<string, ResumeElement> => {
-		const result: Record<string, ResumeElement> = {};
-
-		for (const [id, element] of Object.entries(elements)) {
-			if (id === targetId) {
-				result[id] = updateFn(element);
-			} else {
-				result[id] = {
-					...element,
-					elements: updateNestedElements(element.elements, targetId, updateFn)
-				};
-			}
-		}
-
-		return result;
-	};
-
-	// Helper to create elements structure without a specific element
-	const createElementsWithout = (
-		elements: Record<string, ResumeElement>,
-		elementId: string
-	): Record<string, ResumeElement> => {
-		const result: Record<string, ResumeElement> = {};
-
-		for (const [id, element] of Object.entries(elements)) {
-			if (id !== elementId) {
-				result[id] = {
-					...element,
-					elements: createElementsWithout(element.elements, elementId)
-				};
-			}
-		}
-
-		return result;
+		return page.elements[elementId] || null;
 	};
 
 	const addElement = ({
@@ -127,48 +77,18 @@ const createAppStore = () => {
 			pageId,
 			width,
 			height,
-			zIndex: getNextZIndex(pageId)
+			zIndex: getNextZIndex(pageId),
+			parentElementId
 		});
 
-		// Add to parent element or page root
-		if (parentElementId) {
-			const parentElement = findElement(pageId, parentElementId);
-			if (parentElement) {
-				// Update the entire pages object with proper reactivity
-				pages = {
-					...pages,
-					[pageId]: {
-						...page,
-						elements: updateNestedElements(
-							page.elements,
-							parentElementId,
-							(parent: ResumeElement) => ({
-								...parent,
-								elements: { ...parent.elements, [newElement.id]: newElement }
-							})
-						)
-					}
-				};
-			} else {
-				// Parent not found, add to page root with proper reactivity
-				pages = {
-					...pages,
-					[pageId]: {
-						...page,
-						elements: { ...page.elements, [newElement.id]: newElement }
-					}
-				};
+		// Add to page elements with proper reactivity
+		pages = {
+			...pages,
+			[pageId]: {
+				...page,
+				elements: { ...page.elements, [newElement.id]: newElement }
 			}
-		} else {
-			// Add to page root with proper reactivity
-			pages = {
-				...pages,
-				[pageId]: {
-					...page,
-					elements: { ...page.elements, [newElement.id]: newElement }
-				}
-			};
-		}
+		};
 
 		// select the new element
 		selectElement(newElement);
@@ -186,8 +106,7 @@ const createAppStore = () => {
 		const page = pages[pageId];
 		if (!page) return;
 
-		// Support nested elements: find current element regardless of depth
-		const currentElement = findElement(pageId, elementId);
+		const currentElement = page.elements[elementId];
 		if (!currentElement) return;
 
 		const elementType = currentElement.type;
@@ -195,22 +114,27 @@ const createAppStore = () => {
 
 		switch (elementType) {
 			case 'text':
-				updatedElement = { ...currentElement, ...updates, type: 'text' } as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'text' };
 				break;
 			case 'shape':
-				updatedElement = { ...currentElement, ...updates, type: 'shape' } as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'shape' };
 				break;
 			case 'image':
-				updatedElement = { ...currentElement, ...updates, type: 'image' } as ResumeElement;
+				updatedElement = { ...currentElement, ...updates, type: 'image' };
 				break;
 		}
 
-		// Write back recursively using updateNestedElements
+		if (!updatedElement) {
+			// this shouldn't really happen
+			return;
+		}
+
+		// Update with proper reactivity
 		pages = {
 			...pages,
 			[pageId]: {
 				...page,
-				elements: updateNestedElements(page.elements, elementId, () => updatedElement)
+				elements: { ...page.elements, [elementId]: updatedElement }
 			}
 		};
 
@@ -224,41 +148,21 @@ const createAppStore = () => {
 		selectedElement = element;
 	};
 
-	// Recursively delete element from anywhere in the hierarchy
-	const deleteFromElements = (
-		elements: Record<string, ResumeElement>,
-		elementId: string
-	): Record<string, ResumeElement> => {
-		const result: Record<string, ResumeElement> = {};
-
-		for (const [id, element] of Object.entries(elements)) {
-			if (id === elementId) {
-				// Skip this element (delete it)
-				continue;
-			}
-
-			// Recursively process nested elements
-			result[id] = {
-				...element,
-				elements: deleteFromElements(element.elements, elementId)
-			};
-		}
-
-		return result;
-	};
-
 	const deleteElement = (elementId: string, pageId: string) => {
 		const page = pages[pageId];
 		if (!page) {
 			return;
 		}
 
+		const newElements = { ...page.elements };
+		delete newElements[elementId];
+
 		// Update pages with reactivity
 		pages = {
 			...pages,
 			[pageId]: {
 				...page,
-				elements: deleteFromElements(page.elements, elementId)
+				elements: newElements
 			}
 		};
 
@@ -289,65 +193,25 @@ const createAppStore = () => {
 		const page = pages[pageId];
 		if (!page) return;
 
-		// Find and remove element from current location
-		const removeFromElements = (elements: Record<string, ResumeElement>): ResumeElement | null => {
-			if (elements[elementId]) {
-				const element = elements[elementId];
-				delete elements[elementId];
-				return element;
-			}
-			for (const el of Object.values(elements)) {
-				const found = removeFromElements(el.elements);
-				if (found) return found;
-			}
-			return null;
-		};
-
-		const element = removeFromElements(page.elements);
+		const element = page.elements[elementId];
 		if (!element) return;
 
-		// Update position
-		element.x = newX;
-		element.y = newY;
+		// Update position and parent
+		const updatedElement = {
+			...element,
+			x: newX,
+			y: newY,
+			parentElementId: newParentId
+		};
 
-		// Create new elements structure without the moved element
-		const newElements = createElementsWithout(page.elements, elementId);
-
-		// Add to new parent
-		if (newParentId) {
-			const newParent = findElement(pageId, newParentId);
-			if (newParent) {
-				// Update the entire pages object with proper reactivity
-				pages = {
-					...pages,
-					[pageId]: {
-						...page,
-						elements: updateNestedElements(newElements, newParentId, (parent: ResumeElement) => ({
-							...parent,
-							elements: { ...parent.elements, [element.id]: element }
-						}))
-					}
-				};
-			} else {
-				// Parent not found, add to page root
-				pages = {
-					...pages,
-					[pageId]: {
-						...page,
-						elements: { ...newElements, [element.id]: element }
-					}
-				};
+		// Update with proper reactivity
+		pages = {
+			...pages,
+			[pageId]: {
+				...page,
+				elements: { ...page.elements, [elementId]: updatedElement }
 			}
-		} else {
-			// Add back to page root
-			pages = {
-				...pages,
-				[pageId]: {
-					...page,
-					elements: { ...newElements, [element.id]: element }
-				}
-			};
-		}
+		};
 	};
 
 	const updateBoundaries = (pageId: string, boundaries: RulerBoundaries) => {

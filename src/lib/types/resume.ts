@@ -5,8 +5,8 @@ interface BaseElement {
 	id: string;
 	type: ElementType;
 	pageId: string;
+	parentElementId?: string | null; // Parent element ID for grouping (null for root elements)
 	zIndex: number; // For stacking order
-	elements: Record<string, ResumeElement>; // Nested child elements
 	x: number;
 	y: number;
 	width: number;
@@ -24,10 +24,6 @@ export interface TextElement extends BaseElement {
 	textTransform?: string;
 	textAlign?: 'left' | 'center' | 'right' | 'justify';
 	color: string;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
 }
 
 export interface ShapeElement extends BaseElement {
@@ -89,3 +85,8 @@ export interface ResumePage {
 	elements: Record<string, ResumeElement>;
 	boundaries: RulerBoundaries;
 }
+
+export type TCanvasInstance = {
+	updateDragPreview?: (event: DragEvent) => void;
+	clearDragPreview?: () => void;
+};

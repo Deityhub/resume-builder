@@ -2,7 +2,8 @@
 	import { Modal } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import jsPDF from 'jspdf';
-	import { createExportCanvas } from '$lib/utils/canvasRenderer';
+	import { getPageImageData } from '$lib/utils/canvasRenderer';
+	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
 	interface Props {
 		isOpen: boolean;
@@ -11,9 +12,11 @@
 
 	const { isOpen, onClose }: Props = $props();
 
-	// A4 dimensions in mm
-	const pageWidth = 210;
-	const pageHeight = 297;
+	// Canvas dimensions in mm (A4 at 300 DPI)
+	const DPI = 300;
+	const MM_PER_INCH = 25.4;
+	const pageWidth = (CANVAS_WIDTH / DPI) * MM_PER_INCH;
+	const pageHeight = (CANVAS_HEIGHT / DPI) * MM_PER_INCH;
 
 	let isGenerating = $state(false);
 	let progress = $state(0);
@@ -32,16 +35,16 @@
 				const page = pages[i];
 
 				// Use the utility function to create export canvas
-				const canvas = await createExportCanvas(page);
+				// and Convert to image data
+				const imgData = await getPageImageData(page);
 
-				// Convert to data URL for preview
-				const imgData = canvas.toDataURL('image/png');
 				previewCanvases.push(imgData);
 			}
 			previewImages = previewCanvases;
 			showPreview = true;
 		} catch (_error) {
 			alert('Error generating preview. Please try again.');
+			console.error('Error generating preview: ', _error);
 		} finally {
 			isGeneratingPreview = false;
 		}
@@ -53,9 +56,9 @@
 		try {
 			const pages = Object.values(appStore.getPages());
 			const pdf = new jsPDF({
-				orientation: 'portrait',
+				orientation: pageWidth > pageHeight ? 'landscape' : 'portrait',
 				unit: 'mm',
-				format: 'a4'
+				format: [pageWidth, pageHeight]
 			});
 
 			for (let i = 0; i < pages.length; i++) {
@@ -63,43 +66,23 @@
 				progress = Math.round(((i + 1) / pages.length) * 100);
 
 				// Use the utility function to create export canvas
-				const canvas = await createExportCanvas(page);
+				// and Convert to image data
+				const imgData = await getPageImageData(page);
 
-				// Convert to image data
-				const imgData = canvas.toDataURL('image/png');
-
-				// Add to PDF - scale to fit A4 while maintaining aspect ratio
+				// Add to PDF - use exact canvas dimensions
 				if (i > 0) {
 					pdf.addPage();
 				}
 
-				// Calculate dimensions to fit A4 while maintaining aspect ratio
-				const aspectRatio = page.boundaries.horizontal.end / page.boundaries.vertical.end;
-				const maxWidth = pageWidth - 20; // 10mm margin on each side
-				const maxHeight = pageHeight - 20; // 10mm margin top and bottom
-
-				let imgWidth, imgHeight;
-				if (aspectRatio > maxWidth / maxHeight) {
-					// Image is wider, fit to width
-					imgWidth = maxWidth;
-					imgHeight = maxWidth / aspectRatio;
-				} else {
-					// Image is taller, fit to height
-					imgHeight = maxHeight;
-					imgWidth = maxHeight * aspectRatio;
-				}
-
-				// Center the image on the page
-				const x = (pageWidth - imgWidth) / 2;
-				const y = (pageHeight - imgHeight) / 2;
-
-				pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, undefined, 'FAST');
+				// Add image at full size (no scaling needed since we're using exact dimensions)
+				pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
 			}
 
 			// Save the PDF
 			pdf.save(`resume-${new Date().toISOString().split('T')[0]}.pdf`);
 		} catch (_error) {
 			alert('Error generating PDF. Please try again.');
+			console.error('Error generating PDF: ', _error);
 		} finally {
 			isGenerating = false;
 			progress = 0;
@@ -118,7 +101,7 @@
 		<Modal
 			open={true}
 			title="PDF Preview"
-			description={`Here's how your resume will appear in the PDF. ${previewImages.length} page${previewImages.length > 1 ? 's' : ''}.`}
+			description={`Here's how your resume will appear in the PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm). ${previewImages.length} page${previewImages.length > 1 ? 's' : ''}.`}
 			onCancel={() => {
 				showPreview = false;
 			}}
@@ -164,7 +147,7 @@
 		<Modal
 			open={true}
 			title="Export Resume"
-			description={`Your resume will be exported as a PDF with ${Object.values(appStore.getPages()).length} page${Object.values(appStore.getPages()).length > 1 ? 's' : ''}.`}
+			description={`Your resume will be exported as a PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm).`}
 			onCancel={handleClose}
 			onAccept={generatePreview}
 			acceptLabel={isGeneratingPreview ? 'Generating Preview...' : 'Preview PDF'}
