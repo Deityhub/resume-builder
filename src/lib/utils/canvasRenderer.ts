@@ -6,8 +6,8 @@ import type {
 	ShapeElement,
 	TextElement
 } from '$lib/types/resume';
-import html2canvas from 'html2canvas';
 import { pixelsToPercent } from './index';
+import { toCanvas } from 'html-to-image';
 
 /**
  * Utility function to render a page's elements into a DOM container
@@ -65,19 +65,25 @@ function createElementDiv(element: ResumeElement): HTMLElement {
 	div.style.height = pixelsToPercent(element.height, CANVAS_HEIGHT);
 	div.style.zIndex = element.zIndex.toString();
 
+	const elementDiv = document.createElement('div');
+	elementDiv.style.position = 'relative';
+	elementDiv.style.width = '100%';
+	elementDiv.style.height = '100%';
+
 	// Apply element-specific styling based on type
 	switch (element.type) {
 		case 'text':
-			renderTextElement(div, element);
+			renderTextElement(elementDiv, element);
 			break;
 		case 'shape':
-			renderShapeElement(div, element);
+			renderShapeElement(elementDiv, element);
 			break;
 		case 'image':
-			renderImageElement(div, element);
+			renderImageElement(elementDiv, element);
 			break;
 	}
 
+	div.appendChild(elementDiv);
 	return div;
 }
 
@@ -88,12 +94,12 @@ function createElementDiv(element: ResumeElement): HTMLElement {
  * Applies text-specific styling and content to a DOM element.
  * Handles font properties, text transformations, and content placement.
  *
- * @param div - The DOM element to style
+ * @param parentDiv - The parent DOM element to append the styled element to
  * @param element - The text element containing styling properties
  *
  * @example
  * ```ts
- * renderTextElement(div, {
+ * renderTextElement(parentDiv, {
  *   fontFamily: 'Inter',
  *   fontSize: 16,
  *   fontWeight: '400',
@@ -101,7 +107,11 @@ function createElementDiv(element: ResumeElement): HTMLElement {
  * });
  * ```
  */
-function renderTextElement(div: HTMLElement, element: TextElement): void {
+function renderTextElement(parentDiv: HTMLElement, element: TextElement): void {
+	const div = document.createElement('div');
+	div.style.height = '100%';
+	div.style.width = '100%';
+
 	div.style.fontFamily = `${element.fontFamily}, sans-serif`;
 	div.style.fontSize = `${element.fontSize}px`;
 	div.style.fontWeight = element.fontWeight;
@@ -110,10 +120,13 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
 	div.style.textTransform = element.textTransform || 'none';
 	div.style.textAlign = element.textAlign || 'left';
 	div.style.color = element.color;
+	div.style.padding = '8px';
 
 	// Handle text content
 	div.textContent = element.text;
 	div.style.overflow = 'hidden';
+
+	parentDiv.appendChild(div);
 }
 
 /**
@@ -124,19 +137,23 @@ function renderTextElement(div: HTMLElement, element: TextElement): void {
  * Handles shape creation, styling, and transformations.
  * Supports multiple shape types including lines, rectangles, circles, etc.
  *
- * @param div - The container DOM element
+ * @param parentDiv - The container DOM element to append the styled element to
  * @param element - The shape element with type and styling properties
  *
  * @example
  * ```ts
- * renderShapeElement(div, {
+ * renderShapeElement(parentDiv, {
  *   shapeType: 'line-horizontal',
  *   strokeColor: '#000000',
  *   strokeWidth: 2
  * });
  * ```
  */
-function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
+function renderShapeElement(parentDiv: HTMLElement, element: ShapeElement): void {
+	const div = document.createElement('div');
+	div.style.height = '100%';
+	div.style.width = '100%';
+
 	div.style.display = 'flex';
 	div.style.alignItems = 'center';
 	div.style.justifyContent = 'center';
@@ -202,6 +219,7 @@ function renderShapeElement(div: HTMLElement, element: ShapeElement): void {
 	}
 
 	div.appendChild(svg);
+	parentDiv.appendChild(div);
 }
 
 /**
@@ -584,15 +602,12 @@ function getBackgroundSize(objectFit?: string): string {
  * Utility function to create a hidden canvas for export purposes
  * This can be used for PDF generation or preview
  */
-export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasElement> {
+export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasElement | void> {
 	const width = CANVAS_WIDTH * DISPLAY_SCALE;
 	const height = CANVAS_HEIGHT * DISPLAY_SCALE;
 
 	// Create a temporary container
 	const container = document.createElement('div');
-	container.style.position = 'absolute';
-	container.style.left = '-9999px';
-	container.style.top = '-9999px';
 	container.style.width = `${width}px`;
 	container.style.height = `${height}px`;
 	document.body.appendChild(container);
@@ -601,22 +616,15 @@ export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasEl
 		// Render the page into the container
 		renderPageToCanvas(container, page);
 
-		// Use html2canvas to capture the rendered content
-		// const { default: html2canvas } = await import('html2canvas');
-		const canvas = await html2canvas(container, {
-			backgroundColor: '#ffffff',
-			scale: 2, // High quality for export
-			useCORS: true,
-			allowTaint: false,
-			width: width,
-			height: height,
-			// Ensure clean capture without UI elements
-			ignoreElements: (element) => {
-				return element.tagName === 'SCRIPT' || element.tagName === 'STYLE';
-			}
+		const canvas = await toCanvas(container, {
+			canvasWidth: width,
+			canvasHeight: height,
+			backgroundColor: '#ffffff'
 		});
 
 		return canvas;
+	} catch (_error) {
+		console.error('Error creating export canvas: ', _error);
 	} finally {
 		// Clean up the temporary container
 		document.body.removeChild(container);
@@ -629,5 +637,9 @@ export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasEl
  */
 export async function getPageImageData(page: ResumePage): Promise<string> {
 	const canvas = await createExportCanvas(page);
+
+	if (!canvas) {
+		return '';
+	}
 	return canvas.toDataURL('image/png');
 }
