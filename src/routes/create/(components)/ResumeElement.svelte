@@ -54,6 +54,7 @@
 
 <div
 	class="relative h-full w-full"
+	style:z-index={element.zIndex || 0}
 	onclick={() => appStore.selectElement(element)}
 	role="button"
 	tabindex="0"

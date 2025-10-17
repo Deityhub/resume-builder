@@ -12,6 +12,7 @@
 	import { objectFitOptions, borderStyles } from '$lib/const/image';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { slide } from 'svelte/transition';
+	import Button from '$lib/components/Button.svelte';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -81,6 +82,44 @@
 							onchange={(e) => handlePropertyChange('height', parseInt(e.currentTarget.value))}
 						/>
 					</div>
+				</div>
+			</div>
+
+			<!-- Layering -->
+			<div class="space-y-2">
+				<h4 class="font-medium text-gray-700">Element Layering</h4>
+				<div class="flex items-center gap-2">
+					<span class="block text-sm text-gray-600">Z-Index Layer: {selectedElement.zIndex}</span>
+				</div>
+				<div class="flex gap-2">
+					<Button
+						data-testid="bring-to-front-btn"
+						onClick={() => appStore.bringToFront(selectedElement.id, selectedElement.pageId)}
+						size="xs"
+					>
+						Front
+					</Button>
+					<Button
+						data-testid="bring-forward-btn"
+						onClick={() => appStore.bringForward(selectedElement.id, selectedElement.pageId)}
+						size="xs"
+					>
+						Forward
+					</Button>
+					<Button
+						data-testid="send-backward-btn"
+						onClick={() => appStore.sendBackward(selectedElement.id, selectedElement.pageId)}
+						size="xs"
+					>
+						Backward
+					</Button>
+					<Button
+						data-testid="send-to-back-btn"
+						onClick={() => appStore.sendToBack(selectedElement.id, selectedElement.pageId)}
+						size="xs"
+					>
+						Back
+					</Button>
 				</div>
 			</div>
 
