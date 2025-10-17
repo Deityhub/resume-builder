@@ -26,9 +26,56 @@ const createAppStore = () => {
 	// Helper to get next zIndex for a page
 	const getNextZIndex = (pageId: string): number => {
 		const page = pages[pageId];
+		if (!page) return 0;
+
 		const elements = Object.values(page.elements);
 		if (elements.length === 0) return 0;
+
 		return Math.max(...elements.map((el) => el.zIndex)) + 1;
+	};
+
+	// Layering helpers
+	const getZIndexRange = (pageId: string): { min: number; max: number } => {
+		const page = pages[pageId];
+		if (!page) return { min: 0, max: 0 };
+
+		const elements = Object.values(page.elements);
+		if (elements.length === 0) return { min: 0, max: 0 };
+
+		const zIndices = elements.map((el) => el.zIndex);
+		return { min: Math.min(...zIndices), max: Math.max(...zIndices) };
+	};
+
+	const bringToFront = (elementId: string, pageId: string) => {
+		const element = findElement(pageId, elementId);
+		if (!element) return;
+
+		const elementZIndex = element.zIndex;
+		const { max } = getZIndexRange(pageId);
+
+		if (elementZIndex === max) return;
+		updateElement({ elementId, updates: { zIndex: max + 1 }, pageId });
+	};
+
+	const sendToBack = (elementId: string, pageId: string) => {
+		const { min } = getZIndexRange(pageId);
+		updateElement({ elementId, updates: { zIndex: Math.max(0, min - 1) }, pageId });
+	};
+
+	const bringForward = (elementId: string, pageId: string) => {
+		const element = findElement(pageId, elementId);
+		if (!element) return;
+
+		const currentZ = element.zIndex;
+		updateElement({ elementId, updates: { zIndex: currentZ + 1 }, pageId });
+	};
+
+	const sendBackward = (elementId: string, pageId: string) => {
+		const element = findElement(pageId, elementId);
+		if (!element) return;
+
+		const currentZ = element.zIndex;
+		updateElement({ elementId, updates: { zIndex: Math.max(0, currentZ - 1) }, pageId });
 	};
 
 	// State getters
@@ -244,7 +291,14 @@ const createAppStore = () => {
 		deletePage,
 		updateBoundaries,
 		moveElement,
-		findElement
+		findElement,
+
+		// Layering
+		bringToFront,
+		sendToBack,
+		bringForward,
+		sendBackward,
+		getZIndexRange
 	};
 };
 
