@@ -3,9 +3,11 @@
 
 	type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost' | 'text';
 	type ButtonType = 'button' | 'submit' | 'reset';
+	type ButtonSize = 'xxs' | 'xs' | 's' | 'l' | 'xl' | 'xxl';
 	type ButtonProps = {
 		variant?: ButtonVariant;
 		type?: ButtonType;
+		size?: ButtonSize;
 		href?: string | undefined;
 		disabled?: boolean;
 		pending?: boolean;
@@ -20,6 +22,7 @@
 	const {
 		variant = 'primary',
 		type = 'button',
+		size = 's',
 		href,
 		disabled = false,
 		pending = false,
@@ -31,8 +34,7 @@
 		...restProps
 	}: ButtonProps = $props();
 
-	const focusRingClass = variant === 'destructive' ? 'focus:ring-red-500' : 'focus:ring-indigo-500';
-	const baseClasses = `inline-flex items-center justify-center font-medium rounded-lg transition-colors ${variant !== 'text' && variant !== 'ghost' ? `focus:outline-none focus:ring-2 focus:ring-offset-2 ${focusRingClass}` : ''}`;
+	const baseClasses = `inline-flex items-center justify-center font-medium rounded-lg transition-colors ${variant !== 'text' && variant !== 'ghost' ? `focus:outline-none` : ''}`;
 
 	const variantClasses: Record<ButtonVariant, string> = {
 		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg',
@@ -43,7 +45,47 @@
 		text: 'text-indigo-600 hover:text-indigo-800'
 	};
 
-	const sizeClasses = `text-base ${variant === 'text' ? (noPadding ? '' : 'p-2') : noPadding ? '' : 'px-6 py-2'}`;
+	const getSizeStyles = (size: ButtonSize) => {
+		switch (size) {
+			case 'xxs':
+				return 'py-1/2 px-1 text-[10px] min-h-4';
+			case 'xs':
+				return 'py-1 px-2 text-xs min-h-6';
+			case 's':
+				return 'py-2 px-4 text-sm min-h-8';
+			case 'l':
+				return 'py-3 px-6 text-base min-h-10';
+			case 'xl':
+				return 'py-4 px-8 text-lg min-h-12';
+			case 'xxl':
+				return 'py-5 px-10 text-xl min-h-14';
+			default:
+				return 'py-2 px-4 text-sm min-h-8';
+		}
+	};
+
+	const getSpinnerSize = (size: ButtonSize) => {
+		switch (size) {
+			case 'xxs':
+				return 'h-3 w-3';
+			case 'xs':
+				return 'h-3 w-3';
+			case 's':
+				return 'h-4 w-4';
+			case 'l':
+				return 'h-5 w-5';
+			case 'xl':
+				return 'h-6 w-6';
+			case 'xxl':
+				return 'h-7 w-7';
+			default:
+				return 'h-4 w-4';
+		}
+	};
+
+	const sizeStyles = $derived(getSizeStyles(size));
+	const spinnerSize = $derived(getSpinnerSize(size));
+	const sizeClasses = `text-base ${variant === 'text' ? (noPadding ? '' : 'p-2') : noPadding ? '' : ''}`;
 	const disabledClasses = 'opacity-50 cursor-not-allowed';
 	const widthClass = fullWidth ? 'w-full' : '';
 
@@ -60,7 +102,8 @@
 			isDisabled ? disabledClasses : 'cursor-pointer',
 			widthClass,
 			className,
-			pending ? 'relative' : ''
+			pending ? 'relative' : '',
+			sizeStyles
 		]
 			.filter(Boolean)
 			.join(' ')
@@ -94,7 +137,7 @@
 		{#if pending}
 			<span class="inline-flex items-center">
 				<svg
-					class={`mr-2 -ml-1 h-4 w-4 animate-spin ${spinnerColor}`}
+					class={`mr-2 -ml-1 ${spinnerSize} animate-spin ${spinnerColor}`}
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
@@ -125,7 +168,7 @@
 		{#if pending}
 			<span class="inline-flex items-center">
 				<svg
-					class={`mr-2 -ml-1 h-4 w-4 animate-spin ${spinnerColor}`}
+					class={`mr-2 -ml-1 ${spinnerSize} animate-spin ${spinnerColor}`}
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
