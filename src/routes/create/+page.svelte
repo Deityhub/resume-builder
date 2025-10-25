@@ -4,9 +4,13 @@
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
+	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
+	import { isIndexedDBSupported, saveResume } from '$lib/utils/idb';
+	import type { ResumeData } from '$lib/types/resume';
 	import type { ElementType, TCanvasInstance } from '$lib/types/resume';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
+	import { onMount } from 'svelte';
 
 	const pages = $derived(Object.values(appStore.getPages()));
 	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
@@ -20,6 +24,9 @@
 	}
 
 	let exportModalOpen = $state(false);
+	let saveModalOpen = $state(false);
+	let savePending = $state(false);
+	let saveError = $state('');
 
 	function handleDragOver(event: DragEvent, pageId: string) {
 		event.preventDefault();
@@ -124,10 +131,17 @@
 			if (canvasComponent && canvasComponent.clearDragPreview) {
 				canvasComponent.clearDragPreview();
 			}
-		} catch (_error) {
+		} catch (error) {
 			// Error parsing drag data - silently handle for better UX
+			console.error('Error parsing drag data: ', error);
 		}
 	}
+
+	let isIndexedDbSupported = $state(false);
+
+	onMount(() => {
+		isIndexedDbSupported = isIndexedDBSupported();
+	});
 </script>
 
 <div class="flex h-screen bg-gray-50">
@@ -137,21 +151,44 @@
 	<!-- Main Canvas Area -->
 	<div class="flex flex-1 flex-col">
 		<!-- Page Navigation -->
-		<div class="flex items-center justify-between border-b bg-white p-4">
-			<div class="flex items-center gap-2">
-				<span class="text-sm text-gray-600" data-testid="page-count">
-					{pages.length}
-					{pages.length > 1 ? 'Pages' : 'Page'}
-				</span>
-			</div>
+		<div class="border-b bg-white p-4">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-4">
+					<span class="text-sm text-gray-600" data-testid="page-count">
+						{pages.length}
+						{pages.length > 1 ? 'Pages' : 'Page'}
+					</span>
+				</div>
 
-			<div class="flex items-center gap-2">
-				<Button onClick={() => (exportModalOpen = true)} variant="ghost" data-testid="export-btn">
-					Export PDF
-				</Button>
-				<Button onClick={appStore.addPage} variant="secondary" data-testid="add-page-btn"
-					>Add Page</Button
-				>
+				<div class="flex items-center gap-2">
+					<Button
+						disabled={savePending}
+						onClick={appStore.addPage}
+						variant="secondary"
+						data-testid="add-page-btn"
+					>
+						Add Page
+					</Button>
+					{#if isIndexedDbSupported}
+						<Button
+							disabled={savePending}
+							pending={savePending}
+							onClick={() => (saveModalOpen = true)}
+							variant="primary"
+							data-testid="save-btn"
+						>
+							Save
+						</Button>
+					{/if}
+					<Button
+						disabled={savePending}
+						onClick={() => (exportModalOpen = true)}
+						variant="primary"
+						data-testid="export-btn"
+					>
+						Export PDF
+					</Button>
+				</div>
 			</div>
 		</div>
 
@@ -174,6 +211,39 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Save Resume Modal -->
+	{#if saveModalOpen}
+		<ResumeNameModal
+			isOpen={saveModalOpen}
+			onClose={() => {
+				saveModalOpen = false;
+				saveError = '';
+			}}
+			onSave={async (name: string) => {
+				if (!name) return;
+				savePending = true;
+				try {
+					const resume: ResumeData = {
+						...appStore.getCurrentResume(),
+						name
+					};
+					await saveResume(resume);
+					appStore.updateCurrentResume({ name });
+					saveModalOpen = false;
+					saveError = '';
+				} catch (err) {
+					saveError = 'Failed to save. Please try again: ' + err;
+				} finally {
+					savePending = false;
+				}
+			}}
+			initialName={appStore.getCurrentResume().name}
+		/>
+		{#if saveError}
+			<div class="px-4 text-sm text-red-500">{saveError}</div>
+		{/if}
+	{/if}
 
 	<!-- Property Panel -->
 	<PropertyPanel />
