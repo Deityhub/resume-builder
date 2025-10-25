@@ -30,18 +30,13 @@ describe('/+page.svelte', () => {
 		await expect.element(createButton).not.toBeDisabled();
 	});
 
-	it('should render the disabled "View Templates" button with tooltip', async () => {
+	it('should render the "View Resumes" button', async () => {
 		render(Page);
 
-		const templatesButton = page.getByRole('link', { name: 'View Templates' });
-		await expect.element(templatesButton).toBeInTheDocument();
-		await expect.element(templatesButton).toBeDisabled();
-
-		// Test tooltip functionality
-		await templatesButton.hover();
-		const tooltip = page.getByRole('tooltip');
-		await expect.element(tooltip).toBeInTheDocument();
-		await expect.element(tooltip).toHaveTextContent('Templates feature is coming soon');
+		const resumesButton = page.getByRole('link', { name: 'View Resumes' });
+		await expect.element(resumesButton).toBeInTheDocument();
+		await expect.element(resumesButton).toHaveAttribute('href', '/saved');
+		await expect.element(resumesButton).not.toBeDisabled();
 	});
 
 	it('should render the footer with About Us link', async () => {
