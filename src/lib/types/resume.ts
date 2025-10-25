@@ -86,6 +86,14 @@ export interface ResumePage {
 	boundaries: RulerBoundaries;
 }
 
+export interface ResumeData {
+	id: string;
+	name: string;
+	pages: Record<string, ResumePage>;
+	createdAt: number;
+	updatedAt: number;
+}
+
 export type TCanvasInstance = {
 	updateDragPreview?: (event: DragEvent) => void;
 	clearDragPreview?: () => void;

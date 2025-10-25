@@ -1,5 +1,11 @@
 import { getDefaultProperties } from '$lib/utils/properties';
-import type { ElementType, ResumeElement, ResumePage, RulerBoundaries } from '../types/resume';
+import type {
+	ElementType,
+	ResumeData,
+	ResumeElement,
+	ResumePage,
+	RulerBoundaries
+} from '../types/resume';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
@@ -17,15 +23,21 @@ const createAppStore = () => {
 
 	const firstPageId = crypto.randomUUID();
 
-	let pages: Record<string, ResumePage> = $state({
-		[firstPageId]: getDefaultPage(firstPageId)
+	let currentResume: ResumeData = $state({
+		id: crypto.randomUUID(),
+		name: '', // the user should set this value
+		pages: {
+			[firstPageId]: getDefaultPage(firstPageId)
+		},
+		createdAt: Date.now(),
+		updatedAt: Date.now()
 	});
 
 	let selectedElement: ResumeElement | null = $state(null);
 
 	// Helper to get next zIndex for a page
 	const getNextZIndex = (pageId: string): number => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) return 0;
 
 		const elements = Object.values(page.elements);
@@ -36,7 +48,7 @@ const createAppStore = () => {
 
 	// Layering helpers
 	const getZIndexRange = (pageId: string): { min: number; max: number } => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) return { min: 0, max: 0 };
 
 		const elements = Object.values(page.elements);
@@ -79,17 +91,50 @@ const createAppStore = () => {
 	};
 
 	// State getters
-	const getPages = () => pages;
+	const getPages = () => currentResume.pages;
+
+	const initNewResume = () => {
+		const pageId = crypto.randomUUID();
+
+		currentResume = {
+			id: crypto.randomUUID(),
+			name: '', // the user should set this value
+			pages: {
+				[pageId]: getDefaultPage(pageId)
+			},
+			createdAt: Date.now(),
+			updatedAt: Date.now()
+		};
+
+		selectElement(null);
+	};
+
+	const getCurrentResume = () => currentResume;
+
+	const getPage = (pageId: string) => currentResume.pages[pageId];
 
 	const getSelectedElement = () => selectedElement;
 
 	// Mutations
+	const setCurrentResume = (resume: ResumeData) => {
+		currentResume = { ...resume };
+	};
+
+	const updateResumePages = (pages: Record<string, ResumePage>) => {
+		currentResume = { ...currentResume, pages };
+	};
+
+	const updateCurrentResume = (resume: Partial<ResumeData>) => {
+		currentResume = { ...currentResume, ...resume };
+	};
+
 	const addPage = () => {
 		const newPage = getDefaultPage(crypto.randomUUID());
-		pages = { ...pages, [newPage.id]: newPage };
+		updateResumePages({ ...currentResume.pages, [newPage.id]: newPage });
 	};
+
 	const findElement = (pageId: string, elementId: string): ResumeElement | null => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) return null;
 
 		return page.elements[elementId] || null;
@@ -112,7 +157,7 @@ const createAppStore = () => {
 		height?: number;
 		parentElementId?: string | null;
 	}) => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) {
 			return;
 		}
@@ -129,13 +174,13 @@ const createAppStore = () => {
 		});
 
 		// Add to page elements with proper reactivity
-		pages = {
-			...pages,
+		updateResumePages({
+			...currentResume.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [newElement.id]: newElement }
 			}
-		};
+		});
 
 		// select the new element
 		selectElement(newElement);
@@ -150,7 +195,7 @@ const createAppStore = () => {
 		updates: Partial<ResumeElement>;
 		pageId: string;
 	}) => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) return;
 
 		const currentElement = page.elements[elementId];
@@ -177,17 +222,17 @@ const createAppStore = () => {
 		}
 
 		// Update with proper reactivity
-		pages = {
-			...pages,
+		updateResumePages({
+			...currentResume.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
 			}
-		};
+		});
 
 		// Update selected reference if needed
 		if (selectedElement && selectedElement.id === elementId) {
-			selectedElement = updatedElement;
+			selectElement(updatedElement);
 		}
 	};
 
@@ -196,7 +241,7 @@ const createAppStore = () => {
 	};
 
 	const deleteElement = (elementId: string, pageId: string) => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) {
 			return;
 		}
@@ -205,22 +250,22 @@ const createAppStore = () => {
 		delete newElements[elementId];
 
 		// Update pages with reactivity
-		pages = {
-			...pages,
+		updateResumePages({
+			...currentResume.pages,
 			[pageId]: {
 				...page,
 				elements: newElements
 			}
-		};
+		});
 
 		// Deselect the element after deletion
 		if (selectedElement && selectedElement.id === elementId) {
-			selectedElement = null;
+			selectElement(null);
 		}
 	};
 
 	const deletePage = (pageId: string) => {
-		delete pages[pageId];
+		delete currentResume.pages[pageId];
 	};
 
 	// Move element from one parent to another
@@ -237,7 +282,7 @@ const createAppStore = () => {
 		newX: number;
 		newY: number;
 	}) => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) return;
 
 		const element = page.elements[elementId];
@@ -252,37 +297,39 @@ const createAppStore = () => {
 		};
 
 		// Update with proper reactivity
-		pages = {
-			...pages,
+		updateResumePages({
+			...currentResume.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
 			}
-		};
+		});
 	};
 
 	const updateBoundaries = (pageId: string, boundaries: RulerBoundaries) => {
-		const page = pages[pageId];
+		const page = getPage(pageId);
 		if (!page) {
 			return;
 		}
 
 		// Update with proper reactivity
-		pages = {
-			...pages,
+		updateResumePages({
+			...currentResume.pages,
 			[pageId]: {
 				...page,
 				boundaries
 			}
-		};
+		});
 	};
 
 	return {
 		// State getters
 		getPages,
 		getSelectedElement,
+		getCurrentResume,
 
 		// Mutations
+		setCurrentResume,
 		addPage,
 		addElement,
 		updateElement,
@@ -292,6 +339,8 @@ const createAppStore = () => {
 		updateBoundaries,
 		moveElement,
 		findElement,
+		updateCurrentResume,
+		initNewResume,
 
 		// Layering
 		bringToFront,
