@@ -1,7 +1,6 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
-	const comingSoon = 'Templates feature is coming soon';
+	import { appStore } from '$lib/stores/appStore.svelte.ts';
 </script>
 
 <div class="flex min-h-screen flex-col justify-between p-6 text-center">
@@ -13,10 +12,10 @@
 		</p>
 
 		<div class="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
-			<Button href="/create" variant="primary">Create Your Resume</Button>
-			<Tooltip content={comingSoon} placement="top">
-				<Button href="/templates" variant="secondary" disabled>View Templates</Button>
-			</Tooltip>
+			<Button onClick={() => appStore.initNewResume()} href="/create" variant="primary"
+				>Create Your Resume</Button
+			>
+			<Button href="/saved" variant="secondary">View Resumes</Button>
 		</div>
 	</div>
 

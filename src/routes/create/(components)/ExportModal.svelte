@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Modal } from '$lib/components';
+	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import jsPDF from 'jspdf';
 	import { getPageImageData } from '$lib/utils/canvasRenderer';
@@ -23,6 +24,8 @@
 	let showPreview = $state(false);
 	let previewImages = $state<string[]>([]);
 	let isGeneratingPreview = $state(false);
+	let nameModalOpen = $state(false);
+	let resumeName = $derived(appStore.getCurrentResume()?.name || '');
 
 	async function generatePreview() {
 		if (isGeneratingPreview) return;
@@ -52,6 +55,10 @@
 
 	async function confirmAndExportPDF() {
 		if (isGenerating) return;
+		if (!resumeName) {
+			nameModalOpen = true;
+			return;
+		}
 		isGenerating = true;
 		try {
 			const pages = Object.values(appStore.getPages());
@@ -79,7 +86,7 @@
 			}
 
 			// Save the PDF
-			pdf.save(`resume-${new Date().toISOString().split('T')[0]}.pdf`);
+			pdf.save(`${resumeName || 'resume'}.pdf`);
 		} catch (_error) {
 			alert('Error generating PDF. Please try again.');
 			console.error('Error generating PDF: ', _error);
@@ -94,10 +101,26 @@
 	function handleClose() {
 		if (!isGenerating && !isGeneratingPreview) onClose();
 	}
+
+	function handleNameSave(name: string) {
+		appStore.updateCurrentResume({ name });
+		resumeName = name;
+		nameModalOpen = false;
+
+		// Continue export after getting name
+		confirmAndExportPDF();
+	}
 </script>
 
 {#if isOpen}
-	{#if showPreview}
+	{#if nameModalOpen}
+		<ResumeNameModal
+			isOpen={nameModalOpen}
+			onClose={() => (nameModalOpen = false)}
+			onSave={handleNameSave}
+			initialName={resumeName}
+		/>
+	{:else if showPreview}
 		<Modal
 			open={true}
 			title="PDF Preview"
