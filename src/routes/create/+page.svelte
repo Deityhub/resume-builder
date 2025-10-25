@@ -11,6 +11,8 @@
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	const pages = $derived(Object.values(appStore.getPages()));
 	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
@@ -21,6 +23,14 @@
 
 	function getCanvasRefInstance(pageId: string): TCanvasInstance | undefined {
 		return canvasInstances[pageId];
+	}
+
+	function handleBackNavigation() {
+		const currentResume = appStore.getCurrentResume();
+		// If creating new resume (name is empty), go to home page
+		// If editing existing resume (name has value), go to saved page
+		const destination = currentResume.name ? '/saved' : '/';
+		goto(resolve(destination));
 	}
 
 	let exportModalOpen = $state(false);
@@ -154,13 +164,28 @@
 		<div class="border-b bg-white p-4">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
-					<span class="text-sm text-gray-600" data-testid="page-count">
-						{pages.length}
-						{pages.length > 1 ? 'Pages' : 'Page'}
-					</span>
+					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="mr-2 h-5 w-5"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+						Back
+					</Button>
 				</div>
 
 				<div class="flex items-center gap-2">
+					<span class="mr-4 text-sm text-gray-600" data-testid="page-count">
+						{pages.length}
+						{pages.length > 1 ? 'Pages' : 'Page'}
+					</span>
 					<Button
 						disabled={savePending}
 						onClick={appStore.addPage}

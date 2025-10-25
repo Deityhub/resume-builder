@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import { appStore } from '$lib/stores/appStore.svelte';
 </script>
 
 <div class="mx-auto min-h-screen max-w-4xl p-6 pt-12">
@@ -48,8 +49,11 @@
 
 		<h2 class="mt-8 mb-4 text-2xl font-semibold text-gray-800">Get Started</h2>
 		<p class="mb-6">
-			Ready to create your professional resume? <Button href="/create" variant="text" noPadding
-				>Get started now</Button
+			Ready to create your professional resume? <Button
+				onClick={() => appStore.initNewResume()}
+				href="/create"
+				variant="text"
+				noPadding>Get started now</Button
 			>
 		</p>
 	</div>
