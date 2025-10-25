@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="/fonts/fonts.css" />
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-neutral-900">
+<div class="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white text-neutral-900">
 	<main class="min-h-screen">
 		{@render children?.()}
 	</main>
