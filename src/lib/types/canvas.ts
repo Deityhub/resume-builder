@@ -67,7 +67,7 @@ export interface ImageElement extends BaseElement {
 	backgroundColor?: string;
 }
 
-export type ResumeElement = TextElement | ShapeElement | ImageElement;
+export type TCanvasElement = TextElement | ShapeElement | ImageElement;
 
 export interface RulerBoundaries {
 	horizontal: {
@@ -82,7 +82,7 @@ export interface RulerBoundaries {
 
 export interface ResumePage {
 	id: string;
-	elements: Record<string, ResumeElement>;
+	elements: Record<string, TCanvasElement>;
 	boundaries: RulerBoundaries;
 }
 

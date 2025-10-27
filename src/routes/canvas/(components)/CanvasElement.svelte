@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { ResumeElement, ResizeDirection } from '$lib/types/resume';
+	import type { TCanvasElement, ResizeDirection } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 
 	interface Props {
-		element: ResumeElement;
+		element: TCanvasElement;
 		isSelected: boolean;
 		onResize: (event: MouseEvent, direction: ResizeDirection) => void;
 	}

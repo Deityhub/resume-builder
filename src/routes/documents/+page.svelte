@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getAllResumes, deleteResume, isIndexedDBSupported } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/resume';
+	import type { ResumeData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components';

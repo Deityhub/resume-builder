@@ -1,4 +1,4 @@
-import type { ElementType, ResumeElement } from '../types/resume';
+import type { ElementType, TCanvasElement } from '../types/canvas';
 import { CANVAS_WIDTH } from '../const/dimension';
 
 /**
@@ -15,7 +15,7 @@ import { CANVAS_WIDTH } from '../const/dimension';
  * @param params.zIndex - Stack order of the element (defaults to 0)
  * @param params.parentElementId - ID of the parent element (defaults to null)
  *
- * @returns A new ResumeElement with type-specific default properties
+ * @returns A new TCanvasElement with type-specific default properties
  *
  * @example
  * ```ts
@@ -46,7 +46,7 @@ export function getDefaultProperties({
 	height?: number;
 	zIndex?: number;
 	parentElementId?: string | null;
-}): ResumeElement {
+}): TCanvasElement {
 	const baseElement = {
 		id: crypto.randomUUID(),
 		pageId,

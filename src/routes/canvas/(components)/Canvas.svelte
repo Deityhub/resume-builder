@@ -1,14 +1,14 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import ResumeElementComponent from './ResumeElement.svelte';
+	import CanvasElement from './CanvasElement.svelte';
 	import Ruler from './Ruler.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type {
-		ResumeElement,
+		TCanvasElement,
 		ResumePage,
 		ResizeDirection,
 		TCanvasInstance
-	} from '$lib/types/resume';
+	} from '$lib/types/canvas';
 	import { DISPLAY_SCALE } from '$lib/const/dimension';
 	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
@@ -87,14 +87,14 @@
 	}
 
 	// Get elements that overlap with the given element
-	function getOverlappingElements(element: ResumeElement): ResumeElement[] {
+	function getOverlappingElements(element: TCanvasElement): TCanvasElement[] {
 		return Object.values(page.elements).filter(
 			(el) => el.id !== element.id && elementsOverlap(element, el)
 		);
 	}
 
 	// Find which element (if any) contains the given point
-	function findElementAtPosition(x: number, y: number, excludeId?: string): ResumeElement | null {
+	function findElementAtPosition(x: number, y: number, excludeId?: string): TCanvasElement | null {
 		// Sort by zIndex descending to check top elements first
 		const sorted = [...Object.values(page.elements)].sort((a, b) => b.zIndex - a.zIndex);
 
@@ -339,7 +339,7 @@
 
 	function handleElementResize(
 		event: MouseEvent,
-		element: ResumeElement,
+		element: TCanvasElement,
 		direction: ResizeDirection
 	) {
 		event.stopPropagation();
@@ -643,7 +643,7 @@
 							document.body.style.userSelect = 'none';
 						}}
 					>
-						<ResumeElementComponent
+						<CanvasElement
 							{element}
 							{isSelected}
 							onResize={(event, direction) => handleElementResize(event, element, direction)}

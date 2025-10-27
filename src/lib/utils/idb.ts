@@ -1,5 +1,5 @@
 // Minimal IndexedDB wrapper for storing resumes
-import type { ResumeData } from '../types/resume';
+import type { ResumeData } from '../types/canvas';
 
 export type ResumeRecord = ResumeData;
 

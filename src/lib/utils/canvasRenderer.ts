@@ -1,11 +1,11 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH, DISPLAY_SCALE } from '$lib/const/dimension';
 import type {
 	ImageElement,
-	ResumeElement,
+	TCanvasElement,
 	ResumePage,
 	ShapeElement,
 	TextElement
-} from '$lib/types/resume';
+} from '$lib/types/canvas';
 import { pixelsToPercent } from './index';
 import { toCanvas } from 'html-to-image';
 
@@ -54,7 +54,7 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
  * });
  * ```
  */
-function createElementDiv(element: ResumeElement): HTMLElement {
+function createElementDiv(element: TCanvasElement): HTMLElement {
 	const div = document.createElement('div');
 
 	// Base positioning and sizing
@@ -178,7 +178,7 @@ function renderShapeElement(parentDiv: HTMLElement, element: ShapeElement): void
 
 	svg.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
 
-	// Create shape based on type with exact same styling as ResumeElement.svelte
+	// Create shape based on type with exact same styling as TCanvasElement.svelte
 	switch (element.shapeType) {
 		case 'rectangle':
 			createRectangle(svg, element);

@@ -2,10 +2,10 @@ import { getDefaultProperties } from '$lib/utils/properties';
 import type {
 	ElementType,
 	ResumeData,
-	ResumeElement,
+	TCanvasElement,
 	ResumePage,
 	RulerBoundaries
-} from '../types/resume';
+} from '../types/canvas';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
@@ -33,7 +33,7 @@ const createAppStore = () => {
 		updatedAt: Date.now()
 	});
 
-	let selectedElement: ResumeElement | null = $state(null);
+	let selectedElement: TCanvasElement | null = $state(null);
 
 	// Helper to get next zIndex for a page
 	const getNextZIndex = (pageId: string): number => {
@@ -133,7 +133,7 @@ const createAppStore = () => {
 		updateResumePages({ ...currentResume.pages, [newPage.id]: newPage });
 	};
 
-	const findElement = (pageId: string, elementId: string): ResumeElement | null => {
+	const findElement = (pageId: string, elementId: string): TCanvasElement | null => {
 		const page = getPage(pageId);
 		if (!page) return null;
 
@@ -162,7 +162,7 @@ const createAppStore = () => {
 			return;
 		}
 
-		const newElement: ResumeElement = getDefaultProperties({
+		const newElement: TCanvasElement = getDefaultProperties({
 			type,
 			x,
 			y,
@@ -192,7 +192,7 @@ const createAppStore = () => {
 		pageId
 	}: {
 		elementId: string;
-		updates: Partial<ResumeElement>;
+		updates: Partial<TCanvasElement>;
 		pageId: string;
 	}) => {
 		const page = getPage(pageId);
@@ -202,7 +202,7 @@ const createAppStore = () => {
 		if (!currentElement) return;
 
 		const elementType = currentElement.type;
-		let updatedElement: ResumeElement;
+		let updatedElement: TCanvasElement;
 
 		switch (elementType) {
 			case 'text':
@@ -236,7 +236,7 @@ const createAppStore = () => {
 		}
 	};
 
-	const selectElement = (element: ResumeElement | null) => {
+	const selectElement = (element: TCanvasElement | null) => {
 		selectedElement = element;
 	};
 

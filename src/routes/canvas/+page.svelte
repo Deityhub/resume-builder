@@ -1,13 +1,13 @@
 <script lang="ts">
-	import ResumeCanvas from './(components)/ResumeCanvas.svelte';
+	import Canvas from './(components)/Canvas.svelte';
 	import Toolbar from './(components)/Toolbar.svelte';
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
+	import ResumeNameModal from '$lib/components/NameModal.svelte';
 	import { isIndexedDBSupported, saveResume } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/resume';
-	import type { ElementType, TCanvasInstance } from '$lib/types/resume';
+	import type { ResumeData } from '$lib/types/canvas';
+	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 	import { onMount } from 'svelte';
@@ -221,7 +221,7 @@
 		<div class="flex-1 overflow-auto p-8" data-testid="canvas-container">
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
-					<ResumeCanvas
+					<Canvas
 						bind:this={canvasInstances[page.id]}
 						{page}
 						showDeleteButton={pages.length > 1}

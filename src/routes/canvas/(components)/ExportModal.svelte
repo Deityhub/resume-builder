@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Modal } from '$lib/components';
-	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
+	import ResumeNameModal from '$lib/components/NameModal.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import jsPDF from 'jspdf';
 	import { getPageImageData } from '$lib/utils/canvasRenderer';

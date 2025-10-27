@@ -152,8 +152,8 @@ src/
 │       ├── +page.svelte    # Main builder interface
 │       └── (components)/   # Builder components
 │           ├── Toolbar.svelte
-│           ├── ResumeCanvas.svelte
-│           ├── ResumeElement.svelte
+│           ├── Canvas.svelte
+│           ├── CanvasElement.svelte
 │           ├── Ruler.svelte
 │           └── PropertyPanel.svelte
 └── app.html                # HTML template
@@ -161,7 +161,7 @@ src/
 
 ## 🎨 Key Components
 
-### ResumeCanvas
+### Canvas
 
 The main canvas component that handles:
 
@@ -211,7 +211,7 @@ Advanced resize system with:
 Reactive state management with:
 
 - Svelte 5 runes ($state, $derived, $effect)
-- Nested element structure (Record<string, ResumeElement>)
+- Nested element structure (Record<string, TCanvasElement>)
 - Recursive element operations (find, move, flatten)
 - UUID-based identifiers (crypto.randomUUID())
 - Automatic zIndex management
