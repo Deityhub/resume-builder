@@ -35,7 +35,7 @@ describe('/+page.svelte', () => {
 
 		const resumesButton = page.getByRole('link', { name: 'View Resumes' });
 		await expect.element(resumesButton).toBeInTheDocument();
-		await expect.element(resumesButton).toHaveAttribute('href', '/saved');
+		await expect.element(resumesButton).toHaveAttribute('href', '/documents');
 		await expect.element(resumesButton).not.toBeDisabled();
 	});
 

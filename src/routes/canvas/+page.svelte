@@ -29,7 +29,7 @@
 		const currentResume = appStore.getCurrentResume();
 		// If creating new resume (name is empty), go to home page
 		// If editing existing resume (name has value), go to saved page
-		const destination = currentResume.name ? '/saved' : '/';
+		const destination = currentResume.name ? '/documents' : '/';
 		goto(resolve(destination));
 	}
 
