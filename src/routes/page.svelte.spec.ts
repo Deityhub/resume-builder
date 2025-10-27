@@ -26,7 +26,7 @@ describe('/+page.svelte', () => {
 
 		const createButton = page.getByRole('link', { name: 'Create Your Resume' });
 		await expect.element(createButton).toBeInTheDocument();
-		await expect.element(createButton).toHaveAttribute('href', '/create');
+		await expect.element(createButton).toHaveAttribute('href', '/canvas');
 		await expect.element(createButton).not.toBeDisabled();
 	});
 

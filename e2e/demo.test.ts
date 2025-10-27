@@ -4,17 +4,17 @@ test.describe('Resume Builder E2E Tests', () => {
 	test('home page loads correctly', async ({ page }) => {
 		await page.goto('/');
 		await expect(page.locator('h1')).toContainText('Resume Builder');
-		await expect(page.getByRole('link', { name: /create your resume/i })).toBeVisible();
+		await expect(page.getByRole('link', { name: /canvas your resume/i })).toBeVisible();
 	});
 
 	test('navigate to create page', async ({ page }) => {
 		await page.goto('/');
-		await page.getByRole('link', { name: /create your resume/i }).click();
+		await page.getByRole('link', { name: /canvas your resume/i }).click();
 		await expect(page).toHaveURL(/.*create/);
 	});
 
 	test('create page has toolbar and canvas', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for toolbar
 		await expect(page.getByTestId('toolbar')).toBeVisible();
@@ -24,7 +24,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('add page button works', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Initially should have 1 page
 		const pageCount = page.getByTestId('page-count');
@@ -38,7 +38,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('drag and drop text element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Get the text tool
 		const textTool = page.getByTestId('tool-text');
@@ -56,7 +56,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('element selection and deselection', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
@@ -76,7 +76,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('resize handles appear on selected element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
@@ -91,7 +91,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('delete element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
@@ -108,7 +108,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update text element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add text element
 		const textTool = page.getByTestId('tool-text');
@@ -147,7 +147,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update position and size properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add text element
 		const textTool = page.getByTestId('tool-text');
@@ -178,7 +178,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update shape element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add shape element
 		const shapeTool = page.getByTestId('tool-shape');
@@ -207,7 +207,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update image element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add image element
 		const imageTool = page.getByTestId('tool-image');
@@ -231,7 +231,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('rulers are visible', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for ruler elements
 		const rulers = page.locator('.bg-gray-100');
@@ -239,7 +239,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('boundary visualization is visible', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for boundary box (blue dashed border)
 		const boundary = page.locator('.border-dashed.border-blue-400');
@@ -254,7 +254,7 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('multiple element types can be added', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		const canvas = page.getByTestId('resume-canvas');
 

@@ -44,7 +44,7 @@
 			</div>
 			<div class="flex items-center gap-4">
 				<Button href="/saved" variant="text">My Resumes</Button>
-				<Button onClick={() => appStore.initNewResume()} href="/create" variant="primary"
+				<Button onClick={() => appStore.initNewResume()} href="/canvas" variant="primary"
 					>Start Building</Button
 				>
 			</div>
@@ -147,7 +147,7 @@
 			</p>
 			<Button
 				onClick={() => appStore.initNewResume()}
-				href="/create"
+				href="/canvas"
 				variant="secondary"
 				className="bg-white"
 			>

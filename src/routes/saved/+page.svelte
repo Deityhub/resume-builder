@@ -28,13 +28,13 @@
 		appStore.initNewResume();
 
 		// Navigate to create page
-		await goto(resolve('/create'));
+		await goto(resolve('/canvas'));
 	}
 
 	async function handleEdit(resume: ResumeData) {
 		// load resume and navigate to create page
 		appStore.setCurrentResume(resume);
-		await goto(resolve('/create'));
+		await goto(resolve('/canvas'));
 	}
 
 	async function handleDelete(resume: ResumeData) {
