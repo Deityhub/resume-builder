@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
 
-	type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost' | 'text';
+	type ButtonVariant = 'primary' | 'secondary' | 'secondary-destructive' | 'destructive' | 'ghost' | 'text';
 	type ButtonType = 'button' | 'submit' | 'reset';
 	type ButtonSize = 'xxs' | 'xs' | 's' | 'l' | 'xl' | 'xxl';
 	type ButtonProps = {
@@ -39,6 +39,7 @@
 	const variantClasses: Record<ButtonVariant, string> = {
 		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg',
 		secondary: 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50',
+		'secondary-destructive': 'border-2 border-red-600 text-red-600 hover:bg-red-50',
 		destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg',
 		ghost:
 			'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-300',
@@ -90,7 +91,8 @@
 	const widthClass = fullWidth ? 'w-full' : '';
 
 	const spinnerColor =
-		variant === 'primary' || variant === 'destructive' ? 'text-white' : 'text-indigo-600';
+		variant === 'primary' || variant === 'destructive' ? 'text-white' : 
+		variant === 'secondary-destructive' ? 'text-red-600' : 'text-indigo-600';
 
 	const isDisabled = $derived(disabled || pending);
 
