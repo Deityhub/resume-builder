@@ -93,32 +93,21 @@
 				</div>
 				<div class="flex gap-2">
 					<Button
-						data-testid="bring-to-front-btn"
-						onClick={() => appStore.bringToFront(selectedElement.id, selectedElement.pageId)}
-						size="xs"
-					>
-						Front
-					</Button>
-					<Button
 						data-testid="bring-forward-btn"
-						onClick={() => appStore.bringForward(selectedElement.id, selectedElement.pageId)}
+						onClick={() => appStore.moveForward(selectedElement.id, selectedElement.pageId)}
 						size="xs"
+						disabled={selectedElement.zIndex >=
+							appStore.getPageElements(selectedElement.pageId).length - 1}
 					>
-						Forward
+						Move Forward
 					</Button>
 					<Button
 						data-testid="send-backward-btn"
-						onClick={() => appStore.sendBackward(selectedElement.id, selectedElement.pageId)}
+						onClick={() => appStore.moveBackward(selectedElement.id, selectedElement.pageId)}
 						size="xs"
+						disabled={selectedElement.zIndex <= 0}
 					>
-						Backward
-					</Button>
-					<Button
-						data-testid="send-to-back-btn"
-						onClick={() => appStore.sendToBack(selectedElement.id, selectedElement.pageId)}
-						size="xs"
-					>
-						Back
+						Move Backward
 					</Button>
 				</div>
 			</div>

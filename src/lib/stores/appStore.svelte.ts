@@ -46,48 +46,66 @@ const createAppStore = () => {
 		return Math.max(...elements.map((el) => el.zIndex)) + 1;
 	};
 
-	// Layering helpers
-	const getZIndexRange = (pageId: string): { min: number; max: number } => {
+	const getPageElements = (pageId: string): TCanvasElement[] => {
 		const page = getPage(pageId);
-		if (!page) return { min: 0, max: 0 };
+		if (!page) return [];
 
-		const elements = Object.values(page.elements);
-		if (elements.length === 0) return { min: 0, max: 0 };
-
-		const zIndices = elements.map((el) => el.zIndex);
-		return { min: Math.min(...zIndices), max: Math.max(...zIndices) };
+		return Object.values(page.elements);
 	};
 
-	const bringToFront = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
-
-		const elementZIndex = element.zIndex;
-		const { max } = getZIndexRange(pageId);
-
-		if (elementZIndex === max) return;
-		updateElement({ elementId, updates: { zIndex: max + 1 }, pageId });
+	// Get all elements on a page sorted by zIndex (ascending)
+	const getSortedElements = (pageId: string): TCanvasElement[] => {
+		return getPageElements(pageId).sort((a, b) => a.zIndex - b.zIndex);
 	};
 
-	const sendToBack = (elementId: string, pageId: string) => {
-		const { min } = getZIndexRange(pageId);
-		updateElement({ elementId, updates: { zIndex: Math.max(0, min - 1) }, pageId });
+	// Move an element forward in the z-index stack
+	const moveForward = (elementId: string, pageId: string) => {
+		const elements = getSortedElements(pageId);
+		const currentIndex = elements.findIndex((el) => el.id === elementId);
+
+		// Can't move forward if already at the top
+		if (currentIndex === -1 || currentIndex === elements.length - 1) return;
+
+		const currentElement = elements[currentIndex];
+		const nextElement = elements[currentIndex + 1];
+
+		// Swap z-indices
+		updateElement({
+			elementId: currentElement.id,
+			updates: { zIndex: nextElement.zIndex },
+			pageId
+		});
+
+		updateElement({
+			elementId: nextElement.id,
+			updates: { zIndex: currentElement.zIndex },
+			pageId
+		});
 	};
 
-	const bringForward = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
+	// Move an element backward in the z-index stack
+	const moveBackward = (elementId: string, pageId: string) => {
+		const elements = getSortedElements(pageId);
+		const currentIndex = elements.findIndex((el) => el.id === elementId);
 
-		const currentZ = element.zIndex;
-		updateElement({ elementId, updates: { zIndex: currentZ + 1 }, pageId });
-	};
+		// Can't move backward if already at the bottom
+		if (currentIndex <= 0) return;
 
-	const sendBackward = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
+		const currentElement = elements[currentIndex];
+		const prevElement = elements[currentIndex - 1];
 
-		const currentZ = element.zIndex;
-		updateElement({ elementId, updates: { zIndex: Math.max(0, currentZ - 1) }, pageId });
+		// Swap z-indices
+		updateElement({
+			elementId: currentElement.id,
+			updates: { zIndex: prevElement.zIndex },
+			pageId
+		});
+
+		updateElement({
+			elementId: prevElement.id,
+			updates: { zIndex: currentElement.zIndex },
+			pageId
+		});
 	};
 
 	// State getters
@@ -327,6 +345,7 @@ const createAppStore = () => {
 		getPages,
 		getSelectedElement,
 		getCurrentResume,
+		getPageElements,
 
 		// Mutations
 		setCurrentResume,
@@ -343,11 +362,8 @@ const createAppStore = () => {
 		initNewResume,
 
 		// Layering
-		bringToFront,
-		sendToBack,
-		bringForward,
-		sendBackward,
-		getZIndexRange
+		moveForward,
+		moveBackward
 	};
 };
 
