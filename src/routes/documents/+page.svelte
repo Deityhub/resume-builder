@@ -46,7 +46,7 @@
 
 <div class="min-h-screen bg-gray-50">
 	<!-- Header -->
-	<header class="border-b bg-white shadow-sm">
+	<header class="border-b border-blue-100 bg-white/80 backdrop-blur-md">
 		<div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
 			<div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 				<div class="flex items-center space-x-4">

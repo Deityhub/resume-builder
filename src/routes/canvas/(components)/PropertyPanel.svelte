@@ -13,6 +13,7 @@
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
+	import { Trash2 } from '@lucide/svelte';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -476,13 +477,15 @@
 
 			<!-- Delete Button -->
 			<div class="pt-4">
-				<button
+				<Button
 					data-testid="delete-element-btn"
-					onclick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}
-					class="w-full rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+					onClick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}
+					variant="destructive"
+					fullWidth
 				>
+					<Trash2 class="mr-2 h-4 w-4" />
 					Delete Element
-				</button>
+				</Button>
 			</div>
 		</div>
 	</div>

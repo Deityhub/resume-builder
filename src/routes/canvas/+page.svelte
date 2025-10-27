@@ -13,6 +13,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { Download, Plus, Save } from '@lucide/svelte';
 
 	const pages = $derived(Object.values(appStore.getPages()));
 	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
@@ -161,10 +162,10 @@
 	<!-- Main Canvas Area -->
 	<div class="flex flex-1 flex-col">
 		<!-- Page Navigation -->
-		<div class="border-b bg-white p-4">
+		<div class="border-b border-blue-100 bg-white/80 p-4 backdrop-blur-md">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
-					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
+					<Button onClick={handleBackNavigation} variant="text" data-testid="back-btn">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							class="mr-2 h-5 w-5"
@@ -192,6 +193,7 @@
 						variant="secondary"
 						data-testid="add-page-btn"
 					>
+						<Plus class="mr-2 h-4 w-4" />
 						Add Page
 					</Button>
 					{#if isIndexedDbSupported}
@@ -202,6 +204,7 @@
 							variant="primary"
 							data-testid="save-btn"
 						>
+							<Save class="mr-2 h-4 w-4" />
 							Save
 						</Button>
 					{/if}
@@ -211,6 +214,7 @@
 						variant="primary"
 						data-testid="export-btn"
 					>
+						<Download class="mr-2 h-4 w-4" />
 						Export PDF
 					</Button>
 				</div>
