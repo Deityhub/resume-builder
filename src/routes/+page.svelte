@@ -7,7 +7,7 @@
 		{ number: '1', title: 'Start', desc: "Click 'Start Building' to enter the editor" },
 		{ number: '2', title: 'Create', desc: 'Add text, shapes, and images to your canvas' },
 		{ number: '3', title: 'Design', desc: 'Drag, drop, and arrange elements freely' },
-		{ number: '4', title: 'Export', desc: 'Download your resume as a PDF' }
+		{ number: '4', title: 'Export', desc: 'Download your document as a PDF' }
 	];
 
 	const currentYear: number = new Date().getFullYear();
@@ -39,12 +39,12 @@
 				<span
 					class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent"
 				>
-					Resumé Builder
+					Lienzo
 				</span>
 			</div>
 			<div class="flex items-center gap-4">
-				<Button href="/documents" variant="text">My Resumes</Button>
-				<Button onClick={() => appStore.initNewResume()} href="/canvas" variant="primary"
+				<Button href="/documents" variant="text">My Documents</Button>
+				<Button onClick={() => appStore.initNewDocument()} href="/canvas" variant="primary"
 					>Start Building</Button
 				>
 			</div>
@@ -57,12 +57,11 @@
 			<h1
 				class="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-5xl font-bold text-transparent md:text-6xl"
 			>
-				Create Your Perfect Resume
+				Create Beautiful Documents
 			</h1>
 			<p class="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
-				Whether you're a seasoned professional or just starting your career, this platform provides
-				everything you need to create a resume that stands out. Build a beautiful, professional
-				resume in minutes with our easy-to-use tool.
+				A versatile document builder for creating resumes, invoices, letters, and more. Build
+				beautiful, professional documents in minutes with our intuitive drag-and-drop canvas.
 			</p>
 		</div>
 	</section>
@@ -112,7 +111,7 @@
 					</div>
 					<h3 class="mb-3 text-xl font-semibold">Export to PDF</h3>
 					<p class="text-gray-600">
-						Download your finished resume as a professional PDF file. Ready to send to employers
+						Download your finished document as a professional PDF file. Ready to share or print
 						instantly.
 					</p>
 				</div>
@@ -141,12 +140,12 @@
 	<!-- CTA Section -->
 	<section class="bg-gradient-to-r from-blue-600 to-purple-600 py-20 text-white">
 		<div class="container mx-auto px-4 text-center">
-			<h2 class="mb-4 text-4xl font-bold">Ready to build your resume?</h2>
+			<h2 class="mb-4 text-4xl font-bold">Ready to create your document?</h2>
 			<p class="mb-8 text-lg text-blue-100">
-				Start creating your perfect resume today, completely free.
+				Start building beautiful documents today, completely free.
 			</p>
 			<Button
-				onClick={() => appStore.initNewResume()}
+				onClick={() => appStore.initNewDocument()}
 				href="/canvas"
 				variant="secondary"
 				className="bg-white"
@@ -160,7 +159,7 @@
 	<!-- Footer -->
 	<footer class="border-t border-blue-100 bg-white/50 py-8">
 		<div class="container mx-auto px-4 text-center text-gray-600">
-			<p>&copy; {currentYear} Resumé Builder. Build your future today.</p>
+			<p>&copy; {currentYear} Lienzo. Create beautiful documents with ease.</p>
 		</div>
 	</footer>
 </div>

@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getAllResumes, isIndexedDBSupported } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/canvas';
+	import { getAllDocuments, isIndexedDBSupported } from '$lib/utils/idb';
+	import type { DocumentData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import Document from './(components)/Document.svelte';
 
-	let resumes = $state<ResumeData[]>([]);
+	let documents = $state<DocumentData[]>([]);
 	let loading = $state(true);
 	let error = $state('');
 	let searchQuery = $state('');
 
-	async function fetchResumes() {
+	async function fetchDocuments() {
 		loading = true;
 		try {
-			resumes = await getAllResumes();
+			documents = await getAllDocuments();
 			error = '';
 		} catch (_error) {
 			console.error('Error loading documents:', _error);
@@ -27,20 +27,20 @@
 	}
 
 	async function handleCreateNew() {
-		appStore.initNewResume();
+		appStore.initNewDocument();
 		await goto(resolve('/canvas'));
 	}
 
 	// Filter documents based on search query
-	const filteredResumes = $derived(
-		resumes.filter((resume) => resume.name.toLowerCase().includes(searchQuery.toLowerCase()))
+	const filteredDocuments = $derived(
+		documents.filter((document) => document.name.toLowerCase().includes(searchQuery.toLowerCase()))
 	);
 
 	onMount(() => {
 		if (!isIndexedDBSupported()) {
 			return goto(resolve('/'));
 		}
-		fetchResumes();
+		fetchDocuments();
 	});
 </script>
 
@@ -138,7 +138,7 @@
 					</div>
 				</div>
 			</div>
-		{:else if filteredResumes.length === 0}
+		{:else if filteredDocuments.length === 0}
 			<div
 				class="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center"
 			>
@@ -181,8 +181,8 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{#each filteredResumes as resume (resume.id)}
-					<Document {resume} {fetchResumes} />
+				{#each filteredDocuments as document (document.id)}
+					<Document {document} {fetchDocuments} />
 				{/each}
 			</div>
 		{/if}

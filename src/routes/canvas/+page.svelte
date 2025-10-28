@@ -4,9 +4,9 @@
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import ResumeNameModal from '$lib/components/NameModal.svelte';
-	import { isIndexedDBSupported, saveResume } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/canvas';
+	import NameModal from '$lib/components/NameModal.svelte';
+	import { isIndexedDBSupported, saveDocument } from '$lib/utils/idb';
+	import type { DocumentData } from '$lib/types/canvas';
 	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
@@ -27,10 +27,10 @@
 	}
 
 	function handleBackNavigation() {
-		const currentResume = appStore.getCurrentResume();
-		// If creating new resume (name is empty), go to home page
-		// If editing existing resume (name has value), go to saved page
-		const destination = currentResume.name ? '/documents' : '/';
+		const currentDocument = appStore.getCurrentDocument();
+		// If creating new document (name is empty), go to home page
+		// If editing existing document (name has value), go to documents page
+		const destination = currentDocument.name ? '/documents' : '/';
 		goto(resolve(destination));
 	}
 
@@ -241,9 +241,9 @@
 		</div>
 	</div>
 
-	<!-- Save Resume Modal -->
+	<!-- Save Document Modal -->
 	{#if saveModalOpen}
-		<ResumeNameModal
+		<NameModal
 			isOpen={saveModalOpen}
 			onClose={() => {
 				saveModalOpen = false;
@@ -253,12 +253,12 @@
 				if (!name) return;
 				savePending = true;
 				try {
-					const resume: ResumeData = {
-						...appStore.getCurrentResume(),
+					const document: DocumentData = {
+						...appStore.getCurrentDocument(),
 						name
 					};
-					await saveResume(resume);
-					appStore.updateCurrentResume({ name });
+					await saveDocument(document);
+					appStore.updateCurrentDocument({ name });
 					saveModalOpen = false;
 					saveError = '';
 				} catch (err) {
@@ -267,7 +267,7 @@
 					savePending = false;
 				}
 			}}
-			initialName={appStore.getCurrentResume().name}
+			initialName={appStore.getCurrentDocument().name}
 		/>
 		{#if saveError}
 			<div class="px-4 text-sm text-red-500">{saveError}</div>

@@ -80,16 +80,16 @@ export interface RulerBoundaries {
 	};
 }
 
-export interface ResumePage {
+export interface DocumentPage {
 	id: string;
 	elements: Record<string, TCanvasElement>;
 	boundaries: RulerBoundaries;
 }
 
-export interface ResumeData {
+export interface DocumentData {
 	id: string;
 	name: string;
-	pages: Record<string, ResumePage>;
+	pages: Record<string, DocumentPage>;
 	createdAt: number;
 	updatedAt: number;
 }

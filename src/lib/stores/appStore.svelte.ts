@@ -1,16 +1,16 @@
 import { getDefaultProperties } from '$lib/utils/properties';
 import type {
 	ElementType,
-	ResumeData,
+	DocumentData,
 	TCanvasElement,
-	ResumePage,
+	DocumentPage,
 	RulerBoundaries
 } from '../types/canvas';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
-	const getDefaultPage = (id: string): ResumePage => {
+	const getDefaultPage = (id: string): DocumentPage => {
 		return {
 			id,
 			elements: {},
@@ -23,7 +23,7 @@ const createAppStore = () => {
 
 	const firstPageId = crypto.randomUUID();
 
-	let currentResume: ResumeData = $state({
+	let currentDocument: DocumentData = $state({
 		id: crypto.randomUUID(),
 		name: '', // the user should set this value
 		pages: {
@@ -109,12 +109,12 @@ const createAppStore = () => {
 	};
 
 	// State getters
-	const getPages = () => currentResume.pages;
+	const getPages = () => currentDocument.pages;
 
-	const initNewResume = () => {
+	const initNewDocument = () => {
 		const pageId = crypto.randomUUID();
 
-		currentResume = {
+		currentDocument = {
 			id: crypto.randomUUID(),
 			name: '', // the user should set this value
 			pages: {
@@ -127,28 +127,28 @@ const createAppStore = () => {
 		selectElement(null);
 	};
 
-	const getCurrentResume = () => currentResume;
+	const getCurrentDocument = () => currentDocument;
 
-	const getPage = (pageId: string) => currentResume.pages[pageId];
+	const getPage = (pageId: string) => currentDocument.pages[pageId];
 
 	const getSelectedElement = () => selectedElement;
 
 	// Mutations
-	const setCurrentResume = (resume: ResumeData) => {
-		currentResume = { ...resume };
+	const setCurrentDocument = (document: DocumentData) => {
+		currentDocument = { ...document };
 	};
 
-	const updateResumePages = (pages: Record<string, ResumePage>) => {
-		currentResume = { ...currentResume, pages };
+	const updateDocumentPages = (pages: Record<string, DocumentPage>) => {
+		currentDocument = { ...currentDocument, pages };
 	};
 
-	const updateCurrentResume = (resume: Partial<ResumeData>) => {
-		currentResume = { ...currentResume, ...resume };
+	const updateCurrentDocument = (document: Partial<DocumentData>) => {
+		currentDocument = { ...currentDocument, ...document };
 	};
 
 	const addPage = () => {
 		const newPage = getDefaultPage(crypto.randomUUID());
-		updateResumePages({ ...currentResume.pages, [newPage.id]: newPage });
+		updateDocumentPages({ ...currentDocument.pages, [newPage.id]: newPage });
 	};
 
 	const findElement = (pageId: string, elementId: string): TCanvasElement | null => {
@@ -192,8 +192,8 @@ const createAppStore = () => {
 		});
 
 		// Add to page elements with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [newElement.id]: newElement }
@@ -240,8 +240,8 @@ const createAppStore = () => {
 		}
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
@@ -268,8 +268,8 @@ const createAppStore = () => {
 		delete newElements[elementId];
 
 		// Update pages with reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: newElements
@@ -283,7 +283,7 @@ const createAppStore = () => {
 	};
 
 	const deletePage = (pageId: string) => {
-		delete currentResume.pages[pageId];
+		delete currentDocument.pages[pageId];
 	};
 
 	// Move element from one parent to another
@@ -315,8 +315,8 @@ const createAppStore = () => {
 		};
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
@@ -331,8 +331,8 @@ const createAppStore = () => {
 		}
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				boundaries
@@ -344,22 +344,22 @@ const createAppStore = () => {
 		// State getters
 		getPages,
 		getSelectedElement,
-		getCurrentResume,
+		getCurrentDocument,
 		getPageElements,
 
 		// Mutations
-		setCurrentResume,
+		setCurrentDocument,
 		addPage,
 		addElement,
 		updateElement,
-		selectElement,
 		deleteElement,
 		deletePage,
+		selectElement,
 		updateBoundaries,
 		moveElement,
 		findElement,
-		updateCurrentResume,
-		initNewResume,
+		updateCurrentDocument,
+		initNewDocument,
 
 		// Layering
 		moveForward,

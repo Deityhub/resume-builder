@@ -1,24 +1,26 @@
 <script lang="ts">
-	import { deleteResume } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/canvas';
+	import { deleteDocument } from '$lib/utils/idb';
+	import type { DocumentData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { Trash2, Pen } from '@lucide/svelte';
 
-	const { resume, fetchResumes }: { resume: ResumeData; fetchResumes: () => Promise<void> } =
-		$props();
+	const {
+		document,
+		fetchDocuments
+	}: { document: DocumentData; fetchDocuments: () => Promise<void> } = $props();
 
-	async function handleEdit(resume: ResumeData) {
-		appStore.setCurrentResume(resume);
+	async function handleEdit(document: DocumentData) {
+		appStore.setCurrentDocument(document);
 		await goto(resolve('/canvas'));
 	}
 
-	async function handleDelete(resume: ResumeData) {
-		if (!confirm(`Delete document "${resume.name}"? This cannot be undone.`)) return;
-		await deleteResume(resume.id);
-		await fetchResumes();
+	async function handleDelete(document: DocumentData) {
+		if (!confirm(`Delete document "${document.name}"? This cannot be undone.`)) return;
+		await deleteDocument(document.id);
+		await fetchDocuments();
 	}
 
 	function formatDate(timestamp: number) {
@@ -36,9 +38,9 @@
 	<div class="p-5">
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
-				<h3 class="truncate text-lg font-medium text-gray-900">{resume.name}</h3>
+				<h3 class="truncate text-lg font-medium text-gray-900">{document.name}</h3>
 				<p class="mt-1 text-sm text-gray-500">
-					Updated {formatDate(resume.updatedAt)}
+					Updated {formatDate(document.updatedAt)}
 				</p>
 			</div>
 		</div>
@@ -58,15 +60,15 @@
 						clip-rule="evenodd"
 					/>
 				</svg>
-				{Object.keys(resume.pages).length} pages
+				{Object.keys(document.pages).length} pages
 			</span>
 
 			<div class="ml-4 flex items-center space-x-2">
-				<Button onClick={() => handleEdit(resume)} variant="secondary" size="xs">
+				<Button onClick={() => handleEdit(document)} variant="secondary" size="xs">
 					<Pen class="mr-2 h-4 w-4" />
 					Edit
 				</Button>
-				<Button onClick={() => handleDelete(resume)} variant="secondary-destructive" size="xs">
+				<Button onClick={() => handleDelete(document)} variant="secondary-destructive" size="xs">
 					<Trash2 class="mr-2 h-4 w-4" />
 					Delete
 				</Button>

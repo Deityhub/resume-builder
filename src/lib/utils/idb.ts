@@ -1,10 +1,10 @@
-// Minimal IndexedDB wrapper for storing resumes
-import type { ResumeData } from '../types/canvas';
+// Minimal IndexedDB wrapper for storing documents
+import type { DocumentData } from '../types/canvas';
 
-export type ResumeRecord = ResumeData;
+export type DocumentRecord = DocumentData;
 
-const DB_NAME = 'resume-builder-db';
-const STORE_NAME = 'resumes';
+const DB_NAME = 'lienzo-db';
+const STORE_NAME = 'documents';
 const DB_VERSION = 1;
 
 export function isIndexedDBSupported(): boolean {
@@ -45,12 +45,12 @@ function openDB(): Promise<IDBDatabase> {
 	});
 }
 
-// Clean the resume data to ensure it can be stored in IndexedDB
-function cleanResumeData(record: ResumeData): ResumeData {
+// Clean the document data to ensure it can be stored in IndexedDB
+function cleanDocumentData(record: DocumentData): DocumentData {
 	return JSON.parse(JSON.stringify(record));
 }
 
-export async function saveResume(record: ResumeData): Promise<void> {
+export async function saveDocument(record: DocumentData): Promise<void> {
 	const db = await openDB();
 
 	return new Promise((resolve, reject) => {
@@ -72,7 +72,7 @@ export async function saveResume(record: ResumeData): Promise<void> {
 			const store = tx.objectStore(STORE_NAME);
 			// Clean the data and add updatedAt
 			const cleanData = {
-				...cleanResumeData(record),
+				...cleanDocumentData(record),
 				updatedAt: Date.now()
 			};
 			const request = store.put(cleanData);
@@ -91,29 +91,29 @@ export async function saveResume(record: ResumeData): Promise<void> {
 	});
 }
 
-export async function getAllResumes(): Promise<ResumeData[]> {
+export async function getAllDocuments(): Promise<DocumentData[]> {
 	const db = await openDB();
 
 	return new Promise((resolve, reject) => {
 		const store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
 		const req = store.getAll();
-		req.onsuccess = () => resolve(req.result as ResumeRecord[]);
+		req.onsuccess = () => resolve(req.result as DocumentRecord[]);
 		req.onerror = () => reject(req.error);
 	});
 }
 
-export async function getResume(id: string): Promise<ResumeData | undefined> {
+export async function getDocument(id: string): Promise<DocumentData | undefined> {
 	const db = await openDB();
 
 	return new Promise((resolve, reject) => {
 		const store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
 		const req = store.get(id);
-		req.onsuccess = () => resolve(req.result as ResumeRecord | undefined);
+		req.onsuccess = () => resolve(req.result as DocumentRecord | undefined);
 		req.onerror = () => reject(req.error);
 	});
 }
 
-export async function deleteResume(id: string): Promise<void> {
+export async function deleteDocument(id: string): Promise<void> {
 	const db = await openDB();
 
 	return new Promise((resolve, reject) => {
