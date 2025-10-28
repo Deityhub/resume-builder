@@ -34,7 +34,7 @@
 		class="w-80 overflow-y-auto border-l border-gray-200 bg-white p-4"
 		data-testid="property-panel"
 	>
-		<div class="space-y-4">
+		<div class="mb-6 space-y-4">
 			<h3 class="mb-4 text-lg font-semibold text-gray-800" data-testid="property-panel-title">
 				{selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)} Properties
 			</h3>

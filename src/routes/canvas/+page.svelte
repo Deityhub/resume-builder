@@ -165,36 +165,24 @@
 		<div class="border-b border-blue-100 bg-white/80 p-4 backdrop-blur-md">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
-					<Button onClick={handleBackNavigation} variant="text" data-testid="back-btn">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="mr-2 h-5 w-5"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						Back
-					</Button>
-				</div>
-
-				<div class="flex items-center gap-2">
-					<span class="mr-4 text-sm text-gray-600" data-testid="page-count">
-						{pages.length}
-						{pages.length > 1 ? 'Pages' : 'Page'}
-					</span>
 					<Button
 						disabled={savePending}
 						onClick={appStore.addPage}
-						variant="secondary"
+						variant="primary"
 						data-testid="add-page-btn"
 					>
 						<Plus class="mr-2 h-4 w-4" />
 						Add Page
+					</Button>
+					<span class="mr-4 text-sm text-gray-600" data-testid="page-count">
+						{pages.length}
+						{pages.length > 1 ? 'Pages' : 'Page'}
+					</span>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
+						Cancel
 					</Button>
 					{#if isIndexedDbSupported}
 						<Button
