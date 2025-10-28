@@ -3,6 +3,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
+	import { Icons } from '$lib/icons';
 	type ElementType = 'text' | 'shape' | 'image';
 
 	const tools = [
@@ -48,30 +49,7 @@
 			onkeydown={null}
 		>
 			<div class="flex h-12 w-12 flex-shrink-0 items-center justify-center">
-				<svg
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="text-indigo-600"
-				>
-					<path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
-					<path
-						d="M2 17L12 22L22 17"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-					<path
-						d="M2 12L12 17L22 12"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
+				<Icons.Logo />
 			</div>
 			<span
 				class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-semibold whitespace-nowrap text-transparent transition-opacity duration-200"

@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import Document from './(components)/Document.svelte';
+	import { Icons } from '$lib/icons';
 
 	let documents = $state<DocumentData[]>([]);
 	let loading = $state(true);
@@ -51,23 +52,17 @@
 			<div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 				<div class="flex items-center space-x-4">
 					<Button onClick={() => goto(resolve('/'))} variant="text" size="xs" className="-ml-2">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<div class="flex items-center gap-3">
+							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br">
+								<Icons.Logo />
+							</div>
+							<span
+								class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent"
+							>
+								Lienzo
+							</span>
+						</div>
 					</Button>
-					<div>
-						<h1 class="text-2xl font-bold text-gray-900">Documents</h1>
-						<p class="mt-1 text-sm text-gray-500">View and manage your documents</p>
-					</div>
 				</div>
 				<div class="flex w-full items-center gap-4 sm:w-auto">
 					<div class="relative flex-1 sm:w-64">
@@ -114,6 +109,10 @@
 
 	<!-- Main Content -->
 	<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+		<div class="mb-8">
+			<h1 class="text-2xl font-bold text-gray-900">Documents</h1>
+			<p class="mt-1 text-sm text-gray-500">View and manage your documents</p>
+		</div>
 		{#if loading}
 			<div class="flex h-64 items-center justify-center">
 				<div class="text-center">
