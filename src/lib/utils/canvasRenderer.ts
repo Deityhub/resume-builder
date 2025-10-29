@@ -2,7 +2,7 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH, DISPLAY_SCALE } from '$lib/const/dimension
 import type {
 	ImageElement,
 	TCanvasElement,
-	ResumePage,
+	DocumentPage,
 	ShapeElement,
 	TextElement
 } from '$lib/types/canvas';
@@ -11,12 +11,12 @@ import { toCanvas } from 'html-to-image';
 
 /**
  * Utility function to render a page's elements into a DOM container
- * This creates a WYSIWYG representation of the resume page for export/preview
+ * This creates a WYSIWYG representation of the document page for export/preview
  *
  * @param container - The DOM element to render into
  * @param page - The page data containing elements to render
  */
-export function renderPageToCanvas(container: HTMLElement, page: ResumePage): void {
+export function renderPageToCanvas(container: HTMLElement, page: DocumentPage): void {
 	// Clear existing content
 	container.innerHTML = '';
 	container.style.position = 'relative';
@@ -33,13 +33,13 @@ export function renderPageToCanvas(container: HTMLElement, page: ResumePage): vo
 }
 
 /**
- * Create a DOM element representing a resume element
+ * Create a DOM element representing an element
  */
 /**
- * Creates a DOM element representing a resume element with correct positioning and styling.
+ * Creates a DOM element representing an element with correct positioning and styling.
  * Handles positioning, sizing, and z-index for the base element before type-specific rendering.
  *
- * @param element - The resume element to create a DOM representation for
+ * @param element - The document element to create a DOM representation for
  * @returns HTMLElement with base styling applied
  *
  * @example
@@ -636,7 +636,7 @@ function getBackgroundSize(objectFit?: string): string {
  * Utility function to create a hidden canvas for export purposes
  * This can be used for PDF generation or preview
  */
-export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasElement | void> {
+export async function createExportCanvas(page: DocumentPage): Promise<HTMLCanvasElement | void> {
 	const width = CANVAS_WIDTH * DISPLAY_SCALE;
 	const height = CANVAS_HEIGHT * DISPLAY_SCALE;
 
@@ -669,7 +669,7 @@ export async function createExportCanvas(page: ResumePage): Promise<HTMLCanvasEl
  * Utility function to get image data URL from a page
  * Useful for preview generation
  */
-export async function getPageImageData(page: ResumePage): Promise<string> {
+export async function getPageImageData(page: DocumentPage): Promise<string> {
 	const canvas = await createExportCanvas(page);
 
 	if (!canvas) {

@@ -115,6 +115,7 @@
 	class:border-b={orientation === 'horizontal'}
 	style:width={orientation === 'vertical' ? `${RULER_SIZE}px` : `${displaySize}px`}
 	style:height={orientation === 'horizontal' ? `${RULER_SIZE}px` : `${displaySize}px`}
+	data-testid="ruler"
 >
 	<!-- Major tick marks (tallest) -->
 	{#each majorTicks as tick (tick)}

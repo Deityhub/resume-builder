@@ -2,7 +2,7 @@ import type { ElementType, TCanvasElement } from '../types/canvas';
 import { CANVAS_WIDTH } from '../const/dimension';
 
 /**
- * Creates a new resume element with default properties based on the element type.
+ * Creates a new document element with default properties based on the element type.
  * Each element type (text, shape, image) gets its own set of default styling and attributes.
  *
  * @param params - Element creation parameters

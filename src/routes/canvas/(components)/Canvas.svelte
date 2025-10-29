@@ -13,7 +13,7 @@
 	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
-	interface ResumeCanvasProps {
+	interface CanvasProps {
 		page: DocumentPage;
 		showDeleteButton?: boolean;
 		width: number;
@@ -33,7 +33,7 @@
 		onDrop = (_event: DragEvent) => {},
 		'data-page-id': dataPageId,
 		onMount
-	}: ResumeCanvasProps = $props();
+	}: CanvasProps = $props();
 
 	// Create component instance for onMount callback
 	const componentInstance: TCanvasInstance = {
@@ -562,7 +562,7 @@
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
-				data-testid="resume-canvas"
+				data-testid="document-canvas"
 				class="relative border-2 border-border bg-background shadow-lg"
 				style:width="{width * DISPLAY_SCALE}px"
 				style:height="{height * DISPLAY_SCALE}px"
@@ -683,6 +683,7 @@
 							page.boundaries.vertical.end - page.boundaries.vertical.start,
 							height
 						)}
+						data-testid={`boundary-${page.id}`}
 					></div>
 				{/if}
 			</div>

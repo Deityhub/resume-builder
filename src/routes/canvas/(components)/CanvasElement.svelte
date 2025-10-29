@@ -389,6 +389,7 @@
 				role="button"
 				tabindex="0"
 				onkeydown={null}
+				data-testid={`resize-handle-${handle.direction}`}
 			></div>
 		{/each}
 
@@ -404,6 +405,7 @@
 				role="button"
 				tabindex="0"
 				onkeydown={null}
+				data-testid={`resize-handle-${handle.direction}`}
 			></div>
 		{/each}
 	{/if}
