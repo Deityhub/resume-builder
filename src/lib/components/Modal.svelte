@@ -41,21 +41,21 @@
 
 {#if open}
 	<div
-		class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-foreground/80 backdrop-blur-md"
 		onclick={handleBackdropClick}
 		onkeydown={null}
 		role="dialog"
 		aria-modal="true"
 		tabindex="0"
 	>
-		<div class="mx-4 w-full max-w-lg rounded-lg bg-white shadow-xl">
+		<div class="mx-4 w-full max-w-lg rounded-lg bg-background shadow-xl">
 			<div class="flex items-start justify-between p-6">
 				<div class="pr-4">
 					{#if title}
 						<h2 class="text-lg font-semibold">{title}</h2>
 					{/if}
 					{#if description}
-						<p class="mt-1 text-sm text-gray-600">{description}</p>
+						<p class="mt-1 text-sm text-muted-foreground">{description}</p>
 					{/if}
 				</div>
 				<Button variant="text" onClick={onCancel} disabled={disableActions}>
@@ -74,7 +74,7 @@
 				{@render children()}
 			</div>
 
-			<div class="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+			<div class="flex justify-end gap-3 border-t border-border px-6 py-4">
 				{#if showCancelAction}
 					<Button variant="ghost" onClick={onCancel} disabled={disableActions}>{cancelLabel}</Button
 					>

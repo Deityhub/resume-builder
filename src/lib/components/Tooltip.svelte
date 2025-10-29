@@ -42,7 +42,7 @@
 	{#if open}
 		<div
 			role="tooltip"
-			class={`pointer-events-none absolute z-50 rounded-md bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow ${positionClasses}`}
+			class={`pointer-events-none absolute z-50 rounded-md bg-primary px-2 py-1 text-xs whitespace-nowrap text-background shadow ${positionClasses}`}
 		>
 			{content}
 		</div>

@@ -1,30 +1,30 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Resume Builder E2E Tests', () => {
+test.describe('Document Builder E2E Tests', () => {
 	test('home page loads correctly', async ({ page }) => {
 		await page.goto('/');
-		await expect(page.locator('h1')).toContainText('Resume Builder');
-		await expect(page.getByRole('link', { name: /create your resume/i })).toBeVisible();
+		await expect(page.locator('h1')).toContainText('Create Beautiful Documents');
+		await expect(page.getByRole('link', { name: 'Start Building' }).first()).toBeVisible();
 	});
 
 	test('navigate to create page', async ({ page }) => {
 		await page.goto('/');
-		await page.getByRole('link', { name: /create your resume/i }).click();
-		await expect(page).toHaveURL(/.*create/);
+		await page.getByRole('link', { name: 'Start Building' }).first().click();
+		await expect(page).toHaveURL(/.*canvas/);
 	});
 
 	test('create page has toolbar and canvas', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for toolbar
 		await expect(page.getByTestId('toolbar')).toBeVisible();
 
 		// Check for canvas
-		await expect(page.getByTestId('resume-canvas')).toBeVisible();
+		await expect(page.getByTestId('document-canvas')).toBeVisible();
 	});
 
 	test('add page button works', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Initially should have 1 page
 		const pageCount = page.getByTestId('page-count');
@@ -38,13 +38,13 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('drag and drop text element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Get the text tool
 		const textTool = page.getByTestId('tool-text');
 
 		// Get the canvas
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 
 		// Drag text tool to canvas
 		await textTool.dragTo(canvas, {
@@ -56,11 +56,11 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('element selection and deselection', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await textTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -76,26 +76,28 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('resize handles appear on selected element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await textTool.dragTo(canvas, {
 			targetPosition: { x: 300, y: 300 }
 		});
 
 		// Resize handles should be visible (corner and edge handles)
-		const resizeHandles = page.locator('.bg-blue-500');
-		await expect(resizeHandles.first()).toBeVisible();
+		const edgeResize = page.getByTestId('resize-handle-n');
+		const cornerResize = page.getByTestId('resize-handle-nw');
+		await expect(edgeResize).toBeVisible();
+		await expect(cornerResize).toBeVisible();
 	});
 
 	test('delete element', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add an element
 		const textTool = page.getByTestId('tool-text');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await textTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -108,11 +110,11 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update text element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add text element
 		const textTool = page.getByTestId('tool-text');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await textTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -147,11 +149,11 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update position and size properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add text element
 		const textTool = page.getByTestId('tool-text');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await textTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -178,11 +180,11 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update shape element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add shape element
 		const shapeTool = page.getByTestId('tool-shape');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await shapeTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -207,11 +209,11 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('update image element properties', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Add image element
 		const imageTool = page.getByTestId('tool-image');
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 		await imageTool.dragTo(canvas, {
 			targetPosition: { x: 200, y: 200 }
 		});
@@ -231,32 +233,31 @@ test.describe('Resume Builder E2E Tests', () => {
 	});
 
 	test('rulers are visible', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for ruler elements
-		const rulers = page.locator('.bg-gray-100');
+		const rulers = page.getByTestId(/ruler/);
 		await expect(rulers.first()).toBeVisible();
 	});
 
 	test('boundary visualization is visible', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
 		// Check for boundary box (blue dashed border)
-		const boundary = page.locator('.border-dashed.border-blue-400');
-		await expect(boundary.first()).toBeVisible();
+		const boundary = page.getByTestId(/boundary/);
+		await expect(boundary).toBeVisible();
 	});
 
-	test('navigate to about page', async ({ page }) => {
-		await page.goto('/');
-		await page.getByRole('link', { name: /about us/i }).click();
-		await expect(page).toHaveURL(/.*about/);
-		await expect(page.locator('h1')).toContainText('About');
+	test('navigate to documents page', async ({ page }) => {
+		await page.goto('/documents');
+		await expect(page).toHaveURL(/.*documents/);
+		await expect(page.locator('h1')).toContainText('Documents');
 	});
 
 	test('multiple element types can be added', async ({ page }) => {
-		await page.goto('/create');
+		await page.goto('/canvas');
 
-		const canvas = page.getByTestId('resume-canvas');
+		const canvas = page.getByTestId('document-canvas');
 
 		// Add text element
 		const textTool = page.getByTestId('tool-text');

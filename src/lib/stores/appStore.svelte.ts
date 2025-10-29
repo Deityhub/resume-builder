@@ -1,16 +1,16 @@
 import { getDefaultProperties } from '$lib/utils/properties';
 import type {
 	ElementType,
-	ResumeData,
-	ResumeElement,
-	ResumePage,
+	DocumentData,
+	TCanvasElement,
+	DocumentPage,
 	RulerBoundaries
-} from '../types/resume';
+} from '../types/canvas';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
-	const getDefaultPage = (id: string): ResumePage => {
+	const getDefaultPage = (id: string): DocumentPage => {
 		return {
 			id,
 			elements: {},
@@ -23,7 +23,7 @@ const createAppStore = () => {
 
 	const firstPageId = crypto.randomUUID();
 
-	let currentResume: ResumeData = $state({
+	let currentDocument: DocumentData = $state({
 		id: crypto.randomUUID(),
 		name: '', // the user should set this value
 		pages: {
@@ -33,7 +33,7 @@ const createAppStore = () => {
 		updatedAt: Date.now()
 	});
 
-	let selectedElement: ResumeElement | null = $state(null);
+	let selectedElement: TCanvasElement | null = $state(null);
 
 	// Helper to get next zIndex for a page
 	const getNextZIndex = (pageId: string): number => {
@@ -46,57 +46,75 @@ const createAppStore = () => {
 		return Math.max(...elements.map((el) => el.zIndex)) + 1;
 	};
 
-	// Layering helpers
-	const getZIndexRange = (pageId: string): { min: number; max: number } => {
+	const getPageElements = (pageId: string): TCanvasElement[] => {
 		const page = getPage(pageId);
-		if (!page) return { min: 0, max: 0 };
+		if (!page) return [];
 
-		const elements = Object.values(page.elements);
-		if (elements.length === 0) return { min: 0, max: 0 };
-
-		const zIndices = elements.map((el) => el.zIndex);
-		return { min: Math.min(...zIndices), max: Math.max(...zIndices) };
+		return Object.values(page.elements);
 	};
 
-	const bringToFront = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
-
-		const elementZIndex = element.zIndex;
-		const { max } = getZIndexRange(pageId);
-
-		if (elementZIndex === max) return;
-		updateElement({ elementId, updates: { zIndex: max + 1 }, pageId });
+	// Get all elements on a page sorted by zIndex (ascending)
+	const getSortedElements = (pageId: string): TCanvasElement[] => {
+		return getPageElements(pageId).sort((a, b) => a.zIndex - b.zIndex);
 	};
 
-	const sendToBack = (elementId: string, pageId: string) => {
-		const { min } = getZIndexRange(pageId);
-		updateElement({ elementId, updates: { zIndex: Math.max(0, min - 1) }, pageId });
+	// Move an element forward in the z-index stack
+	const moveForward = (elementId: string, pageId: string) => {
+		const elements = getSortedElements(pageId);
+		const currentIndex = elements.findIndex((el) => el.id === elementId);
+
+		// Can't move forward if already at the top
+		if (currentIndex === -1 || currentIndex === elements.length - 1) return;
+
+		const currentElement = elements[currentIndex];
+		const nextElement = elements[currentIndex + 1];
+
+		// Swap z-indices
+		updateElement({
+			elementId: currentElement.id,
+			updates: { zIndex: nextElement.zIndex },
+			pageId
+		});
+
+		updateElement({
+			elementId: nextElement.id,
+			updates: { zIndex: currentElement.zIndex },
+			pageId
+		});
 	};
 
-	const bringForward = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
+	// Move an element backward in the z-index stack
+	const moveBackward = (elementId: string, pageId: string) => {
+		const elements = getSortedElements(pageId);
+		const currentIndex = elements.findIndex((el) => el.id === elementId);
 
-		const currentZ = element.zIndex;
-		updateElement({ elementId, updates: { zIndex: currentZ + 1 }, pageId });
-	};
+		// Can't move backward if already at the bottom
+		if (currentIndex <= 0) return;
 
-	const sendBackward = (elementId: string, pageId: string) => {
-		const element = findElement(pageId, elementId);
-		if (!element) return;
+		const currentElement = elements[currentIndex];
+		const prevElement = elements[currentIndex - 1];
 
-		const currentZ = element.zIndex;
-		updateElement({ elementId, updates: { zIndex: Math.max(0, currentZ - 1) }, pageId });
+		// Swap z-indices
+		updateElement({
+			elementId: currentElement.id,
+			updates: { zIndex: prevElement.zIndex },
+			pageId
+		});
+
+		updateElement({
+			elementId: prevElement.id,
+			updates: { zIndex: currentElement.zIndex },
+			pageId
+		});
 	};
 
 	// State getters
-	const getPages = () => currentResume.pages;
+	const getPages = () => currentDocument.pages;
 
-	const initNewResume = () => {
+	const initNewDocument = () => {
 		const pageId = crypto.randomUUID();
 
-		currentResume = {
+		currentDocument = {
 			id: crypto.randomUUID(),
 			name: '', // the user should set this value
 			pages: {
@@ -109,31 +127,31 @@ const createAppStore = () => {
 		selectElement(null);
 	};
 
-	const getCurrentResume = () => currentResume;
+	const getCurrentDocument = () => currentDocument;
 
-	const getPage = (pageId: string) => currentResume.pages[pageId];
+	const getPage = (pageId: string) => currentDocument.pages[pageId];
 
 	const getSelectedElement = () => selectedElement;
 
 	// Mutations
-	const setCurrentResume = (resume: ResumeData) => {
-		currentResume = { ...resume };
+	const setCurrentDocument = (document: DocumentData) => {
+		currentDocument = { ...document };
 	};
 
-	const updateResumePages = (pages: Record<string, ResumePage>) => {
-		currentResume = { ...currentResume, pages };
+	const updateDocumentPages = (pages: Record<string, DocumentPage>) => {
+		currentDocument = { ...currentDocument, pages };
 	};
 
-	const updateCurrentResume = (resume: Partial<ResumeData>) => {
-		currentResume = { ...currentResume, ...resume };
+	const updateCurrentDocument = (document: Partial<DocumentData>) => {
+		currentDocument = { ...currentDocument, ...document };
 	};
 
 	const addPage = () => {
 		const newPage = getDefaultPage(crypto.randomUUID());
-		updateResumePages({ ...currentResume.pages, [newPage.id]: newPage });
+		updateDocumentPages({ ...currentDocument.pages, [newPage.id]: newPage });
 	};
 
-	const findElement = (pageId: string, elementId: string): ResumeElement | null => {
+	const findElement = (pageId: string, elementId: string): TCanvasElement | null => {
 		const page = getPage(pageId);
 		if (!page) return null;
 
@@ -162,7 +180,7 @@ const createAppStore = () => {
 			return;
 		}
 
-		const newElement: ResumeElement = getDefaultProperties({
+		const newElement: TCanvasElement = getDefaultProperties({
 			type,
 			x,
 			y,
@@ -174,8 +192,8 @@ const createAppStore = () => {
 		});
 
 		// Add to page elements with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [newElement.id]: newElement }
@@ -192,7 +210,7 @@ const createAppStore = () => {
 		pageId
 	}: {
 		elementId: string;
-		updates: Partial<ResumeElement>;
+		updates: Partial<TCanvasElement>;
 		pageId: string;
 	}) => {
 		const page = getPage(pageId);
@@ -202,7 +220,7 @@ const createAppStore = () => {
 		if (!currentElement) return;
 
 		const elementType = currentElement.type;
-		let updatedElement: ResumeElement;
+		let updatedElement: TCanvasElement;
 
 		switch (elementType) {
 			case 'text':
@@ -222,8 +240,8 @@ const createAppStore = () => {
 		}
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
@@ -236,7 +254,7 @@ const createAppStore = () => {
 		}
 	};
 
-	const selectElement = (element: ResumeElement | null) => {
+	const selectElement = (element: TCanvasElement | null) => {
 		selectedElement = element;
 	};
 
@@ -250,8 +268,8 @@ const createAppStore = () => {
 		delete newElements[elementId];
 
 		// Update pages with reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: newElements
@@ -265,7 +283,7 @@ const createAppStore = () => {
 	};
 
 	const deletePage = (pageId: string) => {
-		delete currentResume.pages[pageId];
+		delete currentDocument.pages[pageId];
 	};
 
 	// Move element from one parent to another
@@ -297,8 +315,8 @@ const createAppStore = () => {
 		};
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				elements: { ...page.elements, [elementId]: updatedElement }
@@ -313,8 +331,8 @@ const createAppStore = () => {
 		}
 
 		// Update with proper reactivity
-		updateResumePages({
-			...currentResume.pages,
+		updateDocumentPages({
+			...currentDocument.pages,
 			[pageId]: {
 				...page,
 				boundaries
@@ -326,28 +344,26 @@ const createAppStore = () => {
 		// State getters
 		getPages,
 		getSelectedElement,
-		getCurrentResume,
+		getCurrentDocument,
+		getPageElements,
 
 		// Mutations
-		setCurrentResume,
+		setCurrentDocument,
 		addPage,
 		addElement,
 		updateElement,
-		selectElement,
 		deleteElement,
 		deletePage,
+		selectElement,
 		updateBoundaries,
 		moveElement,
 		findElement,
-		updateCurrentResume,
-		initNewResume,
+		updateCurrentDocument,
+		initNewDocument,
 
 		// Layering
-		bringToFront,
-		sendToBack,
-		bringForward,
-		sendBackward,
-		getZIndexRange
+		moveForward,
+		moveBackward
 	};
 };
 

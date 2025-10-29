@@ -1,27 +1,27 @@
-# Resume Builder
+# Lienzo
 
-A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwind CSS. Create professional resumes with an intuitive drag-and-drop interface, featuring advanced ruler boundaries and real-time editing capabilities.
+A modern, open-source document builder built with Svelte 5, TypeScript, and Tailwind CSS. Create professional documents (resumes, invoices, letters, and more) with an intuitive drag-and-drop canvas interface, featuring advanced ruler boundaries and real-time editing capabilities.
 
-![CI](https://github.com/Deityhub/resume-builder/workflows/CI/badge.svg)
-![PR Checks](https://github.com/Deityhub/resume-builder/workflows/PR%20Checks/badge.svg)
+![CI](https://github.com/Deityhub/lienzo/workflows/CI/badge.svg)
+![PR Checks](https://github.com/Deityhub/lienzo/workflows/PR%20Checks/badge.svg)
 
 ## 🚀 Features
 
 ### Core Features
 
-- **Drag-and-Drop Interface**: Intuitive canvas-based resume creation with real-time preview
+- **Drag-and-Drop Interface**: Intuitive canvas-based document creation with real-time preview
 - **Multiple Element Types**: Text, shapes, and images with full customization
 - **Real-time Editing**: Live preview with instant updates and inline text editing
-- **Multi-page Support**: Create resumes with unlimited pages
+- **Multi-page Support**: Create documents with unlimited pages
 - **Nested Elements**: Elements can contain other elements (hierarchical structure)
 - **UUID-based IDs**: Cryptographically secure unique identifiers for all elements
+- **Versatile Use Cases**: Perfect for resumes, invoices, letters, certificates, and more
 
 ### Advanced Canvas Tools
 
 - **Professional Ruler System**:
   - Horizontal and vertical rulers with tick marks (major, minor, tiny)
   - Draggable triangle markers for boundary adjustment
-  - Google Docs/Word-style design
   - Real-time boundary visualization
 - **Smart Element Positioning**:
   - Snap-to-grid with 10px threshold
@@ -44,9 +44,19 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
   - Full typography control
 
 - **Shape Elements**:
-  - Horizontal and vertical lines
-  - Customizable stroke color and width
-  - Perfect for dividers and visual organization
+  - **Basic Shapes**: Rectangle, Circle, Ellipse, Triangle, Diamond, Hexagon, Pentagon
+  - **Lines & Arrows**: Horizontal, Vertical, and Directional Arrows (up, down, left, right)
+  - **Styling Options**:
+    - Custom stroke color and width
+    - Fill color with opacity control
+    - Stroke styles: solid, dashed, or dotted
+    - Corner radius for rectangles
+    - Rotation support
+  - **Use Cases**:
+    - Visual dividers and section breaks
+    - Decorative elements and icons
+    - Flow charts and diagrams
+    - Highlighting important content
 
 - **Image Elements**:
   - URL-based image loading
@@ -97,8 +107,8 @@ A modern, open-source resume builder built with Svelte 5, TypeScript, and Tailwi
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/resume-builder.git
-   cd resume-builder
+   git clone https://github.com/your-username/lienzo.git
+   cd lienzo
    ```
 
 2. **Install dependencies**
@@ -126,42 +136,9 @@ yarn build
 yarn preview
 ```
 
-## 🏗️ Project Structure
-
-```
-src/
-├── lib/
-│   ├── components/          # Reusable UI components
-│   │   ├── Button.svelte
-│   │   ├── Tooltip.svelte
-│   │   └── index.ts
-│   ├── const/              # Application constants
-│   │   ├── dimension.ts    # Canvas dimensions
-│   │   └── font.ts         # Font options
-│   ├── stores/             # State management
-│   │   └── appStore.svelte.ts
-│   ├── types/              # TypeScript type definitions
-│   │   └── resume.ts
-│   └── utils/              # Utility functions
-│       └── properties.ts
-├── routes/
-│   ├── +layout.svelte      # Root layout
-│   ├── +page.svelte        # Landing page
-│   ├── about/              # About page
-│   └── create/             # Resume builder
-│       ├── +page.svelte    # Main builder interface
-│       └── (components)/   # Builder components
-│           ├── Toolbar.svelte
-│           ├── ResumeCanvas.svelte
-│           ├── ResumeElement.svelte
-│           ├── Ruler.svelte
-│           └── PropertyPanel.svelte
-└── app.html                # HTML template
-```
-
 ## 🎨 Key Components
 
-### ResumeCanvas
+### Canvas
 
 The main canvas component that handles:
 
@@ -206,17 +183,6 @@ Advanced resize system with:
 - Visual feedback with hover states
 - Boundary-aware resizing
 
-### Store Architecture
-
-Reactive state management with:
-
-- Svelte 5 runes ($state, $derived, $effect)
-- Nested element structure (Record<string, ResumeElement>)
-- Recursive element operations (find, move, flatten)
-- UUID-based identifiers (crypto.randomUUID())
-- Automatic zIndex management
-- Boundary constraint enforcement
-
 ## 🔧 Development
 
 ### Available Scripts
@@ -259,13 +225,14 @@ This project follows:
 
 ## 🎯 Usage Guide
 
-### Creating a Resume
+### Creating a Document
 
-1. **Navigate to Builder**: Click "Create Your Resume" from the homepage
+1. **Navigate to Builder**: Click "Start Building" from the homepage
 2. **Add Elements**: Drag text, shapes, or images from the toolbar
 3. **Customize Elements**: Select elements to edit properties in the panel
 4. **Adjust Boundaries**: Drag ruler markers to set canvas boundaries
 5. **Multi-page Support**: Add additional pages as needed
+6. **Save & Export**: Save your document to locally or export as PDF
 
 ### Element Manipulation
 
@@ -283,7 +250,7 @@ This project follows:
 
 ## 🧪 Testing
 
-This project has comprehensive test coverage for all features.
+This project has comprehensive test coverage for most features.
 
 ### Unit Tests
 
@@ -380,8 +347,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Built with [Svelte 5](https://svelte.dev/) and [SvelteKit](https://svelte.dev/docs/kit)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Icons from [Heroicons](https://heroicons.com/)
-- Typography powered by [Inter](https://fonts.google.com/specimen/Inter)
+- Icons from [Lucide Svelte](https://lucide.dev/)
 
 ## 📞 Support
 
@@ -391,4 +357,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Made with ❤️ for job seekers everywhere**
+**Made with ❤️ by [Deityhub](https://github.com/Deityhub) - Create beautiful documents with ease**

@@ -1,20 +1,20 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import ResumeElementComponent from './ResumeElement.svelte';
+	import CanvasElement from './CanvasElement.svelte';
 	import Ruler from './Ruler.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import type {
-		ResumeElement,
-		ResumePage,
+		TCanvasElement,
+		DocumentPage,
 		ResizeDirection,
 		TCanvasInstance
-	} from '$lib/types/resume';
+	} from '$lib/types/canvas';
 	import { DISPLAY_SCALE } from '$lib/const/dimension';
 	import { pixelsToPercent } from '$lib/utils';
 	const selectedElement = $derived(appStore.getSelectedElement());
 
-	interface ResumeCanvasProps {
-		page: ResumePage;
+	interface CanvasProps {
+		page: DocumentPage;
 		showDeleteButton?: boolean;
 		width: number;
 		height: number;
@@ -33,7 +33,7 @@
 		onDrop = (_event: DragEvent) => {},
 		'data-page-id': dataPageId,
 		onMount
-	}: ResumeCanvasProps = $props();
+	}: CanvasProps = $props();
 
 	// Create component instance for onMount callback
 	const componentInstance: TCanvasInstance = {
@@ -87,14 +87,14 @@
 	}
 
 	// Get elements that overlap with the given element
-	function getOverlappingElements(element: ResumeElement): ResumeElement[] {
+	function getOverlappingElements(element: TCanvasElement): TCanvasElement[] {
 		return Object.values(page.elements).filter(
 			(el) => el.id !== element.id && elementsOverlap(element, el)
 		);
 	}
 
 	// Find which element (if any) contains the given point
-	function findElementAtPosition(x: number, y: number, excludeId?: string): ResumeElement | null {
+	function findElementAtPosition(x: number, y: number, excludeId?: string): TCanvasElement | null {
 		// Sort by zIndex descending to check top elements first
 		const sorted = [...Object.values(page.elements)].sort((a, b) => b.zIndex - a.zIndex);
 
@@ -339,7 +339,7 @@
 
 	function handleElementResize(
 		event: MouseEvent,
-		element: ResumeElement,
+		element: TCanvasElement,
 		direction: ResizeDirection
 	) {
 		event.stopPropagation();
@@ -518,7 +518,7 @@
 		<!-- Corner spacer and Horizontal Ruler -->
 		<div class="flex">
 			<!-- Corner spacer to align with vertical ruler -->
-			<div class="h-[30px] w-[30px] bg-gray-300"></div>
+			<div class="h-[30px] w-[30px]"></div>
 			<Ruler
 				orientation="horizontal"
 				size={width}
@@ -562,8 +562,8 @@
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
-				data-testid="resume-canvas"
-				class="relative border-2 border-gray-300 bg-white shadow-lg"
+				data-testid="document-canvas"
+				class="relative border-2 border-border bg-background shadow-lg"
 				style:width="{width * DISPLAY_SCALE}px"
 				style:height="{height * DISPLAY_SCALE}px"
 				onclick={handleCanvasClick}
@@ -609,14 +609,14 @@
 						role="button"
 						tabindex="0"
 						onkeydown={null}
-						class="absolute cursor-move transition-all select-none"
+						class="absolute cursor-move transition-all select-none {isSelected
+							? 'ring-primary hover:ring-2 hover:ring-primary'
+							: ''} {isHighlighted || isHovered || isSelected
+							? 'ring-2 ring-primary'
+							: ''} {isHovered ? 'ring-primary' : ''} {isHighlighted && !isSelected
+							? 'ring-primary/50'
+							: ''}"
 						class:transition-none={isDragging || isResizing}
-						class:hover:ring-2={isSelected}
-						class:hover:ring-blue-500={isSelected}
-						class:ring-2={isSelected || isHighlighted || isHovered}
-						class:ring-blue-500={isSelected}
-						class:ring-yellow-400={isHighlighted && !isSelected}
-						class:ring-green-400={isHovered}
 						style:left={pixelsToPercent(element.x, width)}
 						style:top={pixelsToPercent(element.y, height)}
 						style:width={pixelsToPercent(element.width, width)}
@@ -643,7 +643,7 @@
 							document.body.style.userSelect = 'none';
 						}}
 					>
-						<ResumeElementComponent
+						<CanvasElement
 							{element}
 							{isSelected}
 							onResize={(event, direction) => handleElementResize(event, element, direction)}
@@ -654,7 +654,7 @@
 				<!-- Drag preview -->
 				{#if dragPreview}
 					<div
-						class="pointer-events-none absolute border-2 border-dashed border-purple-500 bg-purple-100 opacity-50"
+						class="pointer-events-none absolute border-2 border-dashed border-primary bg-primary/10 opacity-50"
 						style:left={pixelsToPercent(dragPreview.x, width)}
 						style:top={pixelsToPercent(dragPreview.y, height)}
 						style:width={pixelsToPercent(dragPreview.width, width)}
@@ -664,7 +664,7 @@
 
 				<!-- Selection outline for empty canvas -->
 				{#if !selectedElement && Object.keys(page.elements).length === 0}
-					<div class="absolute inset-4 flex items-center justify-center text-gray-400">
+					<div class="absolute inset-4 flex items-center justify-center text-muted-foreground">
 						Drag and drop elements from toolbar to create them
 					</div>
 				{/if}
@@ -672,7 +672,7 @@
 				<!-- Boundary visualization -->
 				{#if showBoundary}
 					<div
-						class="pointer-events-none absolute border-2 border-dashed border-blue-400"
+						class="pointer-events-none absolute border-2 border-dashed border-primary/50"
 						style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
 						style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
 						style:width={pixelsToPercent(
@@ -683,15 +683,10 @@
 							page.boundaries.vertical.end - page.boundaries.vertical.start,
 							height
 						)}
+						data-testid={`boundary-${page.id}`}
 					></div>
 				{/if}
 			</div>
 		</div>
 	</div>
 </div>
-
-<style>
-	.hover\:ring-2:hover {
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-	}
-</style>
