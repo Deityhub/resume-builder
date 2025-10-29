@@ -1,3 +1,174 @@
+/* src/app.css */
 @import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
+
+/* Enable class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	/* Base colors */
+	--background: 0 0% 100%;
+	--foreground: 222.2 84% 4.9%;
+	--border: 214.3 31.8% 91.4%;
+	--input: 214.3 31.8% 91.4%;
+	--ring: 221.2 83.2% 53.3%;
+
+	/* Primary colors (indigo) */
+	--primary: 243 75% 59%;
+	--primary-foreground: 0 0% 100%;
+	--primary-light: 237 100% 96%;
+	--primary-dark: 243 75% 49%;
+
+	/* Secondary colors (slate) */
+	--secondary: 215 16% 47%;
+	--secondary-foreground: 0 0% 100%;
+	--secondary-light: 210 20% 98%;
+	--secondary-dark: 215 19% 35%;
+
+	/* Destructive colors (red) */
+	--destructive: 0 84.2% 60.2%;
+	--destructive-foreground: 0 0% 100%;
+	--destructive-light: 0 100% 97%;
+	--destructive-dark: 0 84% 50%;
+
+	/* Success colors (emerald) */
+	--success: 142.1 70.6% 45.3%;
+	--success-foreground: 0 0% 100%;
+	--success-light: 142.1 76% 97%;
+	--success-dark: 142.1 70% 35%;
+
+	/* Warning colors (amber) */
+	--warning: 38 92% 50%;
+	--warning-foreground: 0 0% 100%;
+	--warning-light: 38 100% 96%;
+	--warning-dark: 38 92% 40%;
+
+	/* Muted colors */
+	--muted: 210 20% 98%;
+	--muted-foreground: 215.4 16.3% 46.9%;
+
+	/* Accent colors */
+	--accent: 210 20% 98%;
+	--accent-foreground: 222.2 47.4% 11.2%;
+
+	/* Card colors */
+	--card: 0 0% 100%;
+	--card-foreground: 222.2 84% 4.9%;
+
+	/* Popover colors */
+	--popover: 0 0% 100%;
+	--popover-foreground: 222.2 84% 4.9%;
+}
+
+.dark {
+	/* Base colors */
+	--background: 222.2 84% 4.9%;
+	--foreground: 210 20% 98%;
+	--border: 217.2 32.6% 17.5%;
+	--input: 217.2 32.6% 17.5%;
+	--ring: 224.3 76.3% 48%;
+
+	/* Primary colors (indigo) - dark theme */
+	--primary: 243 75% 65%;
+	--primary-foreground: 0 0% 100%;
+	--primary-light: 243 75% 20%;
+	--primary-dark: 243 75% 75%;
+
+	/* Secondary colors (slate) - dark theme */
+	--secondary: 215 25% 65%;
+	--secondary-foreground: 0 0% 100%;
+	--secondary-light: 215 20% 20%;
+	--secondary-dark: 215 25% 75%;
+
+	/* Destructive colors (red) - dark theme */
+	--destructive: 0 84.2% 65.2%;
+	--destructive-foreground: 0 0% 100%;
+	--destructive-light: 0 84% 20%;
+	--destructive-dark: 0 84% 75%;
+
+	/* Success colors (emerald) - dark theme */
+	--success: 142.1 70.6% 55.3%;
+	--success-foreground: 0 0% 100%;
+	--success-light: 142.1 70% 20%;
+	--success-dark: 142.1 70% 65%;
+
+	/* Warning colors (amber) - dark theme */
+	--warning: 38 92% 60%;
+	--warning-foreground: 0 0% 0%;
+	--warning-light: 38 92% 20%;
+	--warning-dark: 38 92% 70%;
+
+	/* Muted colors - dark theme */
+	--muted: 217.2 32.6% 17.5%;
+	--muted-foreground: 215 20.2% 65.1%;
+
+	/* Accent colors - dark theme */
+	--accent: 217.2 32.6% 17.5%;
+	--accent-foreground: 210 20% 98%;
+
+	/* Card colors - dark theme */
+	--card: 222.2 84% 4.9%;
+	--card-foreground: 210 20% 98%;
+
+	/* Popover colors - dark theme */
+	--popover: 222.2 84% 4.9%;
+	--popover-foreground: 210 20% 98%;
+}
+
+/* Map your CSS variables to Tailwind utilities using @theme */
+@theme {
+	/* Base colors */
+	--color-background: hsl(var(--background));
+	--color-foreground: hsl(var(--foreground));
+	--color-border: hsl(var(--border));
+	--color-input: hsl(var(--input));
+	--color-ring: hsl(var(--ring));
+
+	/* Primary colors */
+	--color-primary: hsl(var(--primary));
+	--color-primary-foreground: hsl(var(--primary-foreground));
+	--color-primary-light: hsl(var(--primary-light));
+	--color-primary-dark: hsl(var(--primary-dark));
+
+	/* Secondary colors */
+	--color-secondary: hsl(var(--secondary));
+	--color-secondary-foreground: hsl(var(--secondary-foreground));
+	--color-secondary-light: hsl(var(--secondary-light));
+	--color-secondary-dark: hsl(var(--secondary-dark));
+
+	/* State colors */
+	--color-destructive: hsl(var(--destructive));
+	--color-destructive-foreground: hsl(var(--destructive-foreground));
+	--color-destructive-light: hsl(var(--destructive-light));
+	--color-destructive-dark: hsl(var(--destructive-dark));
+
+	--color-success: hsl(var(--success));
+	--color-success-foreground: hsl(var(--success-foreground));
+	--color-success-light: hsl(var(--success-light));
+	--color-success-dark: hsl(var(--success-dark));
+
+	--color-warning: hsl(var(--warning));
+	--color-warning-foreground: hsl(var(--warning-foreground));
+	--color-warning-light: hsl(var(--warning-light));
+	--color-warning-dark: hsl(var(--warning-dark));
+
+	--color-info: hsl(var(--info));
+
+	/* UI colors */
+	--color-muted: hsl(var(--muted));
+	--color-muted-foreground: hsl(var(--muted-foreground));
+
+	--color-accent: hsl(var(--accent));
+	--color-accent-foreground: hsl(var(--accent-foreground));
+
+	--color-card: hsl(var(--card));
+	--color-card-foreground: hsl(var(--card-foreground));
+
+	--color-popover: hsl(var(--popover));
+	--color-popover-foreground: hsl(var(--popover-foreground));
+}
+
+@layer base {
+	body {
+		font-family: 'Inter', sans-serif;
+	}
+}

@@ -1,6 +1,6 @@
 /**
  * Converts a pixel value to a percentage string based on a total dimension.
- * Used for responsive element positioning in the resume canvas.
+ * Used for responsive element positioning in the canvas.
  *
  * @param pixels - The pixel value to convert
  * @param total - The total dimension (width or height) to calculate percentage against

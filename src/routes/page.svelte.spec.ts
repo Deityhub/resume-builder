@@ -9,45 +9,34 @@ describe('/+page.svelte', () => {
 
 		const heading = page.getByRole('heading', { level: 1 });
 		await expect.element(heading).toBeInTheDocument();
-		await expect.element(heading).toHaveTextContent('Resume Builder');
+		await expect.element(heading).toHaveTextContent('Create Beautiful Documents');
 	});
 
 	it('should render the description paragraph', async () => {
 		render(Page);
 
 		const description = page.getByText(
-			'Create professional resumes in minutes with our easy-to-use tool. Stand out to employers with a polished, well-structured resume.'
+			'A versatile document builder for creating resumes, invoices, letters, and more. Build beautiful, professional documents in minutes with our intuitive drag-and-drop canvas.'
 		);
 		await expect.element(description).toBeInTheDocument();
 	});
 
-	it('should render the primary "Create Your Resume" button', async () => {
+	it('should render the primary "Start Building" button', async () => {
 		render(Page);
 
-		const createButton = page.getByRole('link', { name: 'Create Your Resume' });
+		const createButton = page.getByRole('link', { name: 'Start Building' }).first();
 		await expect.element(createButton).toBeInTheDocument();
-		await expect.element(createButton).toHaveAttribute('href', '/create');
+		await expect.element(createButton).toHaveAttribute('href', '/canvas');
 		await expect.element(createButton).not.toBeDisabled();
 	});
 
-	it('should render the "View Resumes" button', async () => {
+	it('should render the "My Documents" button', async () => {
 		render(Page);
 
-		const resumesButton = page.getByRole('link', { name: 'View Resumes' });
-		await expect.element(resumesButton).toBeInTheDocument();
-		await expect.element(resumesButton).toHaveAttribute('href', '/saved');
-		await expect.element(resumesButton).not.toBeDisabled();
-	});
-
-	it('should render the footer with About Us link', async () => {
-		render(Page);
-
-		const aboutLink = page.getByRole('link', { name: 'About Us' });
-		await expect.element(aboutLink).toBeInTheDocument();
-		await expect.element(aboutLink).toHaveAttribute('href', '/about');
-
-		const learnMoreText = page.getByText('Learn more about our platform');
-		await expect.element(learnMoreText).toBeInTheDocument();
+		const documentsButton = page.getByRole('link', { name: 'My Documents' });
+		await expect.element(documentsButton).toBeInTheDocument();
+		await expect.element(documentsButton).toHaveAttribute('href', '/documents');
+		await expect.element(documentsButton).not.toBeDisabled();
 	});
 
 	it('should have proper semantic structure', async () => {
@@ -58,6 +47,6 @@ describe('/+page.svelte', () => {
 		await expect.element(h1).toBeInTheDocument();
 
 		// Verify the page title is set
-		await expect.element(page.getByText('Resume Builder')).toBeInTheDocument();
+		await expect.element(h1).toHaveTextContent('Create Beautiful Documents');
 	});
 });

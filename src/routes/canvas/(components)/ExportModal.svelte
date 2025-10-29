@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Modal } from '$lib/components';
-	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
+	import NameModal from '$lib/components/NameModal.svelte';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import jsPDF from 'jspdf';
 	import { getPageImageData } from '$lib/utils/canvasRenderer';
@@ -25,7 +25,7 @@
 	let previewImages = $state<string[]>([]);
 	let isGeneratingPreview = $state(false);
 	let nameModalOpen = $state(false);
-	let resumeName = $derived(appStore.getCurrentResume()?.name || '');
+	let documentName = $derived(appStore.getCurrentDocument()?.name || '');
 
 	async function generatePreview() {
 		if (isGeneratingPreview) return;
@@ -55,7 +55,7 @@
 
 	async function confirmAndExportPDF() {
 		if (isGenerating) return;
-		if (!resumeName) {
+		if (!documentName) {
 			nameModalOpen = true;
 			return;
 		}
@@ -86,7 +86,7 @@
 			}
 
 			// Save the PDF
-			pdf.save(`${resumeName || 'resume'}.pdf`);
+			pdf.save(`${documentName || 'document'}.pdf`);
 		} catch (_error) {
 			alert('Error generating PDF. Please try again.');
 			console.error('Error generating PDF: ', _error);
@@ -103,8 +103,8 @@
 	}
 
 	function handleNameSave(name: string) {
-		appStore.updateCurrentResume({ name });
-		resumeName = name;
+		appStore.updateCurrentDocument({ name });
+		documentName = name;
 		nameModalOpen = false;
 
 		// Continue export after getting name
@@ -114,17 +114,17 @@
 
 {#if isOpen}
 	{#if nameModalOpen}
-		<ResumeNameModal
+		<NameModal
 			isOpen={nameModalOpen}
 			onClose={() => (nameModalOpen = false)}
 			onSave={handleNameSave}
-			initialName={resumeName}
+			initialName={documentName}
 		/>
 	{:else if showPreview}
 		<Modal
 			open={true}
 			title="PDF Preview"
-			description={`Here's how your resume will appear in the PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm). ${previewImages.length} page${previewImages.length > 1 ? 's' : ''}.`}
+			description={`Here's how your document will appear in the PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm). ${previewImages.length} page${previewImages.length > 1 ? 's' : ''}.`}
 			onCancel={() => {
 				showPreview = false;
 			}}
@@ -136,12 +136,12 @@
 			{#if isGenerating}
 				<div class="mb-4">
 					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm text-gray-600">Generating PDF...</span>
-						<span class="text-sm text-gray-600">{progress}%</span>
+						<span class="text-sm text-muted-foreground">Generating PDF...</span>
+						<span class="text-sm text-muted-foreground">{progress}%</span>
 					</div>
-					<div class="h-2 w-full rounded-full bg-gray-200">
+					<div class="h-2 w-full rounded-full bg-muted">
 						<div
-							class="h-2 rounded-full bg-indigo-600 transition-all duration-300"
+							class="h-2 rounded-full bg-primary transition-all duration-300"
 							style={`width: ${progress}%`}
 						></div>
 					</div>
@@ -154,12 +154,12 @@
 				class:grid-cols-2={previewImages.length > 1}
 			>
 				{#each previewImages as previewImage, index (index)}
-					<div class="rounded-lg border border-gray-200 bg-gray-50 p-2">
-						<div class="mb-2 text-sm text-gray-500">Page {index + 1}</div>
+					<div class="rounded-lg border border-border bg-background p-2">
+						<div class="mb-2 text-sm text-muted-foreground">Page {index + 1}</div>
 						<img
 							src={previewImage}
-							alt={`Resume preview page ${index + 1}`}
-							class="h-auto w-full rounded border border-gray-300 shadow-sm"
+							alt={`Document preview page ${index + 1}`}
+							class="h-auto w-full rounded border border-border shadow-sm"
 							style="max-height: 400px; object-fit: contain;"
 						/>
 					</div>
@@ -169,8 +169,8 @@
 	{:else}
 		<Modal
 			open={true}
-			title="Export Resume"
-			description={`Your resume will be exported as a PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm).`}
+			title="Export Document"
+			description={`Your document will be exported as a PDF using the exact canvas dimensions of (${Math.round(pageWidth)}mm × ${Math.round(pageHeight)}mm).`}
 			onCancel={handleClose}
 			onAccept={generatePreview}
 			acceptLabel={isGeneratingPreview ? 'Generating Preview...' : 'Preview PDF'}
@@ -179,10 +179,10 @@
 			{#if isGeneratingPreview}
 				<div class="mb-4">
 					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm text-gray-600">Generating Preview...</span>
+						<span class="text-sm text-muted-foreground">Generating Preview...</span>
 					</div>
-					<div class="h-2 w-full rounded-full bg-gray-200">
-						<div class="h-2 animate-pulse rounded-full bg-indigo-600" style="width: 100%"></div>
+					<div class="h-2 w-full rounded-full bg-muted">
+						<div class="h-2 animate-pulse rounded-full bg-primary" style="width: 100%"></div>
 					</div>
 				</div>
 			{/if}

@@ -108,25 +108,26 @@
 
 <div
 	bind:this={rulerRef}
-	class="relative border-gray-300 bg-gray-100 select-none"
+	class="relative border-primary bg-transparent select-none"
 	class:h-full={orientation === 'vertical'}
 	class:w-full={orientation === 'horizontal'}
 	class:border-r={orientation === 'vertical'}
 	class:border-b={orientation === 'horizontal'}
 	style:width={orientation === 'vertical' ? `${RULER_SIZE}px` : `${displaySize}px`}
 	style:height={orientation === 'horizontal' ? `${RULER_SIZE}px` : `${displaySize}px`}
+	data-testid="ruler"
 >
 	<!-- Major tick marks (tallest) -->
 	{#each majorTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
-				class="absolute bottom-0 w-[1px] bg-gray-500"
+				class="absolute bottom-0 w-[1px] bg-primary"
 				style:left="{(tick / size) * 100}%"
 				style:height="12px"
 			></div>
 		{:else}
 			<div
-				class="absolute right-0 h-[1px] bg-gray-500"
+				class="absolute right-0 h-[1px] bg-primary"
 				style:top="{(tick / size) * 100}%"
 				style:width="12px"
 			></div>
@@ -137,13 +138,13 @@
 	{#each minorTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
-				class="absolute bottom-0 w-[1px] bg-gray-400"
+				class="absolute bottom-0 w-[1px] bg-primary"
 				style:left="{(tick / size) * 100}%"
 				style:height="8px"
 			></div>
 		{:else}
 			<div
-				class="absolute right-0 h-[1px] bg-gray-400"
+				class="absolute right-0 h-[1px] bg-primary"
 				style:top="{(tick / size) * 100}%"
 				style:width="8px"
 			></div>
@@ -154,13 +155,13 @@
 	{#each tinyTicks as tick (tick)}
 		{#if orientation === 'horizontal'}
 			<div
-				class="absolute bottom-0 w-[1px] bg-gray-300"
+				class="absolute bottom-0 w-[1px] bg-primary"
 				style:left="{(tick / size) * 100}%"
 				style:height="4px"
 			></div>
 		{:else}
 			<div
-				class="absolute right-0 h-[1px] bg-gray-300"
+				class="absolute right-0 h-[1px] bg-primary"
 				style:top="{(tick / size) * 100}%"
 				style:width="4px"
 			></div>
@@ -170,13 +171,13 @@
 	<!-- Boundary region highlight -->
 	{#if orientation === 'horizontal'}
 		<div
-			class="absolute top-0 h-full bg-blue-100 opacity-30"
+			class="absolute top-0 h-full opacity-30"
 			style:left="{startPercent}%"
 			style:width="{endPercent - startPercent}%"
 		></div>
 	{:else}
 		<div
-			class="absolute left-0 w-full bg-blue-100 opacity-30"
+			class="absolute left-0 w-full opacity-30"
 			style:top="{startPercent}%"
 			style:height="{endPercent - startPercent}%"
 		></div>
@@ -188,13 +189,13 @@
 			role="button"
 			tabindex="0"
 			onkeydown={null}
-			class="absolute z-10 cursor-grab active:cursor-grabbing"
+			class="absolute z-10 cursor-grab text-primary active:cursor-grabbing"
 			style:left="calc({startPercent}% - 6px)"
 			style:top="0"
 			onmousedown={handleStartAnchorMouseDown}
 		>
 			<svg width="12" height="12" viewBox="0 0 12 12" class="hover:opacity-80">
-				<path d="M 0 0 L 12 0 L 6 12 Z" fill="#4285f4" />
+				<path d="M 0 0 L 12 0 L 6 12 Z" fill="currentColor" />
 			</svg>
 		</div>
 	{:else}
@@ -202,13 +203,13 @@
 			role="button"
 			tabindex="0"
 			onkeydown={null}
-			class="absolute z-10 cursor-grab active:cursor-grabbing"
+			class="absolute z-10 cursor-grab text-primary active:cursor-grabbing"
 			style:left="0"
 			style:top="calc({startPercent}% - 6px)"
 			onmousedown={handleStartAnchorMouseDown}
 		>
 			<svg width="12" height="12" viewBox="0 0 12 12" class="hover:opacity-80">
-				<path d="M 0 0 L 0 12 L 12 6 Z" fill="#4285f4" />
+				<path d="M 0 0 L 0 12 L 12 6 Z" fill="currentColor" />
 			</svg>
 		</div>
 	{/if}
@@ -219,13 +220,13 @@
 			role="button"
 			tabindex="0"
 			onkeydown={null}
-			class="absolute z-10 cursor-grab active:cursor-grabbing"
+			class="absolute z-10 cursor-grab text-destructive active:cursor-grabbing"
 			style:left="calc({endPercent}% - 6px)"
 			style:top="0"
 			onmousedown={handleEndAnchorMouseDown}
 		>
 			<svg width="12" height="12" viewBox="0 0 12 12" class="hover:opacity-80">
-				<path d="M 0 0 L 12 0 L 6 12 Z" fill="#ea4335" />
+				<path d="M 0 0 L 12 0 L 6 12 Z" fill="currentColor" />
 			</svg>
 		</div>
 	{:else}
@@ -233,13 +234,13 @@
 			role="button"
 			tabindex="0"
 			onkeydown={null}
-			class="absolute z-10 cursor-grab active:cursor-grabbing"
+			class="absolute z-10 cursor-grab text-destructive active:cursor-grabbing"
 			style:left="0"
 			style:top="calc({endPercent}% - 6px)"
 			onmousedown={handleEndAnchorMouseDown}
 		>
 			<svg width="12" height="12" viewBox="0 0 12 12" class="hover:opacity-80">
-				<path d="M 0 0 L 0 12 L 12 6 Z" fill="#ea4335" />
+				<path d="M 0 0 L 0 12 L 12 6 Z" fill="currentColor" />
 			</svg>
 		</div>
 	{/if}

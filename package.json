@@ -1,7 +1,7 @@
 {
-	"name": "resume-builder",
+	"name": "lienzo",
 	"private": true,
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -51,6 +51,7 @@
 		"yaml": "^2.4.2"
 	},
 	"dependencies": {
+		"@lucide/svelte": "^0.548.0",
 		"html-to-image": "^1.11.13",
 		"jspdf": "^3.0.3"
 	}

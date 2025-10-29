@@ -1,18 +1,19 @@
 <script lang="ts">
-	import ResumeCanvas from './(components)/ResumeCanvas.svelte';
+	import Canvas from './(components)/Canvas.svelte';
 	import Toolbar from './(components)/Toolbar.svelte';
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import ResumeNameModal from '$lib/components/ResumeNameModal.svelte';
-	import { isIndexedDBSupported, saveResume } from '$lib/utils/idb';
-	import type { ResumeData } from '$lib/types/resume';
-	import type { ElementType, TCanvasInstance } from '$lib/types/resume';
+	import NameModal from '$lib/components/NameModal.svelte';
+	import { isIndexedDBSupported, saveDocument } from '$lib/utils/idb';
+	import type { DocumentData } from '$lib/types/canvas';
+	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { Download, Plus, Save } from '@lucide/svelte';
 
 	const pages = $derived(Object.values(appStore.getPages()));
 	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
@@ -26,10 +27,10 @@
 	}
 
 	function handleBackNavigation() {
-		const currentResume = appStore.getCurrentResume();
-		// If creating new resume (name is empty), go to home page
-		// If editing existing resume (name has value), go to saved page
-		const destination = currentResume.name ? '/saved' : '/';
+		const currentDocument = appStore.getCurrentDocument();
+		// If creating new document (name is empty), go to home page
+		// If editing existing document (name has value), go to documents page
+		const destination = currentDocument.name ? '/documents' : '/';
 		goto(resolve(destination));
 	}
 
@@ -154,45 +155,34 @@
 	});
 </script>
 
-<div class="flex h-screen bg-gray-50">
+<div class="flex h-screen">
 	<!-- Toolbar -->
 	<Toolbar />
 
 	<!-- Main Canvas Area -->
 	<div class="flex flex-1 flex-col">
 		<!-- Page Navigation -->
-		<div class="border-b bg-white p-4">
+		<div class="border-b border-primary/10 bg-background/80 p-4 backdrop-blur-md">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
-					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="mr-2 h-5 w-5"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						Back
-					</Button>
-				</div>
-
-				<div class="flex items-center gap-2">
-					<span class="mr-4 text-sm text-gray-600" data-testid="page-count">
-						{pages.length}
-						{pages.length > 1 ? 'Pages' : 'Page'}
-					</span>
 					<Button
 						disabled={savePending}
 						onClick={appStore.addPage}
-						variant="secondary"
+						variant="primary"
 						data-testid="add-page-btn"
 					>
+						<Plus class="mr-2 h-4 w-4" />
 						Add Page
+					</Button>
+					<span class="mr-4 text-sm text-muted-foreground" data-testid="page-count">
+						{pages.length}
+						{pages.length > 1 ? 'Pages' : 'Page'}
+					</span>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
+						Cancel
 					</Button>
 					{#if isIndexedDbSupported}
 						<Button
@@ -202,6 +192,7 @@
 							variant="primary"
 							data-testid="save-btn"
 						>
+							<Save class="mr-2 h-4 w-4" />
 							Save
 						</Button>
 					{/if}
@@ -211,6 +202,7 @@
 						variant="primary"
 						data-testid="export-btn"
 					>
+						<Download class="mr-2 h-4 w-4" />
 						Export PDF
 					</Button>
 				</div>
@@ -221,7 +213,7 @@
 		<div class="flex-1 overflow-auto p-8" data-testid="canvas-container">
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
-					<ResumeCanvas
+					<Canvas
 						bind:this={canvasInstances[page.id]}
 						{page}
 						showDeleteButton={pages.length > 1}
@@ -237,9 +229,9 @@
 		</div>
 	</div>
 
-	<!-- Save Resume Modal -->
+	<!-- Save Document Modal -->
 	{#if saveModalOpen}
-		<ResumeNameModal
+		<NameModal
 			isOpen={saveModalOpen}
 			onClose={() => {
 				saveModalOpen = false;
@@ -249,12 +241,12 @@
 				if (!name) return;
 				savePending = true;
 				try {
-					const resume: ResumeData = {
-						...appStore.getCurrentResume(),
+					const document: DocumentData = {
+						...appStore.getCurrentDocument(),
 						name
 					};
-					await saveResume(resume);
-					appStore.updateCurrentResume({ name });
+					await saveDocument(document);
+					appStore.updateCurrentDocument({ name });
 					saveModalOpen = false;
 					saveError = '';
 				} catch (err) {
@@ -263,11 +255,12 @@
 					savePending = false;
 				}
 			}}
-			initialName={appStore.getCurrentResume().name}
-		/>
-		{#if saveError}
-			<div class="px-4 text-sm text-red-500">{saveError}</div>
-		{/if}
+			initialName={appStore.getCurrentDocument().name}
+		>
+			{#if saveError}
+				<div class="mt-2 text-sm text-destructive">{saveError}</div>
+			{/if}
+		</NameModal>
 	{/if}
 
 	<!-- Property Panel -->
