@@ -43,13 +43,14 @@
 	const baseClasses = `inline-flex items-center justify-center font-medium rounded-lg transition-colors ${variant !== 'text' && variant !== 'ghost' ? `focus:outline-none` : ''}`;
 
 	const variantClasses: Record<ButtonVariant, string> = {
-		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg',
-		secondary: 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50',
-		'secondary-destructive': 'border-2 border-red-600 text-red-600 hover:bg-red-50',
-		destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg',
+		primary: 'bg-primary text-primary-foreground hover:bg-primary-dark shadow-md hover:shadow-lg',
+		secondary: 'border-2 border-primary text-primary hover:bg-primary/10',
+		'secondary-destructive': 'border-2 border-destructive text-destructive hover:bg-destructive/10',
+		destructive:
+			'bg-destructive text-destructive-foreground hover:bg-destructive-dark shadow-md hover:shadow-lg',
 		ghost:
-			'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-300',
-		text: 'text-indigo-600 hover:text-indigo-800'
+			'text-foreground hover:bg-accent hover:text-accent-foreground border border-transparent hover:border-border',
+		text: 'text-primary hover:bg-accent/50'
 	};
 
 	const getSizeStyles = (size: ButtonSize) => {
@@ -98,10 +99,12 @@
 
 	const spinnerColor =
 		variant === 'primary' || variant === 'destructive'
-			? 'text-white'
-			: variant === 'secondary-destructive'
-				? 'text-red-600'
-				: 'text-indigo-600';
+			? 'text-primary-foreground'
+			: variant === 'ghost'
+				? 'text-foreground'
+				: variant === 'secondary-destructive'
+					? 'text-destructive'
+					: 'text-primary';
 
 	const isDisabled = $derived(disabled || pending);
 

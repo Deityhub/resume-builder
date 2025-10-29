@@ -16,14 +16,16 @@
 
 <div>
 	<!-- header section -->
-	<header class="sticky top-0 z-50 border-b border-blue-100 bg-white/80 backdrop-blur-md">
+	<header class="sticky top-0 z-50 border-b border-primary/10 bg-background/80 backdrop-blur-md">
 		<div class="container mx-auto flex items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
-				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br">
+				<div
+					class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5"
+				>
 					<Icons.Logo />
 				</div>
 				<span
-					class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent"
+					class="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-bold text-transparent"
 				>
 					Lienzo
 				</span>
@@ -41,11 +43,11 @@
 	<section class="container mx-auto px-4 py-20 text-center">
 		<div class="animate-slide-up">
 			<h1
-				class="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-5xl font-bold text-transparent md:text-6xl"
+				class="mb-6 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-5xl font-bold text-transparent md:text-6xl"
 			>
 				Create Beautiful Documents
 			</h1>
-			<p class="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
+			<p class="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
 				A versatile document builder for creating resumes, invoices, letters, and more. Build
 				beautiful, professional documents in minutes with our intuitive drag-and-drop canvas.
 			</p>
@@ -53,50 +55,50 @@
 	</section>
 
 	<!-- feature section -->
-	<section class="bg-white/50 py-20">
+	<section class="bg-background/50 py-20">
 		<div class="container mx-auto px-4">
 			<h2 class="mb-16 text-center text-3xl font-bold md:text-4xl">Powerful Features</h2>
 			<div class="grid gap-8 md:grid-cols-3">
 				<div
-					class="group rounded-xl border border-blue-100 p-8 transition-all hover:border-blue-300 hover:shadow-lg"
+					class="group rounded-xl border border-border/50 bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
 				>
 					<div
-						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 transition-transform group-hover:scale-110"
+						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 transition-transform group-hover:scale-110"
 					>
-						<Zap class="h-6 w-6 text-blue-600" />
+						<Zap class="h-6 w-6 text-primary" />
 					</div>
 					<h3 class="mb-3 text-xl font-semibold">Drag & Drop</h3>
-					<p class="text-gray-600">
+					<p class="text-muted-foreground">
 						Easily drag and drop text, shapes, and images onto your canvas. Perfect positioning
 						without any technical skills.
 					</p>
 				</div>
 
 				<div
-					class="group rounded-xl border border-blue-100 p-8 transition-all hover:border-purple-300 hover:shadow-lg"
+					class="group rounded-xl border border-border/50 bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
 				>
 					<div
-						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-purple-50 transition-transform group-hover:scale-110"
+						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 transition-transform group-hover:scale-110"
 					>
-						<Layers class="h-6 w-6 text-purple-600" />
+						<Layers class="h-6 w-6 text-primary" />
 					</div>
 					<h3 class="mb-3 text-xl font-semibold">Multiple Elements</h3>
-					<p class="text-gray-600">
+					<p class="text-muted-foreground">
 						Work with text blocks, geometric shapes, and custom images. Customize colors, sizes, and
 						properties for each element.
 					</p>
 				</div>
 
 				<div
-					class="group rounded-xl border border-blue-100 p-8 transition-all hover:border-blue-300 hover:shadow-lg"
+					class="group rounded-xl border border-border/50 bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
 				>
 					<div
-						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 transition-transform group-hover:scale-110"
+						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 transition-transform group-hover:scale-110"
 					>
-						<Download class="h-6 w-6 text-blue-600" />
+						<Download class="h-6 w-6 text-primary" />
 					</div>
 					<h3 class="mb-3 text-xl font-semibold">Export to PDF</h3>
-					<p class="text-gray-600">
+					<p class="text-muted-foreground">
 						Download your finished document as a professional PDF file. Ready to share or print
 						instantly.
 					</p>
@@ -112,29 +114,29 @@
 			{#each steps as step (step.number)}
 				<div class="text-center">
 					<div
-						class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-lg font-bold text-white"
+						class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-lg font-bold text-primary-foreground"
 					>
 						{step.number}
 					</div>
 					<h3 class="mb-2 font-semibold">{step.title}</h3>
-					<p class="text-sm text-gray-600">{step.desc}</p>
+					<p class="text-sm text-muted-foreground">{step.desc}</p>
 				</div>
 			{/each}
 		</div>
 	</section>
 
 	<!-- CTA Section -->
-	<section class="bg-gradient-to-r from-blue-600 to-purple-600 py-20 text-white">
+	<section class="bg-gradient-to-r from-primary to-primary/80 py-20 text-primary-foreground">
 		<div class="container mx-auto px-4 text-center">
 			<h2 class="mb-4 text-4xl font-bold">Ready to create your document?</h2>
-			<p class="mb-8 text-lg text-blue-100">
+			<p class="mb-8 text-lg text-primary-foreground/90">
 				Start building beautiful documents today, completely free.
 			</p>
 			<Button
 				onClick={() => appStore.initNewDocument()}
 				href="/canvas"
 				variant="secondary"
-				className="bg-white"
+				className="bg-secondary-foreground hover:bg-secondary-foreground/90"
 			>
 				Start Building Now
 				<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -143,8 +145,8 @@
 	</section>
 
 	<!-- Footer -->
-	<footer class="border-t border-blue-100 bg-white/50 py-8">
-		<div class="container mx-auto px-4 text-center text-gray-600">
+	<footer class="border-t border-border/50 bg-background/50 py-8">
+		<div class="container mx-auto px-4 text-center text-muted-foreground">
 			<p>&copy; {currentYear} Lienzo. Create beautiful documents with ease.</p>
 		</div>
 	</footer>

@@ -136,12 +136,12 @@
 			{#if isGenerating}
 				<div class="mb-4">
 					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm text-gray-600">Generating PDF...</span>
-						<span class="text-sm text-gray-600">{progress}%</span>
+						<span class="text-sm text-muted-foreground">Generating PDF...</span>
+						<span class="text-sm text-muted-foreground">{progress}%</span>
 					</div>
-					<div class="h-2 w-full rounded-full bg-gray-200">
+					<div class="h-2 w-full rounded-full bg-muted">
 						<div
-							class="h-2 rounded-full bg-indigo-600 transition-all duration-300"
+							class="h-2 rounded-full bg-primary transition-all duration-300"
 							style={`width: ${progress}%`}
 						></div>
 					</div>
@@ -154,12 +154,12 @@
 				class:grid-cols-2={previewImages.length > 1}
 			>
 				{#each previewImages as previewImage, index (index)}
-					<div class="rounded-lg border border-gray-200 bg-gray-50 p-2">
-						<div class="mb-2 text-sm text-gray-500">Page {index + 1}</div>
+					<div class="rounded-lg border border-border bg-background p-2">
+						<div class="mb-2 text-sm text-muted-foreground">Page {index + 1}</div>
 						<img
 							src={previewImage}
 							alt={`Document preview page ${index + 1}`}
-							class="h-auto w-full rounded border border-gray-300 shadow-sm"
+							class="h-auto w-full rounded border border-border shadow-sm"
 							style="max-height: 400px; object-fit: contain;"
 						/>
 					</div>
@@ -179,10 +179,10 @@
 			{#if isGeneratingPreview}
 				<div class="mb-4">
 					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm text-gray-600">Generating Preview...</span>
+						<span class="text-sm text-muted-foreground">Generating Preview...</span>
 					</div>
-					<div class="h-2 w-full rounded-full bg-gray-200">
-						<div class="h-2 animate-pulse rounded-full bg-indigo-600" style="width: 100%"></div>
+					<div class="h-2 w-full rounded-full bg-muted">
+						<div class="h-2 animate-pulse rounded-full bg-primary" style="width: 100%"></div>
 					</div>
 				</div>
 			{/if}

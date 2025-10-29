@@ -32,14 +32,14 @@
 
 <div
 	bind:this={toolbarRef}
-	class="relative flex h-full flex-col border-r border-gray-200 bg-white transition-all duration-300 ease-in-out"
+	class="relative flex h-full flex-col border-r border-border bg-background transition-all duration-300 ease-in-out"
 	class:w-64={isExpanded}
 	class:w-20={!isExpanded}
 	class:bg-blue-50={isDragging}
 	class:border-blue-300={isDragging}
 >
 	<!-- Branding -->
-	<div class="flex items-center justify-between border-b border-gray-200 px-4 py-4">
+	<div class="flex items-center justify-between p-4">
 		<div
 			onclick={() => goto(resolve('/'))}
 			class="flex cursor-pointer items-center gap-2 overflow-hidden"
@@ -52,7 +52,7 @@
 				<Icons.Logo />
 			</div>
 			<span
-				class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-semibold whitespace-nowrap text-transparent transition-opacity duration-200"
+				class="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-semibold whitespace-nowrap text-transparent transition-opacity duration-200"
 				class:opacity-0={!isExpanded}
 				class:opacity-100={isExpanded}
 			>
@@ -60,19 +60,17 @@
 			</span>
 		</div>
 	</div>
-	<Button
-		onClick={() => (isExpanded = !isExpanded)}
-		variant="text"
-		className="absolute top-1/2 -right-4 bg-gray-50"
-	>
-		{#if isExpanded}
-			<ChevronLeft class="h-7 w-7" />
-		{:else}
-			<ChevronRight class="h-7 w-7" />
-		{/if}
-	</Button>
+	<div class="absolute top-1/2 -right-4 rounded-xl bg-background">
+		<Button onClick={() => (isExpanded = !isExpanded)} variant="text">
+			{#if isExpanded}
+				<ChevronLeft class="h-7 w-7" />
+			{:else}
+				<ChevronRight class="h-7 w-7" />
+			{/if}
+		</Button>
+	</div>
 
-	<div class="flex-1 overflow-y-auto px-2 py-4" data-testid="toolbar">
+	<div class="flex-1 overflow-y-auto px-2 pb-4" data-testid="toolbar">
 		<div class="space-y-2">
 			{#each tools as tool (tool.type)}
 				<div
@@ -82,19 +80,19 @@
 					ondragend={handleDragEnd}
 					role="button"
 					tabindex="0"
-					class="group flex cursor-grab items-center gap-3 overflow-hidden rounded-lg p-2 transition-all duration-200 hover:bg-gray-100 active:cursor-grabbing"
-					class:bg-blue-200={isDragging}
-					class:scale-105={isDragging}
+					class="group flex cursor-grab items-center gap-3 overflow-hidden rounded-lg p-2 transition-all duration-200 hover:bg-foreground/5 active:cursor-grabbing {isDragging
+						? 'scale-105 bg-primary/10'
+						: ''}"
 					title="Drag {tool.label} to canvas"
 					aria-label="Drag {tool.label} tool to canvas"
 				>
 					<div
-						class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-lg font-semibold text-gray-700 group-hover:bg-gray-200"
+						class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-accent text-lg font-semibold text-foreground"
 					>
 						{tool.icon}
 					</div>
 					<span
-						class="text-sm font-medium whitespace-nowrap text-gray-700 transition-opacity duration-200"
+						class="text-sm font-medium whitespace-nowrap text-foreground transition-opacity duration-200"
 						class:opacity-0={!isExpanded}
 						class:opacity-100={isExpanded}
 					>

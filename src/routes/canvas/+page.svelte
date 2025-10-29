@@ -155,14 +155,14 @@
 	});
 </script>
 
-<div class="flex h-screen bg-gray-50">
+<div class="flex h-screen">
 	<!-- Toolbar -->
 	<Toolbar />
 
 	<!-- Main Canvas Area -->
 	<div class="flex flex-1 flex-col">
 		<!-- Page Navigation -->
-		<div class="border-b border-blue-100 bg-white/80 p-4 backdrop-blur-md">
+		<div class="border-b border-primary/10 bg-background/80 p-4 backdrop-blur-md">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
 					<Button
@@ -174,7 +174,7 @@
 						<Plus class="mr-2 h-4 w-4" />
 						Add Page
 					</Button>
-					<span class="mr-4 text-sm text-gray-600" data-testid="page-count">
+					<span class="mr-4 text-sm text-muted-foreground" data-testid="page-count">
 						{pages.length}
 						{pages.length > 1 ? 'Pages' : 'Page'}
 					</span>
@@ -256,10 +256,11 @@
 				}
 			}}
 			initialName={appStore.getCurrentDocument().name}
-		/>
-		{#if saveError}
-			<div class="px-4 text-sm text-red-500">{saveError}</div>
-		{/if}
+		>
+			{#if saveError}
+				<div class="mt-2 text-sm text-destructive">{saveError}</div>
+			{/if}
+		</NameModal>
 	{/if}
 
 	<!-- Property Panel -->

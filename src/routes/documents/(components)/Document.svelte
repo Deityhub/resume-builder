@@ -33,20 +33,20 @@
 </script>
 
 <div
-	class="overflow-hidden rounded-lg bg-white shadow transition-shadow duration-200 hover:shadow-md"
+	class="overflow-hidden rounded-lg bg-card shadow-sm transition-shadow duration-200 hover:shadow-md"
 >
 	<div class="p-5">
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
-				<h3 class="truncate text-lg font-medium text-gray-900">{document.name}</h3>
-				<p class="mt-1 text-sm text-gray-500">
+				<h3 class="truncate text-lg font-medium text-foreground">{document.name}</h3>
+				<p class="mt-1 text-sm text-muted-foreground">
 					Updated {formatDate(document.updatedAt)}
 				</p>
 			</div>
 		</div>
 		<div class="mt-4 flex items-center justify-between">
 			<span
-				class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800"
+				class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
 			>
 				<svg
 					class="mr-1 h-3 w-3"

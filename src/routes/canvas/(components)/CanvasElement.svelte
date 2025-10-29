@@ -369,7 +369,7 @@
 			{#if element.src}
 				<img src={element.src} alt={element.alt} style="display: none;" />
 			{:else}
-				<div class="text-sm text-gray-400">No image</div>
+				<div class="text-sm text-muted-foreground">No image</div>
 			{/if}
 		</div>
 	{/if}
@@ -379,7 +379,7 @@
 		<!-- Edge handles for width/height resize -->
 		{#each edgeHandles as handle (handle.direction)}
 			<div
-				class="absolute bg-blue-500 transition-colors hover:bg-blue-600 {handle.class}"
+				class="absolute bg-primary transition-colors {handle.class}"
 				style={handle.style}
 				onpointerdown={(e) => {
 					e.preventDefault();
@@ -395,7 +395,7 @@
 		<!-- Corner handles for proportional resize -->
 		{#each cornerHandles as handle (handle.direction)}
 			<div
-				class="absolute h-3 w-3 rounded-full border-2 border-white bg-blue-500 shadow-md transition-colors hover:bg-blue-600 {handle.class}"
+				class="absolute h-3 w-3 rounded-full border-2 border-primary-foreground bg-primary shadow-md transition-colors {handle.class}"
 				onpointerdown={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
