@@ -4,7 +4,7 @@
 	import PropertyPanel from './(components)/PropertyPanel.svelte';
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
-	import NameModal from '$lib/components/NameModal.svelte';
+	import { NameModal } from '$lib/components';
 	import { isIndexedDBSupported, saveDocument } from '$lib/utils/idb';
 	import type { DocumentData } from '$lib/types/canvas';
 	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
@@ -148,6 +148,11 @@
 		}
 	}
 
+	const handleExport = () => {
+		appStore.selectElement(null);
+		exportModalOpen = true;
+	};
+
 	let isIndexedDbSupported = $state(false);
 
 	onMount(() => {
@@ -198,7 +203,7 @@
 					{/if}
 					<Button
 						disabled={savePending}
-						onClick={() => (exportModalOpen = true)}
+						onClick={handleExport}
 						variant="primary"
 						data-testid="export-btn"
 					>

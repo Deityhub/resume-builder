@@ -562,6 +562,7 @@
 			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
+				id={`canvas-${dataPageId}`}
 				data-testid="document-canvas"
 				class="relative border-2 border-border bg-background shadow-lg"
 				style:width="{width * DISPLAY_SCALE}px"
@@ -614,7 +615,7 @@
 							: ''} {isHighlighted || isHovered || isSelected
 							? 'ring-2 ring-primary'
 							: ''} {isHovered ? 'ring-primary' : ''} {isHighlighted && !isSelected
-							? 'ring-primary/50'
+							? 'ring-primary/30'
 							: ''}"
 						class:transition-none={isDragging || isResizing}
 						style:left={pixelsToPercent(element.x, width)}
@@ -659,12 +660,16 @@
 						style:top={pixelsToPercent(dragPreview.y, height)}
 						style:width={pixelsToPercent(dragPreview.width, width)}
 						style:height={pixelsToPercent(dragPreview.height, height)}
+						data-html2canvas-ignore
 					></div>
 				{/if}
 
 				<!-- Selection outline for empty canvas -->
 				{#if !selectedElement && Object.keys(page.elements).length === 0}
-					<div class="absolute inset-4 flex items-center justify-center text-muted-foreground">
+					<div
+						class="absolute inset-4 flex items-center justify-center text-muted-foreground"
+						data-html2canvas-ignore
+					>
 						Drag and drop elements from toolbar to create them
 					</div>
 				{/if}
@@ -684,6 +689,7 @@
 							height
 						)}
 						data-testid={`boundary-${page.id}`}
+						data-html2canvas-ignore
 					></div>
 				{/if}
 			</div>
