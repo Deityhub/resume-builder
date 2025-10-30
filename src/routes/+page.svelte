@@ -19,9 +19,7 @@
 	<header class="sticky top-0 z-50 border-b border-primary/10 bg-background/80 backdrop-blur-md">
 		<div class="container mx-auto flex items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
-				<div
-					class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5"
-				>
+				<div class="flex h-8 w-8 items-center justify-center">
 					<Icons.Logo />
 				</div>
 				<span
