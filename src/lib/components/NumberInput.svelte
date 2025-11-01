@@ -55,6 +55,13 @@
 	function handleClickOutside() {
 		isDropdownOpen = false;
 	}
+
+	$effect(() => {
+		if (isDropdownOpen) {
+			const selectedElement = containerElement?.querySelector('[data-selected]');
+			selectedElement?.scrollIntoView({ block: 'nearest' });
+		}
+	});
 </script>
 
 <div
@@ -66,7 +73,7 @@
 		type="number"
 		{value}
 		oninput={handleOnInput}
-		class="w-full rounded border border-input bg-transparent px-2 py-1 text-sm ring-1 ring-primary focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+		class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:ring-1 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 		{min}
 		{max}
 		{step}
@@ -77,7 +84,7 @@
 			// Only toggle if clicking on the input itself, not the spinner buttons
 			const target = e.target as HTMLInputElement;
 			const rect = target.getBoundingClientRect();
-			const isSpinnerClick = e.clientX > rect.right - 20; // 20px is approximately the width of the spinner buttons
+			const isSpinnerClick = e.clientX > rect.right - 40; // 40px is approximately the width of the spinner buttons
 
 			if (!isSpinnerClick) {
 				toggleDropdown();
@@ -87,11 +94,11 @@
 
 	{#if isDropdownOpen && options.length > 0}
 		<div
-			class="ring-opacity-5 absolute z-10 mt-1 max-h-60 w-full flex-col gap-6 overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-primary focus:outline-none"
+			class="ring-opacity-5 absolute z-10 mt-1 max-h-60 w-full flex-col gap-6 overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
 		>
 			{#each options as option (option)}
 				<span
-					class="m-1 block h-auto cursor-pointer rounded-sm bg-primary/4 px-2 py-1 text-sm text-muted-foreground hover:bg-primary/10 {option.value ===
+					class="relative m-1 block h-auto cursor-pointer rounded-sm bg-primary/4 px-2 py-1 text-sm text-muted-foreground hover:bg-primary/10 {option.value ===
 					value
 						? 'bg-primary/10'
 						: ''}"
@@ -99,8 +106,23 @@
 					onkeydown={(e) => e.key === 'Enter' && selectOption(option)}
 					role="button"
 					tabindex={0}
+					data-selected={value === option.value ? '' : undefined}
+					data-testid={`${testId}-option-${option.value}`}
 				>
 					{option.label}
+
+					{#if value === option.value}
+						<span class="absolute top-1/4 right-2 flex items-center text-primary">
+							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+						</span>
+					{/if}
 				</span>
 			{/each}
 		</div>
