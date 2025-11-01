@@ -53,9 +53,7 @@
 				<div class="flex items-center space-x-4">
 					<Button onClick={() => goto(resolve('/'))} variant="text" size="xs" className="-ml-2">
 						<div class="flex items-center gap-3">
-							<div
-								class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5"
-							>
+							<div class="flex h-8 w-8 items-center justify-center">
 								<Icons.Logo />
 							</div>
 							<span

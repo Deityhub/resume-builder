@@ -92,7 +92,7 @@ export function getDefaultProperties({
 				...baseElement,
 				type: 'image',
 				src: '',
-				alt: 'Image',
+				alt: 'Canvas image',
 				objectFit: 'contain',
 				borderRadius: 0,
 				opacity: 1,
@@ -100,7 +100,7 @@ export function getDefaultProperties({
 				borderWidth: 0,
 				borderStyle: 'solid',
 				boxShadow: '',
-				backgroundColor: 'transparent'
+				backgroundColor: '#ffffff'
 			};
 	}
 }

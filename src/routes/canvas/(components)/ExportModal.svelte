@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Modal } from '$lib/components';
-	import NameModal from '$lib/components/NameModal.svelte';
+	import { NameModal } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import jsPDF from 'jspdf';
-	import { getPageImageData } from '$lib/utils/canvasRenderer';
+	import { getPageImageData } from '$lib/utils/canvas';
 	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 
 	interface Props {

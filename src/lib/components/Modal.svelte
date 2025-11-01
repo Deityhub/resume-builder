@@ -15,6 +15,7 @@
 		showAcceptAction?: boolean;
 		closeFromBackdrop?: boolean;
 		children: Snippet;
+		isPending?: boolean;
 	}
 
 	const {
@@ -29,7 +30,8 @@
 		showCancelAction = true,
 		showAcceptAction = true,
 		closeFromBackdrop = false,
-		children
+		children,
+		isPending = false
 	}: Props = $props();
 
 	function handleBackdropClick(e: MouseEvent) {
@@ -58,7 +60,7 @@
 						<p class="mt-1 text-sm text-muted-foreground">{description}</p>
 					{/if}
 				</div>
-				<Button variant="text" onClick={onCancel} disabled={disableActions}>
+				<Button variant="text" onClick={onCancel} disabled={disableActions || isPending}>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"
@@ -76,11 +78,12 @@
 
 			<div class="flex justify-end gap-3 border-t border-border px-6 py-4">
 				{#if showCancelAction}
-					<Button variant="ghost" onClick={onCancel} disabled={disableActions}>{cancelLabel}</Button
+					<Button variant="ghost" onClick={onCancel} disabled={disableActions || isPending}
+						>{cancelLabel}</Button
 					>
 				{/if}
 				{#if showAcceptAction}
-					<Button variant="primary" onClick={onAccept} disabled={disableActions}
+					<Button variant="primary" onClick={onAccept} disabled={disableActions} pending={isPending}
 						>{acceptLabel}</Button
 					>
 				{/if}

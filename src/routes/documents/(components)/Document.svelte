@@ -3,7 +3,7 @@
 	import type { DocumentData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Button } from '$lib/components';
+	import { Button, Modal } from '$lib/components';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
 	import { Trash2, Pen } from '@lucide/svelte';
 
@@ -12,15 +12,34 @@
 		fetchDocuments
 	}: { document: DocumentData; fetchDocuments: () => Promise<void> } = $props();
 
+	let showDeleteModal = $state(false);
+
 	async function handleEdit(document: DocumentData) {
 		appStore.setCurrentDocument(document);
 		await goto(resolve('/canvas'));
 	}
 
-	async function handleDelete(document: DocumentData) {
-		if (!confirm(`Delete document "${document.name}"? This cannot be undone.`)) return;
-		await deleteDocument(document.id);
-		await fetchDocuments();
+	function openDeleteModal() {
+		showDeleteModal = true;
+	}
+
+	function closeDeleteModal() {
+		showDeleteModal = false;
+	}
+
+	let isDeleting = $state(false);
+
+	async function confirmDelete() {
+		try {
+			isDeleting = true;
+			await deleteDocument(document.id);
+			closeDeleteModal();
+			await fetchDocuments();
+		} catch (error) {
+			console.error('Error with deleting document: ', error);
+		} finally {
+			isDeleting = false;
+		}
 	}
 
 	function formatDate(timestamp: number) {
@@ -68,10 +87,26 @@
 					<Pen class="mr-2 h-4 w-4" />
 					Edit
 				</Button>
-				<Button onClick={() => handleDelete(document)} variant="secondary-destructive" size="xs">
+				<Button onClick={openDeleteModal} variant="secondary-destructive" size="xs">
 					<Trash2 class="mr-2 h-4 w-4" />
 					Delete
 				</Button>
+
+				<Modal
+					open={showDeleteModal}
+					title={`Delete "${document.name}"?`}
+					onCancel={closeDeleteModal}
+					onAccept={confirmDelete}
+					cancelLabel="Cancel"
+					acceptLabel="Delete"
+					closeFromBackdrop={true}
+					isPending={isDeleting}
+				>
+					<div class="text-sm text-muted-foreground">
+						This document with it's content will be permanently deleted. This action cannot be
+						undone.
+					</div>
+				</Modal>
 			</div>
 		</div>
 	</div>
