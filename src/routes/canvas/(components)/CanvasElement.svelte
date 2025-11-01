@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TCanvasElement, ResizeDirection } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
+	import { DISPLAY_SCALE } from '$lib/const/dimension';
 
 	interface Props {
 		element: TCanvasElement;
@@ -62,28 +63,53 @@
 >
 	<!-- Element content based on type -->
 	{#if element.type === 'text'}
-		<div
-			class="h-full w-full overflow-hidden p-2"
-			style:font-family="{element.fontFamily}, sans-serif"
-			style:font-size="{element.fontSize}px"
-			style:font-weight={element.fontWeight}
-			style:font-style={element.fontStyle}
-			style:text-decoration={element.textDecoration}
-			style:text-transform={element.textTransform}
-			style:text-align={element.textAlign || 'left'}
-			style:color={element.color}
-			contenteditable="true"
-			bind:textContent
-			oninput={() => {
-				appStore.updateElement({
-					elementId: element.id,
-					updates: {
-						text: textContent
-					},
-					pageId: element.pageId
-				});
-			}}
-		></div>
+		<div class="relative h-full w-full overflow-hidden">
+			<textarea
+				class="absolute inset-0 h-auto min-h-full w-full cursor-move resize-none overflow-hidden border-none bg-transparent p-2 focus:outline-none"
+				style:font-family="{element.fontFamily}, sans-serif"
+				style:font-size="{element.fontSize}px"
+				style:font-weight={element.fontWeight}
+				style:font-style={element.fontStyle}
+				style:text-decoration={element.textDecoration}
+				style:text-transform={element.textTransform}
+				style:text-align={element.textAlign || 'left'}
+				style:color={element.color}
+				bind:value={textContent}
+				id={`text-element-${element.id}`}
+				oninput={(e) => {
+					const actualElementHeight = element.height * DISPLAY_SCALE;
+					const target = e.target as HTMLTextAreaElement;
+					// Reset height to auto to get the correct scrollHeight
+					target.style.height = 'auto';
+					// Set the height to scrollHeight, but don't exceed the parent's height
+					const newHeight = Math.min(target.scrollHeight, actualElementHeight);
+					target.style.height = newHeight + 'px';
+					// Only update the element's height if the content is larger than the current height
+					if (newHeight > actualElementHeight) {
+						appStore.updateElement({
+							elementId: element.id,
+							updates: {
+								text: textContent,
+								height: newHeight
+							},
+							pageId: element.pageId
+						});
+					} else {
+						// Still update the text content even if height doesn't change
+						appStore.updateElement({
+							elementId: element.id,
+							updates: {
+								text: textContent,
+								height: Math.max(actualElementHeight, target.scrollHeight) / DISPLAY_SCALE // Ensure we don't cut off text
+							},
+							pageId: element.pageId
+						});
+						// Scroll to show cursor position
+						target.scrollTop = target.scrollHeight;
+					}
+				}}
+			></textarea>
+		</div>
 	{:else if element.type === 'shape'}
 		<div class="flex h-full w-full items-center justify-center overflow-hidden">
 			<svg
