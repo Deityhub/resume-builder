@@ -14,6 +14,7 @@
 	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
 	import { Trash2 } from '@lucide/svelte';
+	import { NumberInput } from '$lib/components';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -45,42 +46,34 @@
 				<div class="grid grid-cols-2 gap-2">
 					<div>
 						<span class="text-background-foreground block text-sm">X</span>
-						<input
-							data-testid="input-x"
-							type="number"
+						<NumberInput
 							value={selectedElement.x}
-							class="w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('x', parseInt(e.currentTarget.value))}
+							handleInput={(value) => handlePropertyChange('x', value)}
+							testId="input-x"
 						/>
 					</div>
 					<div>
 						<span class="text-background-foreground block text-sm">Y</span>
-						<input
-							data-testid="input-y"
-							type="number"
+						<NumberInput
 							value={selectedElement.y}
-							class="w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('y', parseInt(e.currentTarget.value))}
+							handleInput={(value) => handlePropertyChange('y', value)}
+							testId="input-y"
 						/>
 					</div>
 					<div>
 						<span class="text-background-foreground block text-sm">Width</span>
-						<input
-							data-testid="input-width"
-							type="number"
+						<NumberInput
 							value={selectedElement.width}
-							class="w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('width', parseInt(e.currentTarget.value))}
+							handleInput={(value) => handlePropertyChange('width', value)}
+							testId="input-width"
 						/>
 					</div>
 					<div>
 						<span class="text-background-foreground block text-sm">Height</span>
-						<input
-							data-testid="input-height"
-							type="number"
+						<NumberInput
 							value={selectedElement.height}
-							class="w-full rounded border px-2 py-1 text-sm"
-							onchange={(e) => handlePropertyChange('height', parseInt(e.currentTarget.value))}
+							handleInput={(value) => handlePropertyChange('height', value)}
+							testId="input-height"
 						/>
 					</div>
 				</div>
@@ -135,16 +128,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Font Size</span>
-							<select
-								data-testid="select-font-size"
+							<NumberInput
 								value={selectedElement.fontSize}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('fontSize', parseInt(e.currentTarget.value))}
-							>
-								{#each fontSizes as size (size)}
-									<option value={size}>{size}px</option>
-								{/each}
-							</select>
+								handleInput={(value) => handlePropertyChange('fontSize', value)}
+								options={fontSizes.map((size) => ({ label: size.toString(), value: size }))}
+								testId="select-font-size"
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Font Weight</span>
@@ -254,20 +243,12 @@
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Stroke Width</span>
-							<input
-								data-testid="input-stroke-width"
-								type="range"
-								min="1"
-								max="20"
+							<span class="text-background-foreground block text-sm">Stroke Weight</span>
+							<NumberInput
 								value={selectedElement.strokeWidth}
-								class="w-full"
-								oninput={(e) =>
-									handlePropertyChange('strokeWidth', parseInt(e.currentTarget.value))}
+								handleInput={(value) => handlePropertyChange('strokeWidth', value)}
+								testId="input-stroke-weight"
 							/>
-							<span class="text-background-foreground block text-sm"
-								>{selectedElement.strokeWidth}px</span
-							>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Stroke Style</span>
@@ -446,19 +427,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Border Width</span>
-							<input
-								data-testid="input-border-width"
-								type="range"
-								min="0"
-								max="10"
+							<NumberInput
 								value={selectedElement.borderWidth || 0}
-								class="w-full"
-								oninput={(e) =>
-									handlePropertyChange('borderWidth', parseInt(e.currentTarget.value))}
+								handleInput={(value) => handlePropertyChange('borderWidth', value)}
+								testId="input-border-width"
+								max={20}
 							/>
-							<span class="text-background-foreground block text-sm"
-								>{selectedElement.borderWidth || 0}px</span
-							>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Border Style</span>
