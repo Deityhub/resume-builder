@@ -14,7 +14,7 @@
 	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
 	import { Trash2 } from '@lucide/svelte';
-	import { NumberInput } from '$lib/components';
+	import { NumberInput, Select } from '$lib/components';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -115,16 +115,16 @@
 					<div class="flex flex-col gap-2">
 						<div>
 							<span class="text-background-foreground block text-sm">Font Family</span>
-							<select
-								data-testid="select-font-family"
+							<Select
 								value={selectedElement.fontFamily}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('fontFamily', e.currentTarget.value)}
-							>
-								{#each fontFamilies as font (font)}
-									<option value={font}>{font}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('fontFamily', value)}
+								testId="select-font-family"
+								options={fontFamilies.map((font) => ({
+									value: font,
+									label: font,
+									fontFamily: font
+								}))}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Font Size</span>
@@ -137,55 +137,39 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Font Weight</span>
-							<select
-								data-testid="select-font-weight"
+							<Select
 								value={selectedElement.fontWeight}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('fontWeight', e.currentTarget.value)}
-							>
-								{#each fontWeights as weight (weight.value)}
-									<option value={weight.value}>{weight.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('fontWeight', value)}
+								testId="select-font-weight"
+								options={[...fontWeights]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Font Style</span>
-							<select
-								data-testid="select-font-style"
+							<Select
 								value={selectedElement.fontStyle}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('fontStyle', e.currentTarget.value)}
-							>
-								{#each fontStyles as style (style.value)}
-									<option value={style.value}>{style.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('fontStyle', value)}
+								testId="select-font-style"
+								options={[...fontStyles]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Text Decoration</span>
-							<select
-								data-testid="select-text-decoration"
+							<Select
 								value={selectedElement.textDecoration || 'none'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('textDecoration', e.currentTarget.value)}
-							>
-								{#each textDecorations as decoration (decoration.value)}
-									<option value={decoration.value}>{decoration.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('textDecoration', value)}
+								testId="select-text-decoration"
+								options={[...textDecorations]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Text Transform</span>
-							<select
-								data-testid="select-text-transform"
+							<Select
 								value={selectedElement.textTransform || 'none'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('textTransform', e.currentTarget.value)}
-							>
-								{#each textTransforms as transform (transform.value)}
-									<option value={transform.value}>{transform.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('textTransform', value)}
+								testId="select-text-transform"
+								options={[...textTransforms]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Color</span>
@@ -199,16 +183,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Text Alignment</span>
-							<select
-								data-testid="select-text-alignment"
+							<Select
 								value={selectedElement.textAlign || 'left'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('textAlign', e.currentTarget.value)}
-							>
-								{#each textAlignments as alignment (alignment.value)}
-									<option value={alignment.value}>{alignment.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('textAlign', value)}
+								testId="select-text-alignment"
+								options={[...textAlignments]}
+							/>
 						</div>
 					</div>
 				</div>
@@ -221,16 +201,12 @@
 					<div class="flex flex-col gap-2">
 						<div>
 							<span class="text-background-foreground block text-sm">Shape Type</span>
-							<select
-								data-testid="select-shape-type"
+							<Select
 								value={selectedElement.shapeType}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('shapeType', e.currentTarget.value)}
-							>
-								{#each shapeTypes as shape (shape.value)}
-									<option value={shape.value}>{shape.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('shapeType', value)}
+								testId="select-shape-type"
+								options={[...shapeTypes]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Stroke Color</span>
@@ -252,16 +228,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Stroke Style</span>
-							<select
-								data-testid="select-stroke-style"
+							<Select
 								value={selectedElement.strokeStyle || 'solid'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('strokeStyle', e.currentTarget.value)}
-							>
-								{#each strokeStyles as style (style.value)}
-									<option value={style.value}>{style.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('strokeStyle', value)}
+								testId="select-stroke-style"
+								options={[...strokeStyles]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Stroke Opacity</span>
@@ -372,16 +344,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Object Fit</span>
-							<select
-								data-testid="select-object-fit"
+							<Select
 								value={selectedElement.objectFit || 'contain'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('objectFit', e.currentTarget.value)}
-							>
-								{#each objectFitOptions as option (option.value)}
-									<option value={option.value}>{option.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('objectFit', value)}
+								testId="select-object-fit"
+								options={[...objectFitOptions]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Border Radius</span>
@@ -436,16 +404,12 @@
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Border Style</span>
-							<select
-								data-testid="select-border-style"
+							<Select
 								value={selectedElement.borderStyle || 'solid'}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('borderStyle', e.currentTarget.value)}
-							>
-								{#each borderStyles as style (style.value)}
-									<option value={style.value}>{style.label}</option>
-								{/each}
-							</select>
+								onChange={(value) => handlePropertyChange('borderStyle', value)}
+								testId="select-border-style"
+								options={[...borderStyles]}
+							/>
 						</div>
 						<div>
 							<span class="text-background-foreground block text-sm">Box Shadow</span>
