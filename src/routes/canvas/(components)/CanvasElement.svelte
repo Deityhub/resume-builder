@@ -77,36 +77,41 @@
 				bind:value={textContent}
 				id={`text-element-${element.id}`}
 				oninput={(e) => {
-					const actualElementHeight = element.height * DISPLAY_SCALE;
 					const target = e.target as HTMLTextAreaElement;
-					// Reset height to auto to get the correct scrollHeight
-					target.style.height = 'auto';
-					// Set the height to scrollHeight, but don't exceed the parent's height
-					const newHeight = Math.min(target.scrollHeight, actualElementHeight);
-					target.style.height = newHeight + 'px';
-					// Only update the element's height if the content is larger than the current height
-					if (newHeight > actualElementHeight) {
-						appStore.updateElement({
-							elementId: element.id,
-							updates: {
-								text: textContent,
-								height: newHeight
-							},
-							pageId: element.pageId
-						});
-					} else {
-						// Still update the text content even if height doesn't change
-						appStore.updateElement({
-							elementId: element.id,
-							updates: {
-								text: textContent,
-								height: Math.max(actualElementHeight, target.scrollHeight) / DISPLAY_SCALE // Ensure we don't cut off text
-							},
-							pageId: element.pageId
-						});
-						// Scroll to show cursor position
-						target.scrollTop = target.scrollHeight;
-					}
+					const actualElementHeight = element.height * DISPLAY_SCALE;
+
+					// Use requestAnimationFrame to batch the updates
+					requestAnimationFrame(() => {
+						// Reset height to auto to get the correct scrollHeight
+						target.style.height = 'auto';
+						const scrollHeight = target.scrollHeight;
+
+						// Only update if the content is larger than current height
+						if (scrollHeight > actualElementHeight) {
+							// Add a small buffer to prevent jitter
+							const newHeight = Math.min(scrollHeight + 2, actualElementHeight * 2); // Limit max height to 2x original
+
+							// Update the element height in the store
+							appStore.updateElement({
+								elementId: element.id,
+								updates: {
+									text: textContent,
+									height: newHeight / DISPLAY_SCALE
+								},
+								pageId: element.pageId
+							});
+
+							// Set the height directly to prevent layout shift
+							target.style.height = `${newHeight}px`;
+						} else {
+							// Update just the text if height doesn't change
+							appStore.updateElement({
+								elementId: element.id,
+								updates: { text: textContent },
+								pageId: element.pageId
+							});
+						}
+					});
 				}}
 			></textarea>
 		</div>
