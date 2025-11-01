@@ -1,39 +1,41 @@
-import type { ActionReturn } from 'svelte/action';
+import type { Action } from 'svelte/action';
 
-export function clickOutside(
-	node: HTMLElement,
-	options: {
-		enabled?: boolean;
-		handler: (event: CustomEvent) => void;
-	}
-): ActionReturn<{ enabled: boolean }> {
-	const handleClick = (event: MouseEvent) => {
-		if (!node.contains(event.target as Node) && !event.defaultPrevented) {
-			const customEvent = new CustomEvent('clickOutside', {
-				detail: { target: event.target }
-			});
-			options.handler(customEvent);
+type ClickOutsideOptions = {
+	enabled?: boolean;
+	handler: (event: MouseEvent | TouchEvent) => void;
+};
+
+export const clickOutside: Action<HTMLElement, ClickOutsideOptions> = (node, options) => {
+	const { enabled = true, handler } = options;
+
+	function handleClick(event: MouseEvent | TouchEvent) {
+		if (!node.contains(event.target as Node)) {
+			handler(event);
 		}
-	};
+	}
 
-	function update({ enabled = true }) {
+	function update({ enabled, handler }: ClickOutsideOptions) {
+		document.removeEventListener('mousedown', handleClick, true);
+		document.removeEventListener('click', handleClick, true);
+		document.removeEventListener('touchstart', handleClick, true);
+
 		if (enabled) {
-			// Use setTimeout to avoid immediate trigger
-			setTimeout(() => document.addEventListener('click', handleClick, true));
-		} else {
-			document.removeEventListener('click', handleClick, true);
+			document.addEventListener('mousedown', handleClick, true);
+			document.addEventListener('click', handleClick, true);
+			document.addEventListener('touchstart', handleClick, true);
 		}
+
+		return { enabled, handler };
 	}
 
-	update({ enabled: options.enabled ?? true });
+	update({ enabled, handler });
 
 	return {
-		update: (newOptions) =>
-			update({
-				enabled: newOptions.enabled ?? true
-			}),
+		update,
 		destroy() {
+			document.removeEventListener('mousedown', handleClick, true);
 			document.removeEventListener('click', handleClick, true);
+			document.removeEventListener('touchstart', handleClick, true);
 		}
 	};
-}
+};
