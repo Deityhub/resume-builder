@@ -21,7 +21,7 @@
 		value,
 		options = [],
 		min = 1,
-		max,
+		max = Infinity,
 		step = 1,
 		placeholder = '',
 		testId = '',
@@ -34,8 +34,12 @@
 	function handleOnInput(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const newValue = parseFloat(target.value);
-		if (!isNaN(newValue)) {
+
+		if (!isNaN(newValue) && newValue >= min && newValue <= max) {
 			handleInput?.(newValue);
+		} else {
+			target.value = value.toString();
+			handleInput?.(value);
 		}
 	}
 
