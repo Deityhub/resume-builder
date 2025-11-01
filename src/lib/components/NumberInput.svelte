@@ -14,6 +14,7 @@
 		step?: number;
 		placeholder?: string;
 		testId?: string;
+		label?: string;
 		handleInput?: (value: number) => void;
 	};
 
@@ -25,11 +26,13 @@
 		step = 1,
 		placeholder = '',
 		testId = '',
+		label = '',
 		handleInput
 	}: TProps = $props();
 
 	let isDropdownOpen = $state(false);
 	let containerElement: HTMLDivElement;
+	const inputId = `number-input-${crypto.randomUUID()}`;
 
 	function handleOnInput(e: Event) {
 		const target = e.target as HTMLInputElement;
@@ -65,12 +68,19 @@
 </script>
 
 <div
-	class="relative w-full"
+	class="relative flex w-full flex-col items-start gap-1"
 	bind:this={containerElement}
 	use:clickOutside={{ enabled: isDropdownOpen, handler: handleClickOutside }}
 >
+	{#if label}
+		<label for={inputId} class="text-background-foreground block text-sm">
+			{label}
+		</label>
+	{/if}
+
 	<input
 		type="number"
+		id={inputId}
 		{value}
 		oninput={handleOnInput}
 		class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:ring-1 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -94,7 +104,7 @@
 
 	{#if isDropdownOpen && options.length > 0}
 		<div
-			class="ring-opacity-5 absolute z-10 mt-1 max-h-60 w-full flex-col gap-6 overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			class="ring-opacity-5 absolute top-16 z-10 mt-1 max-h-60 w-full flex-col gap-6 overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
 		>
 			{#each options as option (option)}
 				<span

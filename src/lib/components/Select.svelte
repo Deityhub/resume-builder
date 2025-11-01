@@ -14,6 +14,7 @@
 		placeholder?: string;
 		testId?: string;
 		onChange?: (value: T) => void;
+		label?: string;
 	};
 
 	const {
@@ -21,11 +22,13 @@
 		options = [],
 		placeholder = 'Select an option',
 		testId = '',
-		onChange
+		onChange,
+		label = ''
 	}: Props = $props();
 
 	let isOpen = $state(false);
 	let containerElement: HTMLDivElement;
+	const inputId = `select-input-${crypto.randomUUID()}`;
 
 	function handleSelect(option: Option) {
 		onChange?.(option.value);
@@ -51,12 +54,18 @@
 </script>
 
 <div
-	class="relative w-full"
+	class="relative flex w-full flex-col items-start gap-1"
 	bind:this={containerElement}
 	use:clickOutside={{ enabled: isOpen, handler: handleClickOutside }}
 >
+	{#if label}
+		<label for={inputId} class="text-background-foreground block text-sm">
+			{label}
+		</label>
+	{/if}
 	<div
 		role="button"
+		id={inputId}
 		tabindex="0"
 		class="flex h-9 w-full cursor-pointer items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:ring-1 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 		onclick={toggleDropdown}
@@ -83,7 +92,7 @@
 
 	{#if isOpen}
 		<div
-			class="ring-opacity-5 absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			class="ring-opacity-5 absolute top-16 z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
 			role="listbox"
 		>
 			{#each options as option (option.value)}

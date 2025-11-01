@@ -14,7 +14,7 @@
 	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
 	import { Trash2 } from '@lucide/svelte';
-	import { NumberInput, Select } from '$lib/components';
+	import { NumberInput, Select, ColorInput, Input } from '$lib/components';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
 
@@ -45,35 +45,35 @@
 				<h4 class="font-medium text-foreground">Position & Size</h4>
 				<div class="grid grid-cols-2 gap-2">
 					<div>
-						<span class="text-background-foreground block text-sm">X</span>
 						<NumberInput
 							value={selectedElement.x}
 							handleInput={(value) => handlePropertyChange('x', value)}
 							testId="input-x"
+							label="X"
 						/>
 					</div>
 					<div>
-						<span class="text-background-foreground block text-sm">Y</span>
 						<NumberInput
 							value={selectedElement.y}
 							handleInput={(value) => handlePropertyChange('y', value)}
 							testId="input-y"
+							label="Y"
 						/>
 					</div>
 					<div>
-						<span class="text-background-foreground block text-sm">Width</span>
 						<NumberInput
 							value={selectedElement.width}
 							handleInput={(value) => handlePropertyChange('width', value)}
 							testId="input-width"
+							label="Width"
 						/>
 					</div>
 					<div>
-						<span class="text-background-foreground block text-sm">Height</span>
 						<NumberInput
 							value={selectedElement.height}
 							handleInput={(value) => handlePropertyChange('height', value)}
 							testId="input-height"
+							label="Height"
 						/>
 					</div>
 				</div>
@@ -114,7 +114,6 @@
 					<h4 class="font-medium text-foreground">Text Properties</h4>
 					<div class="flex flex-col gap-2">
 						<div>
-							<span class="text-background-foreground block text-sm">Font Family</span>
 							<Select
 								value={selectedElement.fontFamily}
 								onChange={(value) => handlePropertyChange('fontFamily', value)}
@@ -124,70 +123,69 @@
 									label: font,
 									fontFamily: font
 								}))}
+								label="Font Family"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Font Size</span>
 							<NumberInput
 								value={selectedElement.fontSize}
 								handleInput={(value) => handlePropertyChange('fontSize', value)}
 								options={fontSizes.map((size) => ({ label: size.toString(), value: size }))}
 								testId="select-font-size"
+								label="Font Size"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Font Weight</span>
 							<Select
 								value={selectedElement.fontWeight}
 								onChange={(value) => handlePropertyChange('fontWeight', value)}
 								testId="select-font-weight"
 								options={[...fontWeights]}
+								label="Font Weight"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Font Style</span>
 							<Select
 								value={selectedElement.fontStyle}
 								onChange={(value) => handlePropertyChange('fontStyle', value)}
 								testId="select-font-style"
 								options={[...fontStyles]}
+								label="Font Style"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Text Decoration</span>
 							<Select
 								value={selectedElement.textDecoration || 'none'}
 								onChange={(value) => handlePropertyChange('textDecoration', value)}
 								testId="select-text-decoration"
 								options={[...textDecorations]}
+								label="Text Decoration"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Text Transform</span>
 							<Select
 								value={selectedElement.textTransform || 'none'}
 								onChange={(value) => handlePropertyChange('textTransform', value)}
 								testId="select-text-transform"
 								options={[...textTransforms]}
+								label="Text Transform"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Color</span>
-							<input
-								data-testid="input-color"
-								type="color"
+							<ColorInput
 								value={selectedElement.color}
-								class="h-8 w-full rounded border px-2 py-1 text-sm"
-								oninput={(e) => handlePropertyChange('color', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('color', value)}
+								testId="input-color"
+								label="Color"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Text Alignment</span>
 							<Select
 								value={selectedElement.textAlign || 'left'}
 								onChange={(value) => handlePropertyChange('textAlign', value)}
 								testId="select-text-alignment"
 								options={[...textAlignments]}
+								label="Text Alignment"
 							/>
 						</div>
 					</div>
@@ -200,22 +198,20 @@
 					<h4 class="font-medium text-foreground">Shape Properties</h4>
 					<div class="flex flex-col gap-2">
 						<div>
-							<span class="text-background-foreground block text-sm">Shape Type</span>
 							<Select
 								value={selectedElement.shapeType}
 								onChange={(value) => handlePropertyChange('shapeType', value)}
 								testId="select-shape-type"
 								options={[...shapeTypes]}
+								label="Shape Type"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Stroke Color</span>
-							<input
-								data-testid="input-stroke-color"
-								type="color"
+							<ColorInput
 								value={selectedElement.strokeColor}
-								class="h-8 w-full rounded border px-2 py-1 text-sm"
-								oninput={(e) => handlePropertyChange('strokeColor', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('strokeColor', value)}
+								testId="input-stroke-color"
+								label="Stroke Color"
 							/>
 						</div>
 						<div>
@@ -227,12 +223,12 @@
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Stroke Style</span>
 							<Select
 								value={selectedElement.strokeStyle || 'solid'}
 								onChange={(value) => handlePropertyChange('strokeStyle', value)}
 								testId="select-stroke-style"
 								options={[...strokeStyles]}
+								label="Stroke Style"
 							/>
 						</div>
 						<div>
@@ -253,13 +249,11 @@
 							>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Fill Color</span>
-							<input
-								data-testid="input-fill-color"
-								type="color"
+							<ColorInput
 								value={selectedElement.fillColor || '#ffffff'}
-								class="h-8 w-full rounded border px-2 py-1 text-sm"
-								oninput={(e) => handlePropertyChange('fillColor', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('fillColor', value)}
+								testId="input-fill-color"
+								label="Fill Color"
 							/>
 						</div>
 						<div>
@@ -322,33 +316,21 @@
 					<h4 class="font-medium text-foreground">Image Properties</h4>
 					<div class="flex flex-col gap-2">
 						<div>
-							<span class="text-background-foreground block text-sm">Image URL</span>
-							<input
-								data-testid="input-image-src"
+							<Input
 								type="url"
 								value={selectedElement.src}
-								class="w-full rounded border px-2 py-1 text-sm"
-								placeholder="https://example.com/image.jpg"
-								onchange={(e) => handlePropertyChange('src', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('src', value)}
+								testId="input-image-src"
+								label="Image URL"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Alt Text</span>
-							<input
-								data-testid="input-image-alt"
-								type="text"
-								value={selectedElement.alt}
-								class="w-full rounded border px-2 py-1 text-sm"
-								onchange={(e) => handlePropertyChange('alt', e.currentTarget.value)}
-							/>
-						</div>
-						<div>
-							<span class="text-background-foreground block text-sm">Object Fit</span>
 							<Select
 								value={selectedElement.objectFit || 'contain'}
 								onChange={(value) => handlePropertyChange('objectFit', value)}
 								testId="select-object-fit"
 								options={[...objectFitOptions]}
+								label="Object Fit"
 							/>
 						</div>
 						<div>
@@ -384,52 +366,46 @@
 							>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Border Color</span>
-							<input
-								data-testid="input-border-color"
-								type="color"
+							<ColorInput
 								value={selectedElement.borderColor || '#000000'}
-								class="h-8 w-full rounded border px-2 py-1 text-sm"
-								oninput={(e) => handlePropertyChange('borderColor', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('borderColor', value)}
+								testId="input-border-color"
+								label="Border Color"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Border Width</span>
 							<NumberInput
 								value={selectedElement.borderWidth || 0}
 								handleInput={(value) => handlePropertyChange('borderWidth', value)}
 								testId="input-border-width"
 								max={20}
+								label="Border Width"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Border Style</span>
 							<Select
 								value={selectedElement.borderStyle || 'solid'}
 								onChange={(value) => handlePropertyChange('borderStyle', value)}
 								testId="select-border-style"
 								options={[...borderStyles]}
+								label="Border Style"
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Box Shadow</span>
-							<input
-								data-testid="input-box-shadow"
-								type="text"
+							<Input
 								value={selectedElement.boxShadow || ''}
-								class="w-full rounded border px-2 py-1 text-sm"
+								onChange={(value) => handlePropertyChange('boxShadow', value)}
+								testId="input-box-shadow"
+								label="Box Shadow"
 								placeholder="0px 2px 4px rgba(0,0,0,0.1)"
-								onchange={(e) => handlePropertyChange('boxShadow', e.currentTarget.value)}
 							/>
 						</div>
 						<div>
-							<span class="text-background-foreground block text-sm">Background Color</span>
-							<input
-								data-testid="input-background-color"
-								type="color"
+							<ColorInput
 								value={selectedElement.backgroundColor || '#ffffff'}
-								class="h-8 w-full rounded border px-2 py-1 text-sm"
-								oninput={(e) => handlePropertyChange('backgroundColor', e.currentTarget.value)}
+								onChange={(value) => handlePropertyChange('backgroundColor', value)}
+								testId="input-background-color"
+								label="Background Color"
 							/>
 						</div>
 					</div>
