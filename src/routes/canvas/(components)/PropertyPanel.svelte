@@ -322,6 +322,7 @@
 								onChange={(value) => handlePropertyChange('src', value)}
 								testId="input-image-src"
 								label="Image URL"
+								placeholder="https://example.com/image.jpg"
 							/>
 						</div>
 						<div>
