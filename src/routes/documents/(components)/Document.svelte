@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteDocument } from '$lib/utils/idb';
+	import { deleteDocument } from '$lib/stores/idb';
 	import type { DocumentData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
