@@ -5,7 +5,7 @@
 	import ExportModal from './(components)/ExportModal.svelte';
 	import { Button } from '$lib/components';
 	import { NameModal } from '$lib/components';
-	import { isIndexedDBSupported, saveDocument } from '$lib/utils/idb';
+	import { isIndexedDBSupported, saveDocument } from '$lib/stores/idb';
 	import type { DocumentData } from '$lib/types/canvas';
 	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';

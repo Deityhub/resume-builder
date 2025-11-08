@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getAllDocuments, isIndexedDBSupported } from '$lib/utils/idb';
+	import { getAllDocuments, isIndexedDBSupported } from '$lib/stores/idb';
 	import type { DocumentData } from '$lib/types/canvas';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
