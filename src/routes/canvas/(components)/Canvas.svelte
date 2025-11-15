@@ -655,7 +655,7 @@
 				<!-- Drag preview -->
 				{#if dragPreview}
 					<div
-						class="pointer-events-none absolute border-2 border-dashed border-primary bg-primary/10 opacity-50"
+						class="pointer-events-none absolute z-[9999] border-2 border-dashed border-primary bg-primary/10 opacity-50"
 						style:left={pixelsToPercent(dragPreview.x, width)}
 						style:top={pixelsToPercent(dragPreview.y, height)}
 						style:width={pixelsToPercent(dragPreview.width, width)}
