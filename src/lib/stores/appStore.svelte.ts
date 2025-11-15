@@ -1,4 +1,5 @@
 import { getDefaultProperties } from '$lib/utils/properties';
+import { uuidv4 } from '$lib/utils/uuid';
 import type {
 	ElementType,
 	DocumentData,
@@ -21,10 +22,10 @@ const createAppStore = () => {
 		};
 	};
 
-	const firstPageId = crypto.randomUUID();
+	const firstPageId = uuidv4();
 
 	let currentDocument: DocumentData = $state({
-		id: crypto.randomUUID(),
+		id: uuidv4(),
 		name: '', // the user should set this value
 		pages: {
 			[firstPageId]: getDefaultPage(firstPageId)
