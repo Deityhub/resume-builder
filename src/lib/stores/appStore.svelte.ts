@@ -7,7 +7,7 @@ import type {
 	DocumentPage,
 	RulerBoundaries
 } from '../types/canvas';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, DISPLAY_SCALE } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
@@ -34,6 +34,8 @@ const createAppStore = () => {
 		updatedAt: Date.now()
 	});
 
+	let scale = $state(DISPLAY_SCALE);
+
 	let selectedElement: TCanvasElement | null = $state(null);
 
 	// Helper to get next zIndex for a page
@@ -57,6 +59,12 @@ const createAppStore = () => {
 	// Get all elements on a page sorted by zIndex (ascending)
 	const getSortedElements = (pageId: string): TCanvasElement[] => {
 		return getPageElements(pageId).sort((a, b) => a.zIndex - b.zIndex);
+	};
+
+	const getScale = () => scale;
+
+	const setScale = (newScale: number) => {
+		scale = newScale;
 	};
 
 	// Move an element forward in the z-index stack
@@ -347,6 +355,7 @@ const createAppStore = () => {
 		getSelectedElement,
 		getCurrentDocument,
 		getPageElements,
+		getScale,
 
 		// Mutations
 		setCurrentDocument,
@@ -361,6 +370,7 @@ const createAppStore = () => {
 		findElement,
 		updateCurrentDocument,
 		initNewDocument,
+		setScale,
 
 		// Layering
 		moveForward,

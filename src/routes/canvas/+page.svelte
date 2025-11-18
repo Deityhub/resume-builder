@@ -9,11 +9,13 @@
 	import type { DocumentData } from '$lib/types/canvas';
 	import type { ElementType, TCanvasInstance } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
-	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
+	import { CANVAS_WIDTH, CANVAS_HEIGHT, DISPLAY_SCALE } from '$lib/const/dimension';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Download, Plus, Save } from '@lucide/svelte';
+	import { Icons } from '$lib/icons';
 
 	const pages = $derived(Object.values(appStore.getPages()));
 	const canvasInstances = $state<Record<string, TCanvasInstance>>({});
@@ -155,20 +157,130 @@
 
 	let isIndexedDbSupported = $state(false);
 
+	const MIN_SCALE = 0.12;
+	const MIN_WIDTH = 360;
+	const MAX_WIDTH = 1440;
+
+	function calculateScale(width: number) {
+		if (width >= MAX_WIDTH) return DISPLAY_SCALE;
+		if (width <= MIN_WIDTH) return MIN_SCALE;
+
+		const range = MAX_WIDTH - MIN_WIDTH;
+		const progress = (width - MIN_WIDTH) / range;
+		const scaleDelta = DISPLAY_SCALE - MIN_SCALE;
+		return Number((MIN_SCALE + progress * scaleDelta).toFixed(3));
+	}
+
+	const getInitialScale = () => {
+		if (!browser) return DISPLAY_SCALE; // Default fallback for SSR
+
+		const MIN_SCALE = 0.12;
+		const MIN_WIDTH = 360;
+		const MAX_WIDTH = 1440;
+
+		const width = Math.min(
+			window.innerWidth,
+			document.documentElement.clientWidth || 0,
+			window.screen.width || 0
+		);
+
+		if (width >= MAX_WIDTH) return DISPLAY_SCALE;
+		if (width <= MIN_WIDTH) return MIN_SCALE;
+
+		const range = MAX_WIDTH - MIN_WIDTH;
+		const progress = (width - MIN_WIDTH) / range;
+		const scaleDelta = DISPLAY_SCALE - MIN_SCALE;
+		return Number((MIN_SCALE + progress * scaleDelta).toFixed(3));
+	};
+
+	// Set initial scale immediately
+	if (browser) {
+		const initialScale = getInitialScale();
+		appStore.setScale(initialScale);
+	}
+
 	onMount(() => {
 		isIndexedDbSupported = isIndexedDBSupported();
+
+		// Use RAF to ensure we get the most up-to-date dimensions
+		const updateScale = () => {
+			requestAnimationFrame(() => {
+				const width = Math.min(
+					window.innerWidth,
+					document.documentElement.clientWidth || 0,
+					window.screen.width || 0
+				);
+				const nextScale = calculateScale(width);
+				appStore.setScale(nextScale);
+			});
+		};
+
+		// Initial update
+		updateScale();
+
+		// Debounced resize handler
+		let resizeTimer: ReturnType<typeof setTimeout>;
+		const handleResize = () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(updateScale, 100);
+		};
+
+		// Use both resize and orientation change events
+		window.addEventListener('resize', handleResize, { passive: true });
+		window.addEventListener('orientationchange', handleResize, { passive: true });
+
+		// Visual viewport changes (for mobile browsers)
+		let vpResizeTimer: ReturnType<typeof setTimeout>;
+		const handleVisualViewportResize = () => {
+			clearTimeout(vpResizeTimer);
+			vpResizeTimer = setTimeout(updateScale, 100);
+		};
+
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener('resize', handleVisualViewportResize, {
+				passive: true
+			});
+		}
+
+		return () => {
+			clearTimeout(resizeTimer);
+			clearTimeout(vpResizeTimer);
+			window.removeEventListener('resize', handleResize);
+			window.removeEventListener('orientationchange', handleResize);
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+			}
+		};
 	});
 </script>
 
-<div class="flex h-screen">
+<div class="flex h-screen overflow-hidden">
 	<!-- Toolbar -->
 	<Toolbar />
 
-	<!-- Main Canvas Area -->
-	<div class="flex flex-1 flex-col">
-		<!-- Page Navigation -->
-		<div class="border-b border-primary/10 bg-background/80 p-4 backdrop-blur-md">
-			<div class="flex items-center justify-between">
+	<!-- Page Navigation -->
+	<div
+		class="absolute top-0 z-9999 w-full border-b border-primary/10 bg-background/80 p-4 backdrop-blur-md"
+	>
+		<div
+			class="flex items-center justify-between gap-2.5 max-sm:flex-col max-sm:items-start md:flex-nowrap md:gap-0"
+		>
+			<div class="flex items-center gap-4">
+				<div class="hidden items-center justify-between p-2 md:flex">
+					<div
+						onclick={() => goto(resolve('/'))}
+						class="flex cursor-pointer items-center gap-2 overflow-hidden"
+						role="button"
+						tabindex="0"
+						aria-label="Go to home"
+						onkeydown={null}
+					>
+						<div class="flex h-12 w-12 flex-shrink-0 items-center justify-center">
+							<Icons.Logo />
+						</div>
+					</div>
+				</div>
+
 				<div class="flex items-center gap-4">
 					<Button
 						disabled={savePending}
@@ -184,38 +296,43 @@
 						{pages.length > 1 ? 'Pages' : 'Page'}
 					</span>
 				</div>
+			</div>
 
-				<div class="flex items-center gap-2">
-					<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
-						Cancel
-					</Button>
-					{#if isIndexedDbSupported}
-						<Button
-							disabled={savePending}
-							pending={savePending}
-							onClick={() => (saveModalOpen = true)}
-							variant="primary"
-							data-testid="save-btn"
-						>
-							<Save class="mr-2 h-4 w-4" />
-							Save
-						</Button>
-					{/if}
+			<div class="flex items-center gap-2">
+				<Button onClick={handleBackNavigation} variant="ghost" data-testid="back-btn">
+					Cancel
+				</Button>
+				{#if isIndexedDbSupported}
 					<Button
 						disabled={savePending}
-						onClick={handleExport}
+						pending={savePending}
+						onClick={() => (saveModalOpen = true)}
 						variant="primary"
-						data-testid="export-btn"
+						data-testid="save-btn"
 					>
-						<Download class="mr-2 h-4 w-4" />
-						Export PDF
+						<Save class="mr-2 h-4 w-4" />
+						Save
 					</Button>
-				</div>
+				{/if}
+				<Button
+					disabled={savePending}
+					onClick={handleExport}
+					variant="primary"
+					data-testid="export-btn"
+				>
+					<Download class="mr-2 h-4 w-4" />
+					Export PDF
+				</Button>
 			</div>
 		</div>
+	</div>
 
-		<!-- Canvas -->
-		<div class="flex-1 overflow-auto p-8" data-testid="canvas-container">
+	<!-- Main Canvas Area -->
+	<div class="flex flex-1 flex-col">
+		<div
+			class="flex-1 overflow-auto p-8 pt-36 max-lg:pb-50 max-md:pt-42 max-sm:pt-58"
+			data-testid="canvas-container"
+		>
 			<div class="flex flex-col items-center justify-center gap-12">
 				{#each pages as page (page.id)}
 					<Canvas

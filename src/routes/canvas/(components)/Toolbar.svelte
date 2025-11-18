@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
-	import { resolve } from '$app/paths';
-	import { Icons } from '$lib/icons';
 	type ElementType = 'text' | 'shape' | 'image';
 
 	const tools = [
@@ -32,35 +29,13 @@
 
 <div
 	bind:this={toolbarRef}
-	class="relative flex h-full flex-col border-r border-border bg-background transition-all duration-300 ease-in-out"
-	class:w-64={isExpanded}
-	class:w-20={!isExpanded}
+	class="absolute left-[50%] z-9999 m-auto flex h-auto w-[90vw] translate-x-[-50%] translate-y-[-50%] flex-col border-r border-border bg-background transition-all duration-300 ease-in-out max-sm:top-40 sm:top-28 md:relative md:top-20 md:left-[unset] md:h-full md:translate-none {isExpanded
+		? 'md:w-64'
+		: 'md:w-20'}"
 	class:bg-blue-50={isDragging}
 	class:border-blue-300={isDragging}
 >
-	<!-- Branding -->
-	<div class="flex items-center justify-between p-4">
-		<div
-			onclick={() => goto(resolve('/'))}
-			class="flex cursor-pointer items-center gap-2 overflow-hidden"
-			role="button"
-			tabindex="0"
-			aria-label="Go to home"
-			onkeydown={null}
-		>
-			<div class="flex h-12 w-12 flex-shrink-0 items-center justify-center">
-				<Icons.Logo />
-			</div>
-			<span
-				class="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-semibold whitespace-nowrap text-transparent transition-opacity duration-200"
-				class:opacity-0={!isExpanded}
-				class:opacity-100={isExpanded}
-			>
-				Lienzo
-			</span>
-		</div>
-	</div>
-	<div class="absolute top-1/2 -right-4 rounded-xl bg-background">
+	<div class="absolute top-1/2 -right-4 hidden rounded-xl bg-background md:block">
 		<Button onClick={() => (isExpanded = !isExpanded)} variant="text">
 			{#if isExpanded}
 				<ChevronLeft class="h-7 w-7" />
@@ -70,8 +45,8 @@
 		</Button>
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-2 pb-4" data-testid="toolbar">
-		<div class="space-y-2">
+	<div class="flex-1 overflow-y-auto px-2 pt-0 md:pt-8 md:pb-4" data-testid="toolbar">
+		<div class="flex flex-row justify-center gap-5 space-y-2 md:flex-col md:justify-start md:gap-0">
 			{#each tools as tool (tool.type)}
 				<div
 					data-testid="tool-{tool.type}"
@@ -92,7 +67,7 @@
 						{tool.icon}
 					</div>
 					<span
-						class="text-sm font-medium whitespace-nowrap text-foreground transition-opacity duration-200"
+						class="hidden text-sm font-medium whitespace-nowrap text-foreground transition-opacity duration-200 md:block"
 						class:opacity-0={!isExpanded}
 						class:opacity-100={isExpanded}
 					>

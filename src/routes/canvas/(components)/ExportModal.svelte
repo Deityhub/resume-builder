@@ -39,7 +39,8 @@
 
 				// Use the utility function to create export canvas
 				// and Convert to image data
-				const imgData = await getPageImageData(page);
+				const scale = appStore.getScale();
+				const imgData = await getPageImageData(page, scale);
 
 				previewCanvases.push(imgData);
 			}
@@ -74,7 +75,8 @@
 
 				// Use the utility function to create export canvas
 				// and Convert to image data
-				const imgData = await getPageImageData(page);
+				const scale = appStore.getScale();
+				const imgData = await getPageImageData(page, scale);
 
 				// Add to PDF - use exact canvas dimensions
 				if (i > 0) {

@@ -33,6 +33,8 @@
 
 	let isDropdownOpen = $state(false);
 	let containerElement: HTMLDivElement | null = null;
+	let dropdownElement = $state<HTMLDivElement | null>(null);
+	let dropdownPosition = $state<'top' | 'bottom'>('bottom');
 	const inputId = `number-input-${uuidv4()}`;
 
 	function handleOnInput(e: Event) {
@@ -53,7 +55,38 @@
 	}
 
 	function toggleDropdown() {
-		isDropdownOpen = !isDropdownOpen;
+		if (!containerElement) return;
+
+		if (isDropdownOpen) {
+			isDropdownOpen = false;
+			return;
+		}
+
+		// Calculate position and dimensions
+		const rect = containerElement.getBoundingClientRect();
+		const spaceBelow = window.innerHeight - rect.bottom;
+		const spaceAbove = rect.top;
+		const dropdownHeight = Math.min(options.length * 40 + 16, 240);
+
+		// Set CSS custom properties for positioning
+		document.documentElement.style.setProperty('--select-width', `${rect.width}px`);
+		document.documentElement.style.setProperty('--select-left', `${rect.left}px`);
+
+		if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
+			dropdownPosition = 'bottom';
+			document.documentElement.style.setProperty(
+				'--select-bottom',
+				`${rect.bottom + window.scrollY + 10}px`
+			);
+		} else {
+			dropdownPosition = 'top';
+			document.documentElement.style.setProperty(
+				'--select-top',
+				`${window.innerHeight - rect.top + window.scrollY - 12}px`
+			);
+		}
+
+		isDropdownOpen = true;
 	}
 
 	function handleClickOutside() {
@@ -61,9 +94,27 @@
 	}
 
 	$effect(() => {
-		if (isDropdownOpen) {
-			const selectedElement = containerElement?.querySelector('[data-selected]');
-			selectedElement?.scrollIntoView({ block: 'nearest' });
+		if (isDropdownOpen && dropdownElement && containerElement) {
+			const selectedElement = dropdownElement.querySelector('[data-selected]');
+			if (selectedElement) {
+				selectedElement.scrollIntoView({ block: 'nearest' });
+			}
+
+			// Recalculate position on window resize when dropdown is open
+			const handleResize = () => {
+				if (isDropdownOpen && containerElement) {
+					const rect = containerElement.getBoundingClientRect();
+					const spaceBelow = window.innerHeight - rect.bottom;
+					const spaceAbove = rect.top;
+					const dropdownHeight = dropdownElement?.offsetHeight || 0;
+
+					dropdownPosition =
+						spaceBelow >= dropdownHeight || spaceBelow > spaceAbove ? 'bottom' : 'top';
+				}
+			};
+
+			window.addEventListener('resize', handleResize, { passive: true });
+			return () => window.removeEventListener('resize', handleResize);
 		}
 	});
 </script>
@@ -105,7 +156,12 @@
 
 	{#if isDropdownOpen && options.length > 0}
 		<div
-			class="ring-opacity-5 absolute top-16 z-10 mt-1 max-h-60 w-full flex-col gap-6 overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			class="ring-opacity-5 fixed z-50 max-h-60 min-w-[var(--select-width)] overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			style="left: var(--select-left); {dropdownPosition === 'bottom'
+				? 'top: var(--select-bottom);'
+				: 'bottom: var(--select-top);'}"
+			bind:this={dropdownElement}
+			role="listbox"
 		>
 			{#each options as option (option)}
 				<span

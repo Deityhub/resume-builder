@@ -9,9 +9,10 @@
 		ResizeDirection,
 		TCanvasInstance
 	} from '$lib/types/canvas';
-	import { DISPLAY_SCALE } from '$lib/const/dimension';
 	import { pixelsToPercent } from '$lib/utils';
+
 	const selectedElement = $derived(appStore.getSelectedElement());
+	const scale = $derived(appStore.getScale());
 
 	interface CanvasProps {
 		page: DocumentPage;
@@ -522,7 +523,7 @@
 			<Ruler
 				orientation="horizontal"
 				size={width}
-				displaySize={width * DISPLAY_SCALE}
+				displaySize={width * scale}
 				startAnchor={page.boundaries.horizontal.start}
 				endAnchor={page.boundaries.horizontal.end}
 				onAnchorChange={(start, end) => {
@@ -539,7 +540,7 @@
 			<Ruler
 				orientation="vertical"
 				size={height}
-				displaySize={height * DISPLAY_SCALE}
+				displaySize={height * scale}
 				startAnchor={page.boundaries.vertical.start}
 				endAnchor={page.boundaries.vertical.end}
 				onAnchorChange={(start, end) => {
@@ -559,14 +560,14 @@
 			tabindex="0"
 			onkeydown={null}
 		>
-			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
+			<div style:height="{height * scale}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
 				id={`canvas-${dataPageId}`}
 				data-testid="document-canvas"
 				class="relative border-2 border-border bg-background shadow-lg"
-				style:width="{width * DISPLAY_SCALE}px"
-				style:height="{height * DISPLAY_SCALE}px"
+				style:width="{width * scale}px"
+				style:height="{height * scale}px"
 				onclick={handleCanvasClick}
 				role="button"
 				tabindex="0"
@@ -667,7 +668,7 @@
 				<!-- Selection outline for empty canvas -->
 				{#if !selectedElement && Object.keys(page.elements).length === 0}
 					<div
-						class="absolute inset-4 flex items-center justify-center text-muted-foreground"
+						class="absolute inset-4 flex items-center justify-center text-muted-foreground max-sm:text-xs"
 						data-html2canvas-ignore
 					>
 						Drag and drop elements from toolbar to create them

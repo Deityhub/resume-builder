@@ -32,19 +32,22 @@
 {#if selectedElement}
 	<div
 		transition:slide={{ duration: 300, axis: 'x' }}
-		class="w-80 overflow-y-auto border-l border-border bg-background p-4"
+		class="w-80 overflow-y-auto border-l border-border bg-background p-4 max-lg:absolute max-lg:bottom-0 max-lg:left-0 max-lg:z-9999 max-lg:h-[15vh] max-lg:w-full max-lg:overflow-y-hidden lg:pt-30"
 		data-testid="property-panel"
 	>
-		<div class="mb-6 space-y-4">
-			<h3 class="mb-4 text-lg font-semibold text-foreground" data-testid="property-panel-title">
+		<div class="mb-6 space-y-4 max-lg:flex max-lg:items-center max-lg:gap-2">
+			<h3
+				class="mb-4 text-lg font-semibold text-foreground max-lg:hidden"
+				data-testid="property-panel-title"
+			>
 				{selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)} Properties
 			</h3>
 
 			<!-- Position and Size -->
 			<div class="space-y-2">
 				<h4 class="font-medium text-foreground">Position & Size</h4>
-				<div class="grid grid-cols-2 gap-2">
-					<div>
+				<div class="grid grid-cols-2 gap-2 max-lg:flex">
+					<div class="max-lg:min-w-[10rem]">
 						<NumberInput
 							value={selectedElement.x}
 							handleInput={(value) => handlePropertyChange('x', value)}
@@ -52,7 +55,7 @@
 							label="X"
 						/>
 					</div>
-					<div>
+					<div class="max-lg:min-w-[10rem]">
 						<NumberInput
 							value={selectedElement.y}
 							handleInput={(value) => handlePropertyChange('y', value)}
@@ -60,7 +63,7 @@
 							label="Y"
 						/>
 					</div>
-					<div>
+					<div class="max-lg:min-w-[10rem]">
 						<NumberInput
 							value={selectedElement.width}
 							handleInput={(value) => handlePropertyChange('width', value)}
@@ -68,7 +71,7 @@
 							label="Width"
 						/>
 					</div>
-					<div>
+					<div class="max-lg:min-w-[10rem]">
 						<NumberInput
 							value={selectedElement.height}
 							handleInput={(value) => handlePropertyChange('height', value)}
@@ -94,6 +97,7 @@
 						size="xs"
 						disabled={selectedElement.zIndex >=
 							appStore.getPageElements(selectedElement.pageId).length - 1}
+						className="max-lg:min-w-[8rem]"
 					>
 						Move Forward
 					</Button>
@@ -102,6 +106,7 @@
 						onClick={() => appStore.moveBackward(selectedElement.id, selectedElement.pageId)}
 						size="xs"
 						disabled={selectedElement.zIndex <= 0}
+						className="max-lg:min-w-[8rem]"
 					>
 						Move Backward
 					</Button>
@@ -112,8 +117,8 @@
 			{#if selectedElement.type === 'text'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-foreground">Text Properties</h4>
-					<div class="flex flex-col gap-2">
-						<div>
+					<div class="flex flex-col gap-2 max-lg:flex-row">
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.fontFamily}
 								onChange={(value) => handlePropertyChange('fontFamily', value)}
@@ -126,7 +131,7 @@
 								label="Font Family"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<NumberInput
 								value={selectedElement.fontSize}
 								handleInput={(value) => handlePropertyChange('fontSize', value)}
@@ -135,7 +140,7 @@
 								label="Font Size"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.fontWeight}
 								onChange={(value) => handlePropertyChange('fontWeight', value)}
@@ -144,7 +149,7 @@
 								label="Font Weight"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.fontStyle}
 								onChange={(value) => handlePropertyChange('fontStyle', value)}
@@ -153,7 +158,7 @@
 								label="Font Style"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.textDecoration || 'none'}
 								onChange={(value) => handlePropertyChange('textDecoration', value)}
@@ -162,7 +167,7 @@
 								label="Text Decoration"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.textTransform || 'none'}
 								onChange={(value) => handlePropertyChange('textTransform', value)}
@@ -171,7 +176,7 @@
 								label="Text Transform"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<ColorInput
 								value={selectedElement.color}
 								onChange={(value) => handlePropertyChange('color', value)}
@@ -179,7 +184,7 @@
 								label="Color"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.textAlign || 'left'}
 								onChange={(value) => handlePropertyChange('textAlign', value)}
@@ -196,8 +201,8 @@
 			{#if selectedElement.type === 'shape'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-foreground">Shape Properties</h4>
-					<div class="flex flex-col gap-2">
-						<div>
+					<div class="flex flex-col gap-2 max-lg:flex-row">
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.shapeType}
 								onChange={(value) => handlePropertyChange('shapeType', value)}
@@ -206,7 +211,7 @@
 								label="Shape Type"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<ColorInput
 								value={selectedElement.strokeColor}
 								onChange={(value) => handlePropertyChange('strokeColor', value)}
@@ -214,7 +219,7 @@
 								label="Stroke Color"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Stroke Weight</span>
 							<NumberInput
 								value={selectedElement.strokeWidth}
@@ -222,7 +227,7 @@
 								testId="input-stroke-weight"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.strokeStyle || 'solid'}
 								onChange={(value) => handlePropertyChange('strokeStyle', value)}
@@ -231,7 +236,7 @@
 								label="Stroke Style"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Stroke Opacity</span>
 							<input
 								data-testid="input-stroke-opacity"
@@ -248,7 +253,7 @@
 								>{((selectedElement.strokeOpacity || 1) * 100).toFixed(0)}%</span
 							>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<ColorInput
 								value={selectedElement.fillColor || '#ffffff'}
 								onChange={(value) => handlePropertyChange('fillColor', value)}
@@ -256,7 +261,7 @@
 								label="Fill Color"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Fill Opacity</span>
 							<input
 								data-testid="input-fill-opacity"
@@ -274,7 +279,7 @@
 							>
 						</div>
 						{#if selectedElement.shapeType === 'rectangle'}
-							<div>
+							<div class="max-lg:min-w-[10rem]">
 								<span class="text-background-foreground block text-sm">Corner Radius</span>
 								<input
 									data-testid="input-corner-radius"
@@ -291,7 +296,7 @@
 								>
 							</div>
 						{/if}
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Rotation</span>
 							<input
 								data-testid="input-rotation"
@@ -314,8 +319,8 @@
 			{#if selectedElement.type === 'image'}
 				<div class="space-y-2">
 					<h4 class="font-medium text-foreground">Image Properties</h4>
-					<div class="flex flex-col gap-2">
-						<div>
+					<div class="flex flex-col gap-2 max-lg:flex-row">
+						<div class="max-lg:min-w-[10rem]">
 							<Input
 								type="url"
 								value={selectedElement.src}
@@ -325,7 +330,7 @@
 								placeholder="https://example.com/image.jpg"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.objectFit || 'contain'}
 								onChange={(value) => handlePropertyChange('objectFit', value)}
@@ -334,7 +339,7 @@
 								label="Object Fit"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Border Radius</span>
 							<input
 								data-testid="input-border-radius"
@@ -350,7 +355,7 @@
 								>{selectedElement.borderRadius || 0}%</span
 							>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<span class="text-background-foreground block text-sm">Opacity</span>
 							<input
 								data-testid="input-opacity"
@@ -366,7 +371,7 @@
 								>{((selectedElement.opacity || 1) * 100).toFixed(0)}%</span
 							>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<ColorInput
 								value={selectedElement.borderColor || '#000000'}
 								onChange={(value) => handlePropertyChange('borderColor', value)}
@@ -374,7 +379,7 @@
 								label="Border Color"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<NumberInput
 								value={selectedElement.borderWidth || 0}
 								handleInput={(value) => handlePropertyChange('borderWidth', value)}
@@ -383,7 +388,7 @@
 								label="Border Width"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.borderStyle || 'solid'}
 								onChange={(value) => handlePropertyChange('borderStyle', value)}
@@ -392,7 +397,7 @@
 								label="Border Style"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<Input
 								value={selectedElement.boxShadow || ''}
 								onChange={(value) => handlePropertyChange('boxShadow', value)}
@@ -401,7 +406,7 @@
 								placeholder="0px 2px 4px rgba(0,0,0,0.1)"
 							/>
 						</div>
-						<div>
+						<div class="max-lg:min-w-[10rem]">
 							<ColorInput
 								value={selectedElement.backgroundColor || '#ffffff'}
 								onChange={(value) => handlePropertyChange('backgroundColor', value)}
@@ -420,6 +425,7 @@
 					onClick={() => appStore.deleteElement(selectedElement.id, selectedElement.pageId)}
 					variant="destructive"
 					fullWidth
+					className="max-lg:min-w-[12rem]"
 				>
 					<Trash2 class="mr-2 h-4 w-4" />
 					Delete Element

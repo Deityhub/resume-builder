@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { TCanvasElement, ResizeDirection } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
-	import { DISPLAY_SCALE } from '$lib/const/dimension';
 
 	interface Props {
 		element: TCanvasElement;
@@ -10,6 +9,7 @@
 	}
 
 	const { element, isSelected, onResize }: Props = $props();
+	const scale = $derived(appStore.getScale());
 
 	// Local reactive state for the text content to enable proper two-way binding
 	let textContent = $state('');
@@ -78,7 +78,7 @@
 				id={`text-element-${element.id}`}
 				oninput={(e) => {
 					const target = e.target as HTMLTextAreaElement;
-					const actualElementHeight = element.height * DISPLAY_SCALE;
+					const actualElementHeight = element.height * scale;
 
 					// Use requestAnimationFrame to batch the updates
 					requestAnimationFrame(() => {
@@ -96,7 +96,7 @@
 								elementId: element.id,
 								updates: {
 									text: textContent,
-									height: newHeight / DISPLAY_SCALE
+									height: newHeight / scale
 								},
 								pageId: element.pageId
 							});
