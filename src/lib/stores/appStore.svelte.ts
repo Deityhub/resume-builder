@@ -113,10 +113,10 @@ const createAppStore = () => {
 	const getPages = () => currentDocument.pages;
 
 	const initNewDocument = () => {
-		const pageId = crypto.randomUUID();
+		const pageId = uuidv4();
 
 		currentDocument = {
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			name: '', // the user should set this value
 			pages: {
 				[pageId]: getDefaultPage(pageId)
@@ -148,7 +148,7 @@ const createAppStore = () => {
 	};
 
 	const addPage = () => {
-		const newPage = getDefaultPage(crypto.randomUUID());
+		const newPage = getDefaultPage(uuidv4());
 		updateDocumentPages({ ...currentDocument.pages, [newPage.id]: newPage });
 	};
 

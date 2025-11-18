@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { clickOutside } from '$lib/actions';
+	import { uuidv4 } from '$lib/utils/uuid';
 
 	type TOption = {
 		label: string;
@@ -31,8 +32,8 @@
 	}: TProps = $props();
 
 	let isDropdownOpen = $state(false);
-	let containerElement: HTMLDivElement;
-	const inputId = `number-input-${crypto.randomUUID()}`;
+	let containerElement: HTMLDivElement | null = null;
+	const inputId = `number-input-${uuidv4()}`;
 
 	function handleOnInput(e: Event) {
 		const target = e.target as HTMLInputElement;

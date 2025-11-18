@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { clickOutside } from '$lib/actions';
+	import { uuidv4 } from '$lib/utils/uuid';
 
 	export type Option<T = string> = {
 		value: T;
@@ -27,8 +28,8 @@
 	}: Props = $props();
 
 	let isOpen = $state(false);
-	let containerElement: HTMLDivElement;
-	const inputId = `select-input-${crypto.randomUUID()}`;
+	let containerElement: HTMLDivElement | null = null;
+	const inputId = `select-input-${uuidv4()}`;
 
 	function handleSelect(option: Option) {
 		onChange?.(option.value);
