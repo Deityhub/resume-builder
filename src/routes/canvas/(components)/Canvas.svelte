@@ -124,43 +124,51 @@
 		const elements = Object.values(page.elements);
 
 		elements.forEach((element) => {
-			let needsUpdate = false;
 			let newX = element.x;
 			let newY = element.y;
 			let newWidth = element.width;
 			let newHeight = element.height;
 
-			// Constrain position to start boundaries
-			if (newX < horizontal.start) {
-				newX = horizontal.start;
-				needsUpdate = true;
-			}
-			if (newY < vertical.start) {
-				newY = vertical.start;
-				needsUpdate = true;
-			}
+			const maxWidth = horizontal.end - horizontal.start;
+			const maxHeight = vertical.end - vertical.start;
 
-			// Constrain width if element extends beyond end boundary
-			if (newX + newWidth > horizontal.end) {
-				newWidth = horizontal.end - newX;
-				needsUpdate = true;
+			// Ensure size stays within allowed range
+			if (newWidth > maxWidth) {
+				newWidth = maxWidth;
 			}
-			if (newY + newHeight > vertical.end) {
-				newHeight = vertical.end - newY;
-				needsUpdate = true;
+			if (newHeight > maxHeight) {
+				newHeight = maxHeight;
 			}
 
 			// Ensure minimum size
 			if (newWidth < 20) {
 				newWidth = 20;
-				needsUpdate = true;
 			}
 			if (newHeight < 20) {
 				newHeight = 20;
-				needsUpdate = true;
 			}
 
-			if (needsUpdate) {
+			// Constrain position to boundaries (similar to enforceBoundaries)
+			if (newX < horizontal.start) {
+				newX = horizontal.start;
+			}
+			if (newY < vertical.start) {
+				newY = vertical.start;
+			}
+			if (newX + newWidth > horizontal.end) {
+				newX = horizontal.end - newWidth;
+			}
+			if (newY + newHeight > vertical.end) {
+				newY = vertical.end - newHeight;
+			}
+
+			// Only update if something actually changed to avoid unnecessary re-renders
+			if (
+				newX !== element.x ||
+				newY !== element.y ||
+				newWidth !== element.width ||
+				newHeight !== element.height
+			) {
 				appStore.updateElement({
 					elementId: element.id,
 					updates: {

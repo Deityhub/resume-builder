@@ -11,12 +11,20 @@
 	import { shapeTypes, strokeStyles } from '$lib/const/shape';
 	import { objectFitOptions, borderStyles } from '$lib/const/image';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
+	import { CANVAS_WIDTH, CANVAS_HEIGHT } from '$lib/const/dimension';
 	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
 	import { Trash2 } from '@lucide/svelte';
 	import { NumberInput, Select, ColorInput, Input } from '$lib/components';
 
 	const selectedElement = $derived(appStore.getSelectedElement());
+	const pages = $derived(appStore.getPages());
+	const currentPage = $derived(selectedElement ? pages[selectedElement.pageId] : undefined);
+
+	const minX = $derived(currentPage ? currentPage.boundaries.horizontal.start : 0);
+	const maxX = $derived(currentPage ? currentPage.boundaries.horizontal.end : CANVAS_WIDTH);
+	const minY = $derived(currentPage ? currentPage.boundaries.vertical.start : 0);
+	const maxY = $derived(currentPage ? currentPage.boundaries.vertical.end : CANVAS_HEIGHT);
 
 	function handlePropertyChange(property: string, value: string | number | object) {
 		if (!selectedElement) return;
@@ -51,6 +59,8 @@
 						<NumberInput
 							value={selectedElement.x}
 							handleInput={(value) => handlePropertyChange('x', value)}
+							min={minX}
+							max={maxX}
 							testId="input-x"
 							label="X"
 						/>
@@ -59,6 +69,8 @@
 						<NumberInput
 							value={selectedElement.y}
 							handleInput={(value) => handlePropertyChange('y', value)}
+							min={minY}
+							max={maxY}
 							testId="input-y"
 							label="Y"
 						/>
