@@ -21,7 +21,7 @@
 		fullWidth?: boolean;
 		noPadding?: boolean;
 		onClick?: (event: MouseEvent) => void;
-		children: Snippet;
+		children?: Snippet;
 		'data-testid'?: string;
 	};
 

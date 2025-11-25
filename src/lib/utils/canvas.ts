@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DISPLAY_SCALE } from '$lib/const/dimension';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '$lib/const/dimension';
 import type { DocumentPage } from '$lib/types/canvas';
 import { toCanvas } from 'html-to-image';
 
@@ -6,9 +6,12 @@ import { toCanvas } from 'html-to-image';
  * Utility function to create a hidden canvas for export purposes
  * This can be used for PDF generation or preview
  */
-export async function createExportCanvas(page: DocumentPage): Promise<HTMLCanvasElement | void> {
-	const width = CANVAS_WIDTH * DISPLAY_SCALE;
-	const height = CANVAS_HEIGHT * DISPLAY_SCALE;
+export async function createExportCanvas(
+	page: DocumentPage,
+	scale: number
+): Promise<HTMLCanvasElement | void> {
+	const width = CANVAS_WIDTH * scale;
+	const height = CANVAS_HEIGHT * scale;
 
 	try {
 		const canvasRef = document.getElementById(`canvas-${page.id}`);
@@ -37,8 +40,8 @@ export async function createExportCanvas(page: DocumentPage): Promise<HTMLCanvas
  * Utility function to get image data URL from a page
  * Useful for preview generation
  */
-export async function getPageImageData(page: DocumentPage): Promise<string> {
-	const canvas = await createExportCanvas(page);
+export async function getPageImageData(page: DocumentPage, scale: number): Promise<string> {
+	const canvas = await createExportCanvas(page, scale);
 
 	if (!canvas) {
 		return '';

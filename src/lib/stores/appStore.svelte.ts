@@ -1,4 +1,5 @@
 import { getDefaultProperties } from '$lib/utils/properties';
+import { uuidv4 } from '$lib/utils/uuid';
 import type {
 	ElementType,
 	DocumentData,
@@ -6,7 +7,7 @@ import type {
 	DocumentPage,
 	RulerBoundaries
 } from '../types/canvas';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../const/dimension';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, DISPLAY_SCALE } from '../const/dimension';
 
 // Create a writable store for the application state
 const createAppStore = () => {
@@ -21,10 +22,10 @@ const createAppStore = () => {
 		};
 	};
 
-	const firstPageId = crypto.randomUUID();
+	const firstPageId = uuidv4();
 
 	let currentDocument: DocumentData = $state({
-		id: crypto.randomUUID(),
+		id: uuidv4(),
 		name: '', // the user should set this value
 		pages: {
 			[firstPageId]: getDefaultPage(firstPageId)
@@ -32,6 +33,8 @@ const createAppStore = () => {
 		createdAt: Date.now(),
 		updatedAt: Date.now()
 	});
+
+	let scale = $state(DISPLAY_SCALE);
 
 	let selectedElement: TCanvasElement | null = $state(null);
 
@@ -56,6 +59,12 @@ const createAppStore = () => {
 	// Get all elements on a page sorted by zIndex (ascending)
 	const getSortedElements = (pageId: string): TCanvasElement[] => {
 		return getPageElements(pageId).sort((a, b) => a.zIndex - b.zIndex);
+	};
+
+	const getScale = () => scale;
+
+	const setScale = (newScale: number) => {
+		scale = newScale;
 	};
 
 	// Move an element forward in the z-index stack
@@ -112,10 +121,10 @@ const createAppStore = () => {
 	const getPages = () => currentDocument.pages;
 
 	const initNewDocument = () => {
-		const pageId = crypto.randomUUID();
+		const pageId = uuidv4();
 
 		currentDocument = {
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			name: '', // the user should set this value
 			pages: {
 				[pageId]: getDefaultPage(pageId)
@@ -147,7 +156,7 @@ const createAppStore = () => {
 	};
 
 	const addPage = () => {
-		const newPage = getDefaultPage(crypto.randomUUID());
+		const newPage = getDefaultPage(uuidv4());
 		updateDocumentPages({ ...currentDocument.pages, [newPage.id]: newPage });
 	};
 
@@ -346,6 +355,7 @@ const createAppStore = () => {
 		getSelectedElement,
 		getCurrentDocument,
 		getPageElements,
+		getScale,
 
 		// Mutations
 		setCurrentDocument,
@@ -360,6 +370,7 @@ const createAppStore = () => {
 		findElement,
 		updateCurrentDocument,
 		initNewDocument,
+		setScale,
 
 		// Layering
 		moveForward,

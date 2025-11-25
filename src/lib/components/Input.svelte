@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { uuidv4 } from '$lib/utils/uuid';
+
 	export type InputProps = {
 		value: string;
 		onChange: (value: string) => void;
@@ -21,7 +23,7 @@
 		disabled = false
 	}: InputProps = $props();
 
-	const inputId = `input-${crypto.randomUUID()}`;
+	const inputId = `input-${uuidv4()}`;
 
 	function handleInput(e: Event) {
 		const target = e.target as HTMLInputElement;

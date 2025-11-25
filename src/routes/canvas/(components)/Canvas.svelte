@@ -9,9 +9,10 @@
 		ResizeDirection,
 		TCanvasInstance
 	} from '$lib/types/canvas';
-	import { DISPLAY_SCALE } from '$lib/const/dimension';
 	import { pixelsToPercent } from '$lib/utils';
+
 	const selectedElement = $derived(appStore.getSelectedElement());
+	const scale = $derived(appStore.getScale());
 
 	interface CanvasProps {
 		page: DocumentPage;
@@ -123,43 +124,51 @@
 		const elements = Object.values(page.elements);
 
 		elements.forEach((element) => {
-			let needsUpdate = false;
 			let newX = element.x;
 			let newY = element.y;
 			let newWidth = element.width;
 			let newHeight = element.height;
 
-			// Constrain position to start boundaries
-			if (newX < horizontal.start) {
-				newX = horizontal.start;
-				needsUpdate = true;
-			}
-			if (newY < vertical.start) {
-				newY = vertical.start;
-				needsUpdate = true;
-			}
+			const maxWidth = horizontal.end - horizontal.start;
+			const maxHeight = vertical.end - vertical.start;
 
-			// Constrain width if element extends beyond end boundary
-			if (newX + newWidth > horizontal.end) {
-				newWidth = horizontal.end - newX;
-				needsUpdate = true;
+			// Ensure size stays within allowed range
+			if (newWidth > maxWidth) {
+				newWidth = maxWidth;
 			}
-			if (newY + newHeight > vertical.end) {
-				newHeight = vertical.end - newY;
-				needsUpdate = true;
+			if (newHeight > maxHeight) {
+				newHeight = maxHeight;
 			}
 
 			// Ensure minimum size
 			if (newWidth < 20) {
 				newWidth = 20;
-				needsUpdate = true;
 			}
 			if (newHeight < 20) {
 				newHeight = 20;
-				needsUpdate = true;
 			}
 
-			if (needsUpdate) {
+			// Constrain position to boundaries (similar to enforceBoundaries)
+			if (newX < horizontal.start) {
+				newX = horizontal.start;
+			}
+			if (newY < vertical.start) {
+				newY = vertical.start;
+			}
+			if (newX + newWidth > horizontal.end) {
+				newX = horizontal.end - newWidth;
+			}
+			if (newY + newHeight > vertical.end) {
+				newY = vertical.end - newHeight;
+			}
+
+			// Only update if something actually changed to avoid unnecessary re-renders
+			if (
+				newX !== element.x ||
+				newY !== element.y ||
+				newWidth !== element.width ||
+				newHeight !== element.height
+			) {
 				appStore.updateElement({
 					elementId: element.id,
 					updates: {
@@ -184,8 +193,19 @@
 	// Handle clicks outside the canvas to hide boundary
 	$effect(() => {
 		const handleDocumentClick = (event: MouseEvent) => {
-			if (!canvasPageRef?.contains(event.target as Node)) {
+			const propertyPanel = document.querySelector('[data-testid="property-panel"]');
+			const allCanvasPages = document.querySelectorAll('[data-testid="document-canvas"]');
+
+			// Check if click is inside any canvas page or property panel
+			const isInsideAnyCanvas = Array.from(allCanvasPages).some((canvas) =>
+				canvas.contains(event.target as Node)
+			);
+
+			const isInsidePropertyPanel = propertyPanel?.contains(event.target as Node);
+
+			if (!isInsideAnyCanvas && !isInsidePropertyPanel) {
 				showBoundary = false;
+				appStore.selectElement(null);
 			}
 		};
 
@@ -273,7 +293,11 @@
 		}
 		document.removeEventListener('pointermove', handleGlobalPointerMove);
 		document.removeEventListener('pointerup', handleGlobalPointerUp, true);
+		document.removeEventListener('touchmove', handleTouchMove);
+		document.removeEventListener('touchend', handleGlobalPointerUp, true);
+		document.removeEventListener('touchcancel', handleGlobalPointerUp, true);
 		document.body.style.userSelect = '';
+		document.body.style.touchAction = '';
 	}
 
 	function cancelDrag() {
@@ -287,7 +311,92 @@
 		}
 		document.removeEventListener('pointermove', handleGlobalPointerMove);
 		document.removeEventListener('pointerup', handleGlobalPointerUp, true);
+		document.removeEventListener('touchmove', handleTouchMove);
+		document.removeEventListener('touchend', handleGlobalPointerUp, true);
+		document.removeEventListener('touchcancel', handleGlobalPointerUp, true);
 		document.body.style.userSelect = '';
+		document.body.style.touchAction = '';
+	}
+
+	function startElementDrag(event: PointerEvent | TouchEvent, element: TCanvasElement) {
+		event.stopPropagation();
+
+		// Start global, rAF-throttled drag
+		isDragging = true;
+
+		// Handle both pointer and touch events
+		const startX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+		const startY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+
+		dragStart = { x: startX, y: startY };
+		dragMeta = {
+			id: element.id,
+			pageId: element.pageId,
+			startX: element.x,
+			startY: element.y,
+			width: element.width,
+			height: element.height
+		};
+		lastPointer = { x: startX, y: startY };
+
+		// Add both pointer and touch event listeners
+		document.addEventListener('pointermove', handleGlobalPointerMove);
+		document.addEventListener('pointerup', handleGlobalPointerUp, true);
+		document.addEventListener('touchmove', handleTouchMove, {
+			passive: false
+		} as AddEventListenerOptions);
+		document.addEventListener('touchend', handleGlobalPointerUp, true);
+		document.addEventListener('touchcancel', handleGlobalPointerUp, true); // Add touchcancel
+		document.body.style.userSelect = 'none';
+		document.body.style.touchAction = 'none';
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (!isDragging || !dragMeta) return;
+
+		const touch = e.touches[0];
+		lastPointer = { x: touch.clientX, y: touch.clientY };
+
+		// rAF throttle
+		if (dragRafId === null) {
+			dragRafId = requestAnimationFrame(() => {
+				dragRafId = null;
+				if (!isDragging || !dragMeta) return;
+
+				const rect = canvasRef.getBoundingClientRect();
+				const scaleX = width / rect.width;
+				const scaleY = height / rect.height;
+
+				const deltaX = (lastPointer.x - dragStart.x) * scaleX;
+				const deltaY = (lastPointer.y - dragStart.y) * scaleY;
+
+				let newX = dragMeta.startX + deltaX;
+				let newY = dragMeta.startY + deltaY;
+
+				// Snap and enforce boundaries
+				newX = snapToBoundaries(
+					newX,
+					page.boundaries.horizontal.start,
+					page.boundaries.horizontal.end - dragMeta.width
+				);
+				newY = snapToBoundaries(
+					newY,
+					page.boundaries.vertical.start,
+					page.boundaries.vertical.end - dragMeta.height
+				);
+
+				const bounded = {
+					x: newX,
+					y: newY
+				};
+
+				appStore.updateElement({
+					elementId: dragMeta.id,
+					updates: { x: bounded.x, y: bounded.y },
+					pageId: dragMeta.pageId
+				});
+			});
+		}
 	}
 
 	function handleGlobalPointerMove(e: PointerEvent) {
@@ -337,22 +446,108 @@
 		}
 	}
 
+	function handleElementResizeAnimationFrame({
+		element,
+		direction,
+		startState,
+		startX,
+		startY,
+		scaleX,
+		scaleY,
+		last
+	}: {
+		element: TCanvasElement;
+		direction: ResizeDirection;
+		startState: { x: number; y: number; w: number; h: number };
+		startX: number;
+		startY: number;
+		scaleX: number;
+		scaleY: number;
+		last: { x: number; y: number };
+	}) {
+		return requestAnimationFrame(() => {
+			const deltaX = (last.x - startX) * scaleX;
+			const deltaY = (last.y - startY) * scaleY;
+
+			let newWidth = startState.w;
+			let newHeight = startState.h;
+			let newX = startState.x;
+			let newY = startState.y;
+
+			const { horizontal, vertical } = page.boundaries;
+
+			switch (direction) {
+				case 'e':
+					newWidth = Math.max(20, startState.w + deltaX);
+					break;
+				case 'w':
+					newWidth = Math.max(20, startState.w - deltaX);
+					newX = Math.max(horizontal.start, startState.x + deltaX);
+					break;
+				case 's':
+					newHeight = Math.max(20, startState.h + deltaY);
+					break;
+				case 'n':
+					newHeight = Math.max(20, startState.h - deltaY);
+					newY = Math.max(vertical.start, startState.y + deltaY);
+					break;
+				case 'se':
+					newWidth = Math.max(20, startState.w + deltaX);
+					newHeight = Math.max(20, startState.h + deltaY);
+					break;
+				case 'sw':
+					newWidth = Math.max(20, startState.w - deltaX);
+					newX = Math.max(horizontal.start, startState.x + deltaX);
+					newHeight = Math.max(20, startState.h + deltaY);
+					break;
+				case 'ne':
+					newWidth = Math.max(20, startState.w + deltaX);
+					newHeight = Math.max(20, startState.h - deltaY);
+					newY = Math.max(vertical.start, startState.y + deltaY);
+					break;
+				case 'nw':
+					newWidth = Math.max(20, startState.w - deltaX);
+					newX = Math.max(horizontal.start, startState.x + deltaX);
+					newHeight = Math.max(20, startState.h - deltaY);
+					newY = Math.max(vertical.start, startState.y + deltaY);
+					break;
+			}
+
+			// Enforce boundaries
+			if (newX + newWidth > horizontal.end) {
+				newWidth = horizontal.end - newX;
+			}
+			if (newY + newHeight > vertical.end) {
+				newHeight = vertical.end - newY;
+			}
+
+			appStore.updateElement({
+				elementId: element.id,
+				updates: { x: newX, y: newY, width: newWidth, height: newHeight },
+				pageId: element.pageId
+			});
+		});
+	}
+
 	function handleElementResize(
-		event: MouseEvent,
+		event: MouseEvent | PointerEvent | TouchEvent,
 		element: TCanvasElement,
 		direction: ResizeDirection
 	) {
 		event.stopPropagation();
 		event.preventDefault();
 		isResizing = true;
-		document.body.style.userSelect = 'none';
+		document.body.style.userSelect = '';
+		document.body.style.touchAction = 'none'; // Prevent touch scrolling during resize
 
 		const rect = canvasRef.getBoundingClientRect();
 		const scaleX = width / rect.width;
 		const scaleY = height / rect.height;
 
-		const startX = event.clientX;
-		const startY = event.clientY;
+		// Handle both mouse/pointer and touch events
+		const startX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+		const startY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+
 		const startState = {
 			x: element.x,
 			y: element.y,
@@ -362,75 +557,65 @@
 
 		let resizeRafId: number | null = null;
 		let last = { x: startX, y: startY };
+		let lastUpdateTime = 0;
+		const UPDATE_THROTTLE = 16; // ~60fps for smoother mobile performance
 
 		const onPointerMove = (e: PointerEvent) => {
 			last = { x: e.clientX, y: e.clientY };
+
+			// Throttle updates for better mobile performance
+			const now = performance.now();
+			if (now - lastUpdateTime < UPDATE_THROTTLE && resizeRafId !== null) {
+				return;
+			}
+
+			lastUpdateTime = now;
+
 			if (resizeRafId === null) {
-				resizeRafId = requestAnimationFrame(() => {
-					resizeRafId = null;
-					const deltaX = (last.x - startX) * scaleX;
-					const deltaY = (last.y - startY) * scaleY;
-
-					let newWidth = startState.w;
-					let newHeight = startState.h;
-					let newX = startState.x;
-					let newY = startState.y;
-
-					const { horizontal, vertical } = page.boundaries;
-
-					switch (direction) {
-						case 'e':
-							newWidth = Math.max(20, startState.w + deltaX);
-							break;
-						case 'w':
-							newWidth = Math.max(20, startState.w - deltaX);
-							newX = Math.max(horizontal.start, startState.x + deltaX);
-							break;
-						case 's':
-							newHeight = Math.max(20, startState.h + deltaY);
-							break;
-						case 'n':
-							newHeight = Math.max(20, startState.h - deltaY);
-							newY = Math.max(vertical.start, startState.y + deltaY);
-							break;
-						case 'se':
-							newWidth = Math.max(20, startState.w + deltaX);
-							newHeight = Math.max(20, startState.h + deltaY);
-							break;
-						case 'sw':
-							newWidth = Math.max(20, startState.w - deltaX);
-							newX = Math.max(horizontal.start, startState.x + deltaX);
-							newHeight = Math.max(20, startState.h + deltaY);
-							break;
-						case 'ne':
-							newWidth = Math.max(20, startState.w + deltaX);
-							newHeight = Math.max(20, startState.h - deltaY);
-							newY = Math.max(vertical.start, startState.y + deltaY);
-							break;
-						case 'nw':
-							newWidth = Math.max(20, startState.w - deltaX);
-							newX = Math.max(horizontal.start, startState.x + deltaX);
-							newHeight = Math.max(20, startState.h - deltaY);
-							newY = Math.max(vertical.start, startState.y + deltaY);
-							break;
-					}
-
-					// Enforce boundaries
-					if (newX + newWidth > horizontal.end) {
-						newWidth = horizontal.end - newX;
-					}
-					if (newY + newHeight > vertical.end) {
-						newHeight = vertical.end - newY;
-					}
-
-					appStore.updateElement({
-						elementId: element.id,
-						updates: { x: newX, y: newY, width: newWidth, height: newHeight },
-						pageId: element.pageId
-					});
+				resizeRafId = handleElementResizeAnimationFrame({
+					element,
+					direction,
+					startState,
+					startX,
+					startY,
+					scaleX,
+					scaleY,
+					last
 				});
+
+				resizeRafId = null;
 			}
 		};
+
+		const onTouchMove = (e: TouchEvent) => {
+			const touch = e.touches[0];
+			last = { x: touch.clientX, y: touch.clientY };
+
+			// Throttle updates for better mobile performance
+			const now = performance.now();
+			if (now - lastUpdateTime < UPDATE_THROTTLE && resizeRafId !== null) {
+				return;
+			}
+
+			lastUpdateTime = now;
+
+			if (resizeRafId === null) {
+				resizeRafId = handleElementResizeAnimationFrame({
+					element,
+					direction,
+					startState,
+					startX,
+					startY,
+					scaleX,
+					scaleY,
+					last
+				});
+
+				resizeRafId = null;
+			}
+		};
+
+		const option: AddEventListenerOptions = { passive: false };
 
 		const onPointerUp = () => {
 			isResizing = false;
@@ -440,11 +625,17 @@
 			}
 			document.removeEventListener('pointermove', onPointerMove);
 			document.removeEventListener('pointerup', onPointerUp, true);
+			document.removeEventListener('touchmove', onTouchMove, option);
+			document.removeEventListener('touchend', onPointerUp, true);
 			document.body.style.userSelect = '';
+			document.body.style.touchAction = ''; // Restore touch scrolling
 		};
 
+		// Add both pointer and touch event listeners for better mobile support
 		document.addEventListener('pointermove', onPointerMove);
 		document.addEventListener('pointerup', onPointerUp, true);
+		document.addEventListener('touchmove', onTouchMove, option);
+		document.addEventListener('touchend', onPointerUp, true);
 	}
 
 	// Exposed methods for drag preview
@@ -522,7 +713,7 @@
 			<Ruler
 				orientation="horizontal"
 				size={width}
-				displaySize={width * DISPLAY_SCALE}
+				displaySize={width * scale}
 				startAnchor={page.boundaries.horizontal.start}
 				endAnchor={page.boundaries.horizontal.end}
 				onAnchorChange={(start, end) => {
@@ -539,7 +730,7 @@
 			<Ruler
 				orientation="vertical"
 				size={height}
-				displaySize={height * DISPLAY_SCALE}
+				displaySize={height * scale}
 				startAnchor={page.boundaries.vertical.start}
 				endAnchor={page.boundaries.vertical.end}
 				onAnchorChange={(start, end) => {
@@ -559,14 +750,14 @@
 			tabindex="0"
 			onkeydown={null}
 		>
-			<div style:height="{height * DISPLAY_SCALE}px" class="w-[30px]"></div>
+			<div style:height="{height * scale}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
 				id={`canvas-${dataPageId}`}
 				data-testid="document-canvas"
-				class="relative border-2 border-border bg-background shadow-lg"
-				style:width="{width * DISPLAY_SCALE}px"
-				style:height="{height * DISPLAY_SCALE}px"
+				class="relative bg-background shadow-lg"
+				style:width="{width * scale}px"
+				style:height="{height * scale}px"
 				onclick={handleCanvasClick}
 				role="button"
 				tabindex="0"
@@ -623,25 +814,15 @@
 						style:width={pixelsToPercent(element.width, width)}
 						style:height={pixelsToPercent(element.height, height)}
 						style:z-index={element.zIndex}
+						style:touch-action="none"
 						onclick={() => {
 							showBoundary = true;
 						}}
 						onpointerdown={(e) => {
-							// Start global, rAF-throttled drag
-							isDragging = true;
-							dragStart = { x: e.clientX, y: e.clientY };
-							dragMeta = {
-								id: element.id,
-								pageId: element.pageId,
-								startX: element.x,
-								startY: element.y,
-								width: element.width,
-								height: element.height
-							};
-							lastPointer = { x: e.clientX, y: e.clientY };
-							document.addEventListener('pointermove', handleGlobalPointerMove);
-							document.addEventListener('pointerup', handleGlobalPointerUp, true);
-							document.body.style.userSelect = 'none';
+							startElementDrag(e, element);
+						}}
+						ontouchstart={(e) => {
+							startElementDrag(e, element);
 						}}
 					>
 						<CanvasElement
@@ -655,7 +836,7 @@
 				<!-- Drag preview -->
 				{#if dragPreview}
 					<div
-						class="pointer-events-none absolute border-2 border-dashed border-primary bg-primary/10 opacity-50"
+						class="pointer-events-none absolute z-[9999] border-2 border-dashed border-primary bg-primary/10 opacity-50"
 						style:left={pixelsToPercent(dragPreview.x, width)}
 						style:top={pixelsToPercent(dragPreview.y, height)}
 						style:width={pixelsToPercent(dragPreview.width, width)}
@@ -667,7 +848,7 @@
 				<!-- Selection outline for empty canvas -->
 				{#if !selectedElement && Object.keys(page.elements).length === 0}
 					<div
-						class="absolute inset-4 flex items-center justify-center text-muted-foreground"
+						class="absolute inset-4 flex items-center justify-center text-muted-foreground max-sm:text-xs"
 						data-html2canvas-ignore
 					>
 						Drag and drop elements from toolbar to create them
