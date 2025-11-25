@@ -5,7 +5,7 @@
 	interface Props {
 		element: TCanvasElement;
 		isSelected: boolean;
-		onResize: (event: MouseEvent, direction: ResizeDirection) => void;
+		onResize: (event: MouseEvent | PointerEvent | TouchEvent, direction: ResizeDirection) => void;
 	}
 
 	const { element, isSelected, onResize }: Props = $props();
@@ -412,10 +412,16 @@
 			<div
 				class="absolute bg-primary transition-colors {handle.class}"
 				style={handle.style}
+				style:touch-action="none"
 				onpointerdown={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					onResize(e as unknown as MouseEvent, handle.direction);
+					onResize(e, handle.direction);
+				}}
+				ontouchstart={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					onResize(e, handle.direction);
 				}}
 				role="button"
 				tabindex="0"
@@ -428,10 +434,16 @@
 		{#each cornerHandles as handle (handle.direction)}
 			<div
 				class="absolute h-3 w-3 rounded-full border-2 border-primary-foreground bg-primary shadow-md transition-colors {handle.class}"
+				style:touch-action="none"
 				onpointerdown={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					onResize(e as unknown as MouseEvent, handle.direction);
+					onResize(e, handle.direction);
+				}}
+				ontouchstart={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					onResize(e, handle.direction);
 				}}
 				role="button"
 				tabindex="0"
