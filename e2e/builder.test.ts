@@ -69,7 +69,7 @@ test.describe('Document Builder E2E Tests', () => {
 		await expect(page.getByTestId('property-panel-title')).toContainText('Text Properties');
 
 		// Click on empty canvas area to deselect
-		await canvas.click({ position: { x: 50, y: 50 } });
+		await canvas.click();
 
 		// Should show default message
 		await expect(page.getByTestId('no-selection-message')).toBeHidden();
@@ -270,7 +270,7 @@ test.describe('Document Builder E2E Tests', () => {
 		});
 
 		// Deselect
-		await canvas.click({ position: { x: 50, y: 50 } });
+		await canvas.click();
 
 		// Add shape element
 		const shapeTool = page.getByTestId('tool-shape');

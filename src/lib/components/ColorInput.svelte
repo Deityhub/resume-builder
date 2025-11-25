@@ -101,7 +101,6 @@
 		class="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-left text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
 		style={`background-color: ${value}`}
 		aria-label={label ? `Select ${label} color` : 'Select color'}
-		data-testid={testId}
 	>
 	</button>
 
@@ -114,6 +113,7 @@
 		style="width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;"
 		aria-hidden="true"
 		bind:this={hiddenInput}
+		data-testid={testId}
 	/>
 </div>
 

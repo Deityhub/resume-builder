@@ -193,8 +193,13 @@
 	// Handle clicks outside the canvas to hide boundary
 	$effect(() => {
 		const handleDocumentClick = (event: MouseEvent) => {
-			if (!canvasPageRef?.contains(event.target as Node)) {
+			const propertyPanel = document.querySelector('[data-testid="property-panel"]');
+			if (
+				!canvasPageRef?.contains(event.target as Node) &&
+				!propertyPanel?.contains(event.target as Node)
+			) {
 				showBoundary = false;
+				appStore.selectElement(null);
 			}
 		};
 
