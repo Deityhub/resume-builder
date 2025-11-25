@@ -1,5 +1,6 @@
 import type { ElementType, TCanvasElement } from '../types/canvas';
 import { CANVAS_WIDTH } from '../const/dimension';
+import { uuidv4 } from '../utils/uuid';
 
 /**
  * Creates a new document element with default properties based on the element type.
@@ -48,7 +49,7 @@ export function getDefaultProperties({
 	parentElementId?: string | null;
 }): TCanvasElement {
 	const baseElement = {
-		id: crypto.randomUUID(),
+		id: uuidv4(),
 		pageId,
 		zIndex,
 		parentElementId,

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { clickOutside } from '$lib/actions';
+	import { uuidv4 } from '$lib/utils/uuid';
 
 	export type Option<T = string> = {
 		value: T;
@@ -8,27 +9,29 @@
 		[key: string]: unknown;
 	};
 
-	type Props<T = string> = {
+	interface IProps<T = string> {
 		value: T;
 		options: Option<T>[];
 		placeholder?: string;
 		testId?: string;
 		onChange?: (value: T) => void;
 		label?: string;
-	};
+	}
 
 	const {
-		value,
+		value = '',
 		options = [],
 		placeholder = 'Select an option',
-		testId = '',
-		onChange,
+		testId = 'select',
+		onChange = () => {},
 		label = ''
-	}: Props = $props();
+	}: IProps = $props();
 
 	let isOpen = $state(false);
-	let containerElement: HTMLDivElement;
-	const inputId = `select-input-${crypto.randomUUID()}`;
+	let containerElement: HTMLDivElement | null = null;
+	let dropdownElement = $state<HTMLDivElement | null>(null);
+	let dropdownPosition = $state<'top' | 'bottom'>('bottom');
+	const inputId = `select-input-${uuidv4()}`;
 
 	function handleSelect(option: Option) {
 		onChange?.(option.value);
@@ -36,7 +39,40 @@
 	}
 
 	function toggleDropdown() {
-		isOpen = !isOpen;
+		if (!containerElement) return;
+
+		if (isOpen) {
+			isOpen = false;
+			return;
+		}
+
+		// Calculate position and dimensions
+		const rect = containerElement.getBoundingClientRect();
+		const spaceBelow = window.innerHeight - rect.bottom;
+		const spaceAbove = rect.top;
+		const dropdownHeight = Math.min(options.length * 40 + 16, 240); // Approx height of dropdown
+
+		// Set CSS custom properties for positioning
+		document.documentElement.style.setProperty('--select-width', `${rect.width}px`);
+		document.documentElement.style.setProperty('--select-left', `${rect.left}px`);
+
+		if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
+			// Position below
+			dropdownPosition = 'bottom';
+			document.documentElement.style.setProperty(
+				'--select-bottom',
+				`${rect.bottom + window.scrollY + 10}px`
+			);
+		} else {
+			// Position above
+			dropdownPosition = 'top';
+			document.documentElement.style.setProperty(
+				'--select-top',
+				`${window.innerHeight - rect.top + window.scrollY - 12}px`
+			);
+		}
+
+		isOpen = true;
 	}
 
 	function handleClickOutside() {
@@ -44,9 +80,27 @@
 	}
 
 	$effect(() => {
-		if (isOpen) {
-			const selectedElement = containerElement?.querySelector('[data-selected]');
-			selectedElement?.scrollIntoView({ block: 'nearest' });
+		if (isOpen && dropdownElement && containerElement) {
+			const selectedElement = dropdownElement.querySelector('[data-selected]');
+			if (selectedElement) {
+				selectedElement.scrollIntoView({ block: 'nearest' });
+			}
+
+			// Recalculate position on window resize when dropdown is open
+			const handleResize = () => {
+				if (isOpen && containerElement) {
+					const rect = containerElement.getBoundingClientRect();
+					const spaceBelow = window.innerHeight - rect.bottom;
+					const spaceAbove = rect.top;
+					const dropdownHeight = dropdownElement?.offsetHeight || 0;
+
+					dropdownPosition =
+						spaceBelow >= dropdownHeight || spaceBelow > spaceAbove ? 'bottom' : 'top';
+				}
+			};
+
+			window.addEventListener('resize', handleResize, { passive: true });
+			return () => window.removeEventListener('resize', handleResize);
 		}
 	});
 
@@ -92,7 +146,11 @@
 
 	{#if isOpen}
 		<div
-			class="ring-opacity-5 absolute top-16 z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			class="ring-opacity-5 fixed z-50 max-h-60 min-w-[var(--select-width)] overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg ring-1 ring-ring focus:outline-none"
+			style="left: var(--select-left); {dropdownPosition === 'bottom'
+				? 'top: var(--select-bottom);'
+				: 'bottom: var(--select-top);'}"
+			bind:this={dropdownElement}
 			role="listbox"
 		>
 			{#each options as option (option.value)}

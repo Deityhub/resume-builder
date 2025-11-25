@@ -1,15 +1,15 @@
 <script lang="ts">
 	import type { TCanvasElement, ResizeDirection } from '$lib/types/canvas';
 	import { appStore } from '$lib/stores/appStore.svelte.ts';
-	import { DISPLAY_SCALE } from '$lib/const/dimension';
 
 	interface Props {
 		element: TCanvasElement;
 		isSelected: boolean;
-		onResize: (event: MouseEvent, direction: ResizeDirection) => void;
+		onResize: (event: MouseEvent | PointerEvent | TouchEvent, direction: ResizeDirection) => void;
 	}
 
 	const { element, isSelected, onResize }: Props = $props();
+	const scale = $derived(appStore.getScale());
 
 	// Local reactive state for the text content to enable proper two-way binding
 	let textContent = $state('');
@@ -78,7 +78,7 @@
 				id={`text-element-${element.id}`}
 				oninput={(e) => {
 					const target = e.target as HTMLTextAreaElement;
-					const actualElementHeight = element.height * DISPLAY_SCALE;
+					const actualElementHeight = element.height * scale;
 
 					// Use requestAnimationFrame to batch the updates
 					requestAnimationFrame(() => {
@@ -96,7 +96,7 @@
 								elementId: element.id,
 								updates: {
 									text: textContent,
-									height: newHeight / DISPLAY_SCALE
+									height: newHeight / scale
 								},
 								pageId: element.pageId
 							});
@@ -412,10 +412,16 @@
 			<div
 				class="absolute bg-primary transition-colors {handle.class}"
 				style={handle.style}
+				style:touch-action="none"
 				onpointerdown={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					onResize(e as unknown as MouseEvent, handle.direction);
+					onResize(e, handle.direction);
+				}}
+				ontouchstart={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					onResize(e, handle.direction);
 				}}
 				role="button"
 				tabindex="0"
@@ -428,10 +434,16 @@
 		{#each cornerHandles as handle (handle.direction)}
 			<div
 				class="absolute h-3 w-3 rounded-full border-2 border-primary-foreground bg-primary shadow-md transition-colors {handle.class}"
+				style:touch-action="none"
 				onpointerdown={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					onResize(e as unknown as MouseEvent, handle.direction);
+					onResize(e, handle.direction);
+				}}
+				ontouchstart={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					onResize(e, handle.direction);
 				}}
 				role="button"
 				tabindex="0"
