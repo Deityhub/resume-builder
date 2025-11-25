@@ -194,10 +194,16 @@
 	$effect(() => {
 		const handleDocumentClick = (event: MouseEvent) => {
 			const propertyPanel = document.querySelector('[data-testid="property-panel"]');
-			if (
-				!canvasPageRef?.contains(event.target as Node) &&
-				!propertyPanel?.contains(event.target as Node)
-			) {
+			const allCanvasPages = document.querySelectorAll('[data-testid="document-canvas"]');
+
+			// Check if click is inside any canvas page or property panel
+			const isInsideAnyCanvas = Array.from(allCanvasPages).some((canvas) =>
+				canvas.contains(event.target as Node)
+			);
+
+			const isInsidePropertyPanel = propertyPanel?.contains(event.target as Node);
+
+			if (!isInsideAnyCanvas && !isInsidePropertyPanel) {
 				showBoundary = false;
 				appStore.selectElement(null);
 			}
@@ -313,17 +319,7 @@
 	}
 
 	function startElementDrag(event: PointerEvent | TouchEvent, element: TCanvasElement) {
-		// Prevent default touch behavior - more aggressive for mobile
-		event.preventDefault();
 		event.stopPropagation();
-
-		// For touch events, also prevent any scrolling
-		if ('touches' in event) {
-			// Force prevent any default behavior if cancellable
-			if (event.cancelable) {
-				event.preventDefault();
-			}
-		}
 
 		// Start global, rAF-throttled drag
 		isDragging = true;
