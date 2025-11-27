@@ -169,7 +169,10 @@
 					value
 						? 'bg-primary/10'
 						: ''}"
-					onclick={() => selectOption(option)}
+					onclick={(e) => {
+						e.stopPropagation();
+						selectOption(option);
+					}}
 					onkeydown={(e) => e.key === 'Enter' && selectOption(option)}
 					role="button"
 					tabindex={0}
