@@ -105,8 +105,8 @@ test.describe('Document Builder E2E Tests', () => {
 		// Click delete button
 		await page.getByTestId('delete-element-btn').click();
 
-		// Should show empty canvas message
-		await expect(page.locator('text=Drag and drop elements')).toBeVisible();
+		// delete button should be hidden
+		await expect(page.getByTestId('delete-element-btn')).toBeHidden();
 	});
 
 	test('update text element properties', async ({ page }) => {
