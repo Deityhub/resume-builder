@@ -531,8 +531,9 @@
 		direction: ResizeDirection
 	) {
 		event.stopPropagation();
-		event.preventDefault();
 		isResizing = true;
+		const originalUserSelect = document.body.style.userSelect;
+		const originalTouchAction = document.body.style.touchAction;
 		document.body.style.userSelect = '';
 		document.body.style.touchAction = 'none'; // Prevent touch scrolling during resize
 
@@ -623,8 +624,8 @@
 			document.removeEventListener('pointerup', onPointerUp, true);
 			document.removeEventListener('touchmove', onTouchMove, option);
 			document.removeEventListener('touchend', onPointerUp, true);
-			document.body.style.userSelect = '';
-			document.body.style.touchAction = ''; // Restore touch scrolling
+			document.body.style.userSelect = originalUserSelect; // Restore original user select
+			document.body.style.touchAction = originalTouchAction; // Restore original touch action
 		};
 
 		// Add both pointer and touch event listeners for better mobile support

@@ -424,7 +424,6 @@
 					onResize(e, handle.direction);
 				}}
 				ontouchstart={(e) => {
-					e.preventDefault();
 					e.stopPropagation();
 					onResize(e, handle.direction);
 				}}
@@ -446,7 +445,6 @@
 					onResize(e, handle.direction);
 				}}
 				ontouchstart={(e) => {
-					e.preventDefault();
 					e.stopPropagation();
 					onResize(e, handle.direction);
 				}}
