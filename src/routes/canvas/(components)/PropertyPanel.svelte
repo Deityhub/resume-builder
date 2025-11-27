@@ -197,6 +197,31 @@
 							/>
 						</div>
 						<div class="max-lg:min-w-[10rem]">
+							<ColorInput
+								value={selectedElement.backgroundColor || '#ffffff'}
+								onChange={(value) => handlePropertyChange('backgroundColor', value)}
+								testId="input-background-color"
+								label="Background Color"
+							/>
+						</div>
+						<div class="max-lg:min-w-[10rem]">
+							<span class="text-background-foreground block text-sm">Background Opacity</span>
+							<input
+								data-testid="input-fill-opacity"
+								type="range"
+								min="0"
+								max="1"
+								step="0.1"
+								value={selectedElement.backgroundOpacity || 0}
+								class="w-full"
+								oninput={(e) =>
+									handlePropertyChange('backgroundOpacity', parseFloat(e.currentTarget.value))}
+							/>
+							<span class="text-background-foreground block text-sm"
+								>{((selectedElement.backgroundOpacity || 0) * 100).toFixed(0)}%</span
+							>
+						</div>
+						<div class="max-lg:min-w-[10rem]">
 							<Select
 								value={selectedElement.textAlign || 'left'}
 								onChange={(value) => handlePropertyChange('textAlign', value)}

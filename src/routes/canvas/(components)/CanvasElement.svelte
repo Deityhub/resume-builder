@@ -65,7 +65,7 @@
 	{#if element.type === 'text'}
 		<div class="relative h-full w-full overflow-hidden">
 			<textarea
-				class="absolute inset-0 h-auto min-h-full w-full cursor-move resize-none overflow-hidden border-none bg-transparent p-2 focus:outline-none"
+				class="absolute inset-0 h-auto min-h-full w-full cursor-move resize-none overflow-hidden border-none p-2 focus:outline-none"
 				style:font-family="{element.fontFamily}, sans-serif"
 				style:font-size="{element.fontSize}px"
 				style:font-weight={element.fontWeight}
@@ -74,6 +74,11 @@
 				style:text-transform={element.textTransform}
 				style:text-align={element.textAlign || 'left'}
 				style:color={element.color}
+				style:background-color={element.backgroundColor
+					? `${element.backgroundColor}${Math.round((element.backgroundOpacity ?? 1) * 255)
+							.toString(16)
+							.padStart(2, '0')}`
+					: 'transparent'}
 				bind:value={textContent}
 				id={`text-element-${element.id}`}
 				oninput={(e) => {
