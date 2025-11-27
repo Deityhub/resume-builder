@@ -131,7 +131,7 @@
 			event.stopImmediatePropagation();
 			// Also stop bubbling just in case
 			event.stopPropagation();
-			return false;
+			return;
 		}
 
 		onClick?.(event);

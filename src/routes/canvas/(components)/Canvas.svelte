@@ -49,7 +49,6 @@
 		}
 	});
 
-	let showBoundary = $state(true);
 	let dragRafId: number | null = null;
 	let lastPointer = { x: 0, y: 0 };
 	let dragMeta: {
@@ -204,7 +203,6 @@
 			const isInsidePropertyPanel = propertyPanel?.contains(event.target as Node);
 
 			if (!isInsideAnyCanvas && !isInsidePropertyPanel) {
-				showBoundary = false;
 				appStore.selectElement(null);
 			}
 		};
@@ -244,13 +242,11 @@
 
 	function handleCanvasClick(event: MouseEvent) {
 		if (event.target === canvasRef) {
-			showBoundary = true;
 			appStore.selectElement(null);
 		}
 	}
 
 	function handleCanvasDragOver(event: DragEvent) {
-		showBoundary = true;
 		onDragover(event);
 	}
 
@@ -535,8 +531,9 @@
 		direction: ResizeDirection
 	) {
 		event.stopPropagation();
-		event.preventDefault();
 		isResizing = true;
+		const originalUserSelect = document.body.style.userSelect;
+		const originalTouchAction = document.body.style.touchAction;
 		document.body.style.userSelect = '';
 		document.body.style.touchAction = 'none'; // Prevent touch scrolling during resize
 
@@ -627,8 +624,8 @@
 			document.removeEventListener('pointerup', onPointerUp, true);
 			document.removeEventListener('touchmove', onTouchMove, option);
 			document.removeEventListener('touchend', onPointerUp, true);
-			document.body.style.userSelect = '';
-			document.body.style.touchAction = ''; // Restore touch scrolling
+			document.body.style.userSelect = originalUserSelect; // Restore original user select
+			document.body.style.touchAction = originalTouchAction; // Restore original touch action
 		};
 
 		// Add both pointer and touch event listeners for better mobile support
@@ -743,13 +740,7 @@
 		</div>
 
 		<!-- Canvas wrapper with left margin -->
-		<div
-			class="flex"
-			onclick={() => (showBoundary = true)}
-			role="button"
-			tabindex="0"
-			onkeydown={null}
-		>
+		<div class="flex">
 			<div style:height="{height * scale}px" class="w-[30px]"></div>
 			<div
 				bind:this={canvasRef}
@@ -815,9 +806,6 @@
 						style:height={pixelsToPercent(element.height, height)}
 						style:z-index={element.zIndex}
 						style:touch-action="none"
-						onclick={() => {
-							showBoundary = true;
-						}}
 						onpointerdown={(e) => {
 							startElementDrag(e, element);
 						}}
@@ -845,34 +833,22 @@
 					></div>
 				{/if}
 
-				<!-- Selection outline for empty canvas -->
-				{#if !selectedElement && Object.keys(page.elements).length === 0}
-					<div
-						class="absolute inset-4 flex items-center justify-center text-muted-foreground max-sm:text-xs"
-						data-html2canvas-ignore
-					>
-						Drag and drop elements from toolbar to create them
-					</div>
-				{/if}
-
 				<!-- Boundary visualization -->
-				{#if showBoundary}
-					<div
-						class="pointer-events-none absolute border-2 border-dashed border-primary/50"
-						style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
-						style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
-						style:width={pixelsToPercent(
-							page.boundaries.horizontal.end - page.boundaries.horizontal.start,
-							width
-						)}
-						style:height={pixelsToPercent(
-							page.boundaries.vertical.end - page.boundaries.vertical.start,
-							height
-						)}
-						data-testid={`boundary-${page.id}`}
-						data-html2canvas-ignore
-					></div>
-				{/if}
+				<div
+					class="pointer-events-none absolute border-2 border-dashed border-primary/50"
+					style:left={pixelsToPercent(page.boundaries.horizontal.start, width)}
+					style:top={pixelsToPercent(page.boundaries.vertical.start, height)}
+					style:width={pixelsToPercent(
+						page.boundaries.horizontal.end - page.boundaries.horizontal.start,
+						width
+					)}
+					style:height={pixelsToPercent(
+						page.boundaries.vertical.end - page.boundaries.vertical.start,
+						height
+					)}
+					data-testid={`boundary-${page.id}`}
+					data-html2canvas-ignore
+				></div>
 			</div>
 		</div>
 	</div>

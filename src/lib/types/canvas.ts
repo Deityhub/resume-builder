@@ -24,6 +24,8 @@ export interface TextElement extends BaseElement {
 	textTransform?: string;
 	textAlign?: 'left' | 'center' | 'right' | 'justify';
 	color: string;
+	backgroundColor?: string;
+	backgroundOpacity?: number; // 0-1 for transparency control
 }
 
 export interface ShapeElement extends BaseElement {

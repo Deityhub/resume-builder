@@ -72,7 +72,9 @@ export function getDefaultProperties({
 				fontStyle: 'normal',
 				textDecoration: 'none',
 				textTransform: 'none',
-				color: '#000000'
+				color: '#000000',
+				backgroundOpacity: 0,
+				backgroundColor: '#ffffff'
 			};
 		case 'shape':
 			return {
